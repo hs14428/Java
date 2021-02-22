@@ -7,6 +7,11 @@ class OXOController
     OXOModel gameModel;
     private String message = "";
 
+    // Controller needs to be able to handle if board size changes mid game when checking moves and for wins etc
+    // Change OXOGame.class to test game to test if diff board size, test if diff number of players etc
+    // Check if game can handle new players mid way through (modify model/ call functions on model, so only need to change one class)
+    // Write OXOGameTester.class
+    // Extension of multiplayer is about 5%
 
     public OXOController(OXOModel model)
     {
