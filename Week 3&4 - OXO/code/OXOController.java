@@ -92,7 +92,6 @@ class OXOController
 //  Check if a row is a win based of winThreshold
     public boolean checkRow(int rowNumber)
     {
-        int winThreshold = gameModel.getWinThreshold();
         int cnt = 1;
         for (int c = 1; c < gameModel.getNumberOfColumns(); c++) {
             if (gameModel.getCellOwner(rowNumber, c) == null) {
@@ -102,7 +101,7 @@ class OXOController
                 return false;
             }
             cnt++;
-            if (cnt == winThreshold) {
+            if (cnt == gameModel.getWinThreshold()) {
                 return true;
             }
         }
@@ -112,7 +111,6 @@ class OXOController
 //  Check if a col is three of a kind
     public boolean checkCol(int colNumber)
     {
-        int winThreshold = gameModel.getWinThreshold();
         int cnt = 1;
         for (int r = 1; r < gameModel.getNumberOfRows(); r++) {
             if (gameModel.getCellOwner(r, colNumber) == null) {
@@ -122,7 +120,7 @@ class OXOController
                 return false;
             }
             cnt++;
-            if (cnt == winThreshold) {
+            if (cnt == gameModel.getWinThreshold()) {
                 return true;
             }
         }
@@ -130,35 +128,44 @@ class OXOController
     }
 
 // Check if there is a win via diagonal line. Check left to right
-    public boolean checkDiagLR()
+    public boolean checkDiagLR(int row, int col)
     {
-        int c = 1;
-        for (int r = 1; (r < gameModel.getNumberOfRows()) && (c < gameModel.getNumberOfColumns()); r++, c++) {
+        int cnt = 1;
+        int c = col;
+        for (int r = row; (r < gameModel.getNumberOfRows()) && (c < gameModel.getNumberOfColumns()); r++, c++) {
             if (gameModel.getCellOwner(r, c) == null) {
                 return false;
             }
             if (gameModel.getCellOwner(r, c) != gameModel.getCellOwner(r-1, c-1)) {
-                // Check right to left diagonal
-
+                return false;
+            }
+            cnt++;
+            if (cnt == gameModel.getWinThreshold()) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
 // Check if there is a win via diagonal line. Check right to left
-    public boolean checkDiagRL()
+    public boolean checkDiagRL(int row, int col)
     {
-        int c = gameModel.getNumberOfColumns() - 1;
-        for (int r = 0; (r < gameModel.getNumberOfRows()) && (c >= 0); r++, c--) {
+        int cnt = 1;
+//        int c = gameModel.getNumberOfColumns() - 2;
+        int c = col;
+        for (int r = row; (r < gameModel.getNumberOfRows()) && (c >= 0); r++, c--) {
             if (gameModel.getCellOwner(r, c) == null) {
                 return false;
             }
-            // Erroring here when enter certain cell references - doesn't like right to left diagonal - try separating them out, one for L->R and one R->L
-            if (gameModel.getCellOwner(r, c) != gameModel.getCellOwner(r+1, c-1)) {
+            if (gameModel.getCellOwner(r, c) != gameModel.getCellOwner(r-1, c+1)) {
                 return false;
             }
+            cnt++;
+            if (cnt == gameModel.getWinThreshold()) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     public boolean checkWin()
@@ -175,9 +182,21 @@ class OXOController
                 return true;
             }
         }
-        if (checkDiagLR() || checkDiagRL()) {
-            gameModel.setWinner(gameModel.getCurrentPlayer());
-            return true;
+        for (int r = 1; r < gameModel.getNumberOfRows(); r++) {
+            for (int c = 1; c < gameModel.getNumberOfColumns(); c++) {
+                if (checkDiagLR(r, c)) {
+                    gameModel.setWinner(gameModel.getCurrentPlayer());
+                    return true;
+                }
+            }
+        }
+        for (int r = 1; r < gameModel.getNumberOfRows(); r++) {
+            for (int c = gameModel.getNumberOfColumns() - 2; c >= 0; c--) {
+                if (checkDiagRL(r, c)) {
+                    gameModel.setWinner(gameModel.getCurrentPlayer());
+                    return true;
+                }
+            }
         }
         return false;
     }
