@@ -18,6 +18,6 @@ public class OutsideCellRangeException extends CellDoesNotExistException
 
     public String toString()
     {
-        return "Error with " + getClass().getName() + ": This cell, " + (char) position + ", is out of the current " + type + " limits. Please select another cell";
+        return getClass().getName() + ": This cell, " + (char) position + ", is out of the current " + type + " limits. Please select another cell.";
     }
 }

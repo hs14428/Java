@@ -1,9 +1,11 @@
 import OXOExceptions.*;
 
+import static OXOExceptions.RowOrColumn.ROW;
+
 class OXOController
 {
     private final int asciiA = 97;
-    private final int ascii1 = 49;
+    private final int ascii0 = 48;
     OXOModel gameModel;
     private String message = "";
 
@@ -24,17 +26,29 @@ class OXOController
         if ((gameModel.getWinner() == null) && (!gameModel.isGameDrawn())) {
 
             int rowNum = (int) command.toLowerCase().charAt(0) - asciiA;
-            int colNum = (int) command.charAt(1) - ascii1;
-            if (validMove(rowNum, colNum)) {
-                gameModel.setCellOwner(rowNum, colNum, gameModel.getCurrentPlayer());
-                drawCheck();
-                checkWin();
-                changePlayer();
+            int colNum = (int) command.charAt(1) - ascii0;
+
+            System.out.println(colNum);
+            System.out.println(gameModel.getNumberOfColumns());
+
+            if (colNum > gameModel.getNumberOfColumns() || colNum < 1) {
+                throw new OutsideCellRangeException(rowNum, colNum, 99, ROW);
             }
-            else {
-                // Needs work
-                message = "Invalid move, please try again";
-            }
+            gameModel.setCellOwner(rowNum, colNum-1, gameModel.getCurrentPlayer());
+            drawCheck();
+            checkWin();
+            changePlayer();
+
+//            if (validMove(rowNum, colNum-1)) {
+//                gameModel.setCellOwner(rowNum, colNum-1, gameModel.getCurrentPlayer());
+//                drawCheck();
+//                checkWin();
+//                changePlayer();
+//            }
+//            else {
+//                // Needs work
+//                message = "Invalid move, please try again";
+//            }
 
         }
 

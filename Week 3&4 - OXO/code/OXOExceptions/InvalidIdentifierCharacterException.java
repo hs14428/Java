@@ -18,6 +18,6 @@ public class InvalidIdentifierCharacterException extends InvalidIdentifierExcept
 
     public String toString()
     {
-        return "Error with " + getClass().getName() + ": This input is invalid. Character " + character + " is an invalid selection. Please select another row reference.";
+        return "Error with " + this.getClass().getName() + ": This input is invalid. Character " + character + " is an invalid selection. Please select another row reference.";
     }
 }

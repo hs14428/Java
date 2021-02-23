@@ -13,6 +13,6 @@ public class CellDoesNotExistException extends OXOMoveException
 
     public String toString()
     {
-        return "Error with " + getClass().getName() + ": This is an invalid cell. Your selection might be of bounds, or an incorrect cell identifier chosen.";
+        return "Error with " + getClass().getName() + ": " + getRow()+getColumn() + " is an invalid cell. Your selection might be of bounds, or an incorrect cell identifier chosen.";
     }
 }
