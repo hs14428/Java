@@ -2,6 +2,8 @@ package OXOExceptions;
 
 public class CellAlreadyTakenException extends OXOMoveException
 {
+    private final int asciiA = 97;
+
     public CellAlreadyTakenException()
     {
     }
@@ -13,7 +15,7 @@ public class CellAlreadyTakenException extends OXOMoveException
 
     public String toString()
     {
-        return getClass().getName() + ": This cell is already taken. Please select another cell.";
+        return getClass().getName() + ": " +(char)(getRow()+asciiA) + (getColumn()+1) +" is already taken. Please select another cell.";
     }
 
 }

@@ -2,6 +2,7 @@ package OXOExceptions;
 
 public class InvalidIdentifierCharacterException extends InvalidIdentifierException
 {
+    private final int asciiA = 97;
     private char character;
     private RowOrColumn type;
 
@@ -9,15 +10,15 @@ public class InvalidIdentifierCharacterException extends InvalidIdentifierExcept
     {
     }
 
-    public InvalidIdentifierCharacterException(int row, int column, char inputChar, RowOrColumn inputType)
+    public InvalidIdentifierCharacterException(int row, int column, RowOrColumn inputType)
     {
         super(row, column);
-        character = inputChar;
         type = inputType;
+        character = (char) (row+asciiA);
     }
 
     public String toString()
     {
-        return "Error with " + this.getClass().getName() + ": This input is invalid. Character " + character + " is an invalid selection. Please select another row reference.";
+        return getClass().getName() + ": "+ character + (getColumn()+1) +" is and invalid cell because "+ character +" is an invalid "+ type +" selection. Please select a different "+ type +" character.";
     }
 }

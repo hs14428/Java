@@ -13,6 +13,6 @@ public class InvalidIdentifierException extends CellDoesNotExistException
 
     public String toString()
     {
-        return "Error with " + getClass().getName() + ": You have selected a cell reference with an invalid identifier. Please choose again";
+        return getClass().getName() + ": You have selected a cell reference with an invalid identifier. Please choose again";
     }
 }
