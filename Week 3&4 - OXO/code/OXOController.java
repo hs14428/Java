@@ -8,9 +8,7 @@ class OXOController
     private final int asciiA = 97;
     private final int ascii1 = 49;
     private final int maxCols = 9;
-    private final int maxRows = 9;
     OXOModel gameModel;
-    private String message = "";
     RowOrColumn type;
 
     // Controller needs to be able to handle if board size changes mid game when checking moves and for wins etc
@@ -37,10 +35,6 @@ class OXOController
             int rowNum = (int) command.toLowerCase().charAt(0) - asciiA;
             int colNum = (int) command.charAt(1) - ascii1;
 
-//
-
-
-
 //          Check if within the max possible 9x9 first - if outside, it will call: CellDoesNotExistException
             if (rowNum+1 > maxCols /*|| rowNum+1 < 1 */|| colNum+1 > maxCols /*|| colNum+1 < 1*/) {
                 throw new CellDoesNotExistException(rowNum, colNum);
@@ -58,7 +52,6 @@ class OXOController
                 type = ROW;
                 throw new InvalidIdentifierCharacterException(rowNum, colNum, type);
             }
-
 //          Finally, check if the cell is taken, as by this point the selection must be valid to reach here
             else if (gameModel.getCellOwner(rowNum, colNum) != null) {
                 throw new CellAlreadyTakenException(rowNum, colNum);
@@ -96,9 +89,11 @@ class OXOController
         return true;
     }
 
-//  Check if a row is three of a kind
+//  Check if a row is a win based of winThreshold
     public boolean checkRow(int rowNumber)
     {
+        int winThreshold = gameModel.getWinThreshold();
+        int cnt = 1;
         for (int c = 1; c < gameModel.getNumberOfColumns(); c++) {
             if (gameModel.getCellOwner(rowNumber, c) == null) {
                 return false;
@@ -106,13 +101,19 @@ class OXOController
             if (gameModel.getCellOwner(rowNumber, c) != gameModel.getCellOwner(rowNumber, c-1)) {
                 return false;
             }
+            cnt++;
+            if (cnt == winThreshold) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
 //  Check if a col is three of a kind
     public boolean checkCol(int colNumber)
     {
+        int winThreshold = gameModel.getWinThreshold();
+        int cnt = 1;
         for (int r = 1; r < gameModel.getNumberOfRows(); r++) {
             if (gameModel.getCellOwner(r, colNumber) == null) {
                 return false;
@@ -120,12 +121,16 @@ class OXOController
             if (gameModel.getCellOwner(r, colNumber) != gameModel.getCellOwner(r-1, colNumber)) {
                 return false;
             }
+            cnt++;
+            if (cnt == winThreshold) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
-// Check if there is a win via diagonal line. Check top left start and top right start
-    public boolean checkDiag()
+// Check if there is a win via diagonal line. Check left to right
+    public boolean checkDiagLR()
     {
         int c = 1;
         for (int r = 1; (r < gameModel.getNumberOfRows()) && (c < gameModel.getNumberOfColumns()); r++, c++) {
@@ -134,16 +139,23 @@ class OXOController
             }
             if (gameModel.getCellOwner(r, c) != gameModel.getCellOwner(r-1, c-1)) {
                 // Check right to left diagonal
-                c = gameModel.getNumberOfColumns()-1;
-                for (r = 0; (r < gameModel.getNumberOfRows()) && (c >= 0); r++, c--) {
-                    if (gameModel.getCellOwner(r, c) == null) {
-                        return false;
-                    }
-                    // Erroring here when enter certain cell references - doesn't like right to left diagonal - try separating them out, one for L->R and one R->L
-                    if (gameModel.getCellOwner(r, c) != gameModel.getCellOwner(r+1, c-1)) {
-                        return false;
-                    }
-                }
+
+            }
+        }
+        return true;
+    }
+
+// Check if there is a win via diagonal line. Check right to left
+    public boolean checkDiagRL()
+    {
+        int c = gameModel.getNumberOfColumns() - 1;
+        for (int r = 0; (r < gameModel.getNumberOfRows()) && (c >= 0); r++, c--) {
+            if (gameModel.getCellOwner(r, c) == null) {
+                return false;
+            }
+            // Erroring here when enter certain cell references - doesn't like right to left diagonal - try separating them out, one for L->R and one R->L
+            if (gameModel.getCellOwner(r, c) != gameModel.getCellOwner(r+1, c-1)) {
+                return false;
             }
         }
         return true;
@@ -163,10 +175,10 @@ class OXOController
                 return true;
             }
         }
-//        if (checkDiag()) {
-//            gameModel.setWinner(gameModel.getCurrentPlayer());
-//            return true;
-//        }
+        if (checkDiagLR() || checkDiagRL()) {
+            gameModel.setWinner(gameModel.getCurrentPlayer());
+            return true;
+        }
         return false;
     }
 
