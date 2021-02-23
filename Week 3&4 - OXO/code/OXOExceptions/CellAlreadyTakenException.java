@@ -13,7 +13,7 @@ public class CellAlreadyTakenException extends OXOMoveException
 
     public String toString()
     {
-        return "Error with " + getClass().getName() + ": This cell is already taken. Please select another cell";
+        return getClass().getName() + ": This cell is already taken. Please select another cell.";
     }
 
 }

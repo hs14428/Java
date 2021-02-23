@@ -1,13 +1,17 @@
 import OXOExceptions.*;
 
+import static OXOExceptions.RowOrColumn.COLUMN;
 import static OXOExceptions.RowOrColumn.ROW;
 
 class OXOController
 {
     private final int asciiA = 97;
-    private final int ascii0 = 48;
+    private final int ascii1 = 49;
+    private final int maxCols = 9;
+    private final int maxRows = 9;
     OXOModel gameModel;
     private String message = "";
+    RowOrColumn type;
 
     // Controller needs to be able to handle if board size changes mid game when checking moves and for wins etc
     // Change OXOGame.class to test game to test if diff board size, test if diff number of players etc
@@ -26,15 +30,31 @@ class OXOController
         if ((gameModel.getWinner() == null) && (!gameModel.isGameDrawn())) {
 
             int rowNum = (int) command.toLowerCase().charAt(0) - asciiA;
-            int colNum = (int) command.charAt(1) - ascii0;
+            int colNum = (int) command.charAt(1) - ascii1;
 
             System.out.println(colNum);
             System.out.println(gameModel.getNumberOfColumns());
+            System.out.println(rowNum);
+            System.out.println(gameModel.getNumberOfRows() + "\n");
 
-            if (colNum > gameModel.getNumberOfColumns() || colNum < 1) {
-                throw new OutsideCellRangeException(rowNum, colNum, 99, ROW);
+//          Check if within the max possible 9x9 first - if outside, it will call: CellDoesNotExistException
+            if (rowNum+1 > maxCols || rowNum+1 < 1 || colNum+1 > maxCols || colNum+1 < 1) {
+                throw new CellDoesNotExistException(rowNum, colNum);
             }
-            gameModel.setCellOwner(rowNum, colNum-1, gameModel.getCurrentPlayer());
+//          Now check if selection is within the current row and column limits and call OutsideCellRangeException if not
+            else if (rowNum+1 > gameModel.getNumberOfRows()) {
+                type = ROW;
+                throw new OutsideCellRangeException(rowNum, colNum, type);
+            }
+            else if (colNum+1 > gameModel.getNumberOfColumns()) {
+                type = COLUMN;
+                throw new OutsideCellRangeException(rowNum, colNum, type);
+            }
+//          Finally, check if the cell is taken, as by this point the selection must be valid to reach here
+            else if (gameModel.getCellOwner(rowNum, colNum) != null) {
+                throw new CellAlreadyTakenException(rowNum, colNum);
+            }
+            gameModel.setCellOwner(rowNum, colNum, gameModel.getCurrentPlayer());
             drawCheck();
             checkWin();
             changePlayer();
