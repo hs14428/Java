@@ -4,7 +4,7 @@ class OXOModel
 {
     private ArrayList<ArrayList<OXOPlayer>> cells;
 //    private OXOPlayer cells[][];
-    private OXOPlayer players[];
+    private ArrayList<OXOPlayer> players;
     private OXOPlayer currentPlayer;
     private OXOPlayer winner;
     private boolean gameDrawn;
@@ -20,28 +20,22 @@ class OXOModel
                 cells.get(i).add(null);
             }
         }
-        //        cells = new OXOPlayer[numberOfRows][numberOfColumns];
-        players = new OXOPlayer[2];
+        players = new ArrayList(2);
     }
 
     public int getNumberOfPlayers()
     {
-        return players.length;
+        return players.size();
     }
 
     public void addPlayer(OXOPlayer player)
     {
-        for(int i=0; i<players.length ;i++) {
-            if(players[i] == null) {
-                players[i] = player;
-                return;
-            }
-        }
+        players.add(player);
     }
 
     public OXOPlayer getPlayerByNumber(int number)
     {
-        return players[number];
+        return players.get(number);
     }
 
     public OXOPlayer getWinner()
@@ -67,25 +61,21 @@ class OXOModel
     public int getNumberOfRows()
     {
         return cells.size();
-//        return cells.length;
     }
 
     public int getNumberOfColumns()
     {
         return cells.get(0).size();
-//        return cells[0].length;
     }
 
     public OXOPlayer getCellOwner(int rowNumber, int colNumber)
     {
         return cells.get(rowNumber).get(colNumber);
-//        return cells[rowNumber][colNumber];
     }
 
     public void setCellOwner(int rowNumber, int colNumber, OXOPlayer player)
     {
         cells.get(rowNumber).set(colNumber, player);
-//        cells[rowNumber][colNumber] = player;
     }
 
     public void setWinThreshold(int winThresh)
