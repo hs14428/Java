@@ -5,28 +5,27 @@ import static OXOExceptions.RowOrColumn.ROW;
 
 class OXOController
 {
-    private final int asciiA = 97;
-    private final int ascii1 = 49;
-    private final int maxCols = 9;
+    public static int turnNum;
     OXOModel gameModel;
     RowOrColumn type;
 
     // Controller needs to be able to handle if board size changes mid game when checking moves and for wins etc
-    // Change OXOGame.class to test game to test if diff board size, test if diff number of players etc
-    // Check if game can handle new players mid way through (modify model/ call functions on model, so only need to change one class)
-    // Write OXOGameTester.class
-    // Extension of multiplayer is about 5% - will need to change the OXOPlayer data structure to an arraylist (general GPS 16/02)
+    // Change OXOGame.java to test game to test if diff board size, test if diff number of players etc
 
     public OXOController(OXOModel model)
     {
         gameModel = model;
         gameModel.setCurrentPlayer(gameModel.getPlayerByNumber(0));
+        turnNum = 0;
     }
 
     public void handleIncomingCommand(String command) throws OXOMoveException
     {
-        if ((gameModel.getWinner() == null) && (!gameModel.isGameDrawn())) {
+        int asciiA = 97;
+        int ascii1 = 49;
+        int maxCols = 9;
 
+        if ((gameModel.getWinner() == null) && (!gameModel.isGameDrawn())) {
 //          Check that input string is only 2 long
             if (command.length() != 2) {
                 throw new InvalidIdentifierLengthException(command.length());
@@ -48,6 +47,7 @@ class OXOController
                 type = COLUMN;
                 throw new OutsideCellRangeException(rowNum, colNum, type);
             }
+//          Check if the row identifier is valid or not
             else if (rowNum+1 < 0) {
                 type = ROW;
                 throw new InvalidIdentifierCharacterException(rowNum, colNum, type);
@@ -60,19 +60,19 @@ class OXOController
             drawCheck();
             checkWin();
             changePlayer();
-
+            if (turnNum == 6) {
+                OXOModel gameModel = new OXOModel(3,3,3);
+//                gameModel.addPlayer(new OXOPlayer('Y'));
+                gameModel.setWinThreshold(3);
+            }
         }
-
     }
 
     public void changePlayer()
     {
-        if (gameModel.getCurrentPlayer() == gameModel.getPlayerByNumber(0)) {
-            gameModel.setCurrentPlayer(gameModel.getPlayerByNumber(1));
-        }
-        else {
-            gameModel.setCurrentPlayer(gameModel.getPlayerByNumber(0));
-        }
+        turnNum++;
+        int playerNum = turnNum%gameModel.getNumberOfPlayers();
+        gameModel.setCurrentPlayer(gameModel.getPlayerByNumber(playerNum));
     }
 
 //  Can improve to check if draw happens before board is full?
@@ -95,10 +95,10 @@ class OXOController
         int cnt = 1;
         for (int c = 1; c < gameModel.getNumberOfColumns(); c++) {
             if (gameModel.getCellOwner(rowNumber, c) == null) {
-                return false;
+                cnt = 0;
             }
             if (gameModel.getCellOwner(rowNumber, c) != gameModel.getCellOwner(rowNumber, c-1)) {
-                return false;
+                cnt = 0;
             }
             cnt++;
             if (cnt == gameModel.getWinThreshold()) {
@@ -108,16 +108,17 @@ class OXOController
         return false;
     }
 
-//  Check if a col is three of a kind
+//  Check if a col is a win based of winThreshold
     public boolean checkCol(int colNumber)
     {
         int cnt = 1;
         for (int r = 1; r < gameModel.getNumberOfRows(); r++) {
             if (gameModel.getCellOwner(r, colNumber) == null) {
-                return false;
+                cnt = 0;
+
             }
             if (gameModel.getCellOwner(r, colNumber) != gameModel.getCellOwner(r-1, colNumber)) {
-                return false;
+                cnt = 0;
             }
             cnt++;
             if (cnt == gameModel.getWinThreshold()) {
@@ -151,7 +152,6 @@ class OXOController
     public boolean checkDiagRL(int row, int col)
     {
         int cnt = 1;
-//        int c = gameModel.getNumberOfColumns() - 2;
         int c = col;
         for (int r = row; (r < gameModel.getNumberOfRows()) && (c >= 0); r++, c--) {
             if (gameModel.getCellOwner(r, c) == null) {
@@ -199,22 +199,5 @@ class OXOController
             }
         }
         return false;
-    }
-
-//  Check if position is inbounds
-    public boolean inbounds(int rowNumber, int colNumber)
-    {
-        return rowNumber >= 0 && rowNumber < gameModel.getNumberOfRows()
-                && colNumber >= 0 && colNumber < gameModel.getNumberOfColumns();
-    }
-
-    public boolean validMove(int rowNumber, int colNumber)
-    {
-        if (gameModel.getCellOwner(rowNumber, colNumber) == null) {
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 }

@@ -3,6 +3,7 @@ package OXOExceptions;
 public class InvalidIdentifierCharacterException extends InvalidIdentifierException
 {
     private final int asciiA = 97;
+    private final int ascii1 = 49;
     private char character;
     private RowOrColumn type;
 
@@ -19,6 +20,6 @@ public class InvalidIdentifierCharacterException extends InvalidIdentifierExcept
 
     public String toString()
     {
-        return getClass().getName() + ": "+ character + (getColumn()+1) +" is and invalid cell because "+ character +" is an invalid "+ type +" selection. Please select a different "+ type +" character.";
+        return getClass().getName() + ": "+ character + (char)(getColumn()+ascii1) +" is and invalid cell because "+ character +" is an invalid "+ type +" selection. Please select a different "+ type +" character.";
     }
 }
