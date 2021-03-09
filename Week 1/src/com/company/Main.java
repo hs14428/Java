@@ -103,6 +103,9 @@ public class Main {
         TriangleVariant variant = firstTriangle.getVariant();
         int population = firstTriangle.getPopulation();
         System.out.println("The first shape of twoDimensionalShapes array is a " + variant + " triangle. Total triangles = " + population);
+
+        String test1 = "HeLLo3";
+        System.out.println(test1.toLowerCase());
     }
 
 }

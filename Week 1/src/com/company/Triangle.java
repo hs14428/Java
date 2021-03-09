@@ -104,30 +104,6 @@ public class Triangle extends TwoDimensionalShape implements MultiVariantShape
         }
     }
 
- /*   public boolean rightTriangle() {
-        double longestSide = getLongestSide();
-        double side1, side2;
-        longestSide = pow(longestSide, 2);
-        if (getLongestSide() == len1) {
-            side1 = pow(len2, 2);
-            side2 = pow(len3, 2);
-        }
-        else if (getLongestSide() == len2) {
-            side1 = pow(len1, 2);
-            side2 = pow(len3, 2);
-        }
-        else {
-            side1 = pow(len1, 2);
-            side2 = pow(len2, 2);
-        }
-        if (longestSide == side1 + side2) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }*/
-
     public boolean rightTriangle() {
         BigDecimal longestSide = new BigDecimal(getLongestSide());
         BigDecimal side1 = new BigDecimal(len1);
