@@ -13,7 +13,7 @@ class OXOModel
     public OXOModel(int numberOfRows, int numberOfColumns, int winThresh)
     {
         winThreshold = winThresh;
-        cells = new ArrayList<ArrayList<OXOPlayer>>(numberOfRows);
+        cells = new ArrayList<>(numberOfRows);
         for (int i = 0; i < numberOfRows; i++) {
             cells.add(new ArrayList<OXOPlayer>(numberOfColumns));
             for (int j = 0; j < numberOfColumns; j++) {
