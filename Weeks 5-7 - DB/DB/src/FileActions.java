@@ -1,4 +1,7 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 // Useful java.io methods:
 // canRead()	    Boolean	    Tests whether the file is readable or not
@@ -21,28 +24,95 @@ class FileActions
     public String contactDetails = directory + File.separator + contact;
     private File fileToOpen;
 
-    private String currentDirectory = ".";
+    private String fileName;
+    private String currentDirectory;// = ".";
+    private String filePath;
+    private File fileLocation;
+
+    public void setCurrentDirectory(String currentDirectory)
+    {
+        this.currentDirectory = currentDirectory;
+    }
+
+    public String getCurrentDirectory()
+    {
+        return currentDirectory;
+    }
 
     public FileActions()
     {
-        //fileToOpen = new File(currentDirectory); // For prod
+        fileName = "testFile.tab";
+        currentDirectory = ".";
+        filePath = currentDirectory + File.separator + fileName;
+        fileLocation = new File(filePath); // For prod
         fileToOpen = new File(filepath); // For testing
     }
 
-    public void FileCreator()
+    public void FileCreator(String fileName, String directory)
     {
+        File newFile = new File(directory + File.separator + fileName);
+
         try {
-            if (fileToOpen.exists()) {
+            if (newFile.exists()) {
                 System.out.println("File already exists.");
             }
             else {
                 System.out.println("File does not exist. Creating a new one.");
-                fileToOpen.createNewFile();
+                newFile.createNewFile();
             }
+        } catch (IOException e) {
+            System.out.println("An error occurred: "+ e + ".\nFile was not created.");
+            e.printStackTrace();
+        }
+    }
+
+    public void FileWriter(String fileName, String directory, String textToAdd)
+    {
+        String fileToWrite = directory + File.separator + fileName + ".tab";
+        try {
+            FileWriter writer = new FileWriter(fileToWrite);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+            bufferedWriter.write(textToAdd);
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            System.out.println("Successfully wrote to the file.\n");
+        } catch (IOException e) {
+            System.out.println("An error occurred: " + e + ".\nFailed to write to file.");
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<List<String>> FileReader(String fileName, String directory)
+    {
+//        ArrayList<String[]> readFileArray = new ArrayList<String[]>();
+        ArrayList<List<String>> readFileArrayList = new ArrayList<>();
+        File fileToRead = new File(directory + File.separator + fileName);
+
+        try {
+            FileReader reader = new FileReader(fileToRead);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+            String line;
+            String[] lineArray;
+            List<String> rowArrayList = new ArrayList<String>();
+            while ((line = bufferedReader.readLine()) != null) {
+                lineArray = line.split("\t");
+//                readFileArray.add(lineArray);
+
+                rowArrayList = Arrays.asList(lineArray);
+                readFileArrayList.add(rowArrayList);
+                System.out.println(rowArrayList.get(0));
+            }
+            System.out.println("RAL: "+rowArrayList.get(0));
+            System.out.println("RFAL: "+readFileArrayList.get(1).get(1));
+
+//            System.out.println(readFileArray.get(1)[2]);
+            reader.close();
+            bufferedReader.close();
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+        return readFileArrayList;
     }
 
     public void FileCreatorTest()
@@ -61,7 +131,7 @@ class FileActions
         }
     }
 
-    public void FileWriter()
+    public void FileWriterTest()
     {
         try {
             FileWriter writer = new FileWriter(fileToOpen);
@@ -77,7 +147,7 @@ class FileActions
         }
     }
 
-    public void FileReader()
+    public void FileReaderTest()
     {
         try {
             FileReader reader = new FileReader(fileToOpen);

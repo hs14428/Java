@@ -34,6 +34,12 @@ class DBServer
     {
         String incomingCommand = socketReader.readLine();
         System.out.println("Received message: " + incomingCommand);
+
+        Database testDB = new Database("JobsDB");
+        testDB.listTables();
+        Table testTable = new Table("contact-details", "JobsDB");
+        testTable.printTable();
+
         socketWriter.write("[OK] Thanks for your message: " + incomingCommand);
         socketWriter.write("\n" + ((char)4) + "\n");
         socketWriter.flush();

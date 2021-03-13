@@ -1,4 +1,8 @@
+import javax.xml.crypto.Data;
+import java.awt.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBController {
 
@@ -6,10 +10,10 @@ public class DBController {
 	// write your code here
         FileActions createFile = new FileActions();
         createFile.FileCreatorTest();
-        createFile.FileWriter();
-        createFile.FileReader();
+        createFile.FileWriterTest();
+        createFile.FileReaderTest();
         createFile.setFileToOpen(createFile.contactDetails);
-        createFile.FileReader();
+        createFile.FileReaderTest();
 
 
         //Playing around with Java.io API
@@ -17,12 +21,11 @@ public class DBController {
         System.out.println(createFile.directory);
         File[] listOfFiles = directory.listFiles();
 
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                System.out.println("File " + listOfFiles[i].getName());
-            }
-            else if (listOfFiles[i].isDirectory()) {
-                System.out.println("Directory " + listOfFiles[i].getName());
+        for (File listOfFile : listOfFiles) {
+            if (listOfFile.isFile()) {
+ //               System.out.println("File " + listOfFile.getName());
+            } else if (listOfFile.isDirectory()) {
+ //               System.out.println("Directory " + listOfFile.getName());
             }
         }
 
@@ -37,10 +40,31 @@ public class DBController {
             }
             else if (listOfFiles2[i].isDirectory()) {
                 System.out.println("Directory " + listOfFiles2[i].getName());
-                System.out.println("Directory " + listOfFiles2[i].getParent());
+//                System.out.println("Directory " + listOfFiles2[i].getParent());
                 System.out.println("Directory " + listOfFiles2[i].getPath());
             }
         }
 
+        FileActions testFile = new FileActions();
+        String testPath = "C:"+File.separator+"Users"+File.separator+"Harry"+File.separator+"OneDrive"+File.separator+"Documents";
+        System.out.println(testPath+"\\contact-details.tab");
+        testFile.FileReader("contact-details.tab", testPath);
+
+        testFile.setCurrentDirectory("C:"+File.separator+"Users"+File.separator+"Harry"+File.separator+"OneDrive"+File.separator+"Documents");
+        System.out.println(testFile.getCurrentDirectory());
+
+        System.out.println("\n\nNew testing from here\n\n");
+
+        Table table = new Table("contact-details", "JobsDB");
+        ArrayList<List<String>> tableArrayList = table.ReadTable();
+
+        System.out.println(tableArrayList.size());
+        System.out.println(tableArrayList.get(3)+"\n");
+        for (List<String> strings : tableArrayList) {
+            for (String string : strings) {
+                System.out.print(string + "\t");
+            }
+            System.out.println();
+        }
     }
 }
