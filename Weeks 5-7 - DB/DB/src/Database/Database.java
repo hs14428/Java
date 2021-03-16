@@ -1,3 +1,5 @@
+package Database;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,7 +26,7 @@ public class Database
             database.mkdirs();
         }
         else {
-            System.out.println("Database of same name already exists.");
+            System.out.println("Database: "+databaseName+" of same name already exists.");
         }
     }
 
@@ -42,9 +44,9 @@ public class Database
         assert listOfFiles != null;
         for (File listOfFile : listOfFiles) {
             if (listOfFile.isFile()) {
-                System.out.println("Table: " + listOfFile.getName());
+                System.out.println("Database.Table: " + listOfFile.getName());
             } else if (listOfFile.isDirectory()) {
-                System.out.println("Database: " + listOfFile.getName());
+                System.out.println("Database.Database: " + listOfFile.getName());
             }
         }
     }

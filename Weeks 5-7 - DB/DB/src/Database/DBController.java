@@ -1,4 +1,4 @@
-import java.util.Locale;
+package Database;
 
 public class DBController {
 

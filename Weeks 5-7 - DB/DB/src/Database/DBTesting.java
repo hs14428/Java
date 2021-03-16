@@ -1,6 +1,11 @@
+package Database;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import Input.Token;
+import Input.Tokenizer;
 
 public class DBTesting {
 
@@ -60,5 +65,15 @@ public class DBTesting {
         System.out.println("\n\ncreateTable and writeToTable tests:");
         table.createTable("writeToTableTest");
         table.writeToTable("writeToTableTest");
+
+//      Test tokensizer class with the Tokenize fn
+        Tokenizer tokenizer = new Tokenizer();
+        tokenizer.tokenize("CREATE TABLE Table1 (id, name, email, address)");
+        System.out.println("\n"+tokenizer.getToken(3).getTokenString());
+//      Test tokensizer class with the TokenizeBrackets fn
+        tokenizer.tokenizeBrackets(tokenizer.getToken(3).getTokenString());
+
+
+        Token tokenType = new Token("use");
     }
 }

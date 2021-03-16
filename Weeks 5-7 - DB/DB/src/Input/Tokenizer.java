@@ -1,0 +1,67 @@
+package Input;
+
+import java.util.ArrayList;
+
+public class Tokenizer
+{
+    private ArrayList<Token> tokenArrayList;
+    private ArrayList<Token> bracketsArrayList;
+    private Token token;
+    private String command;
+    private int currentToken;
+    private int finalToken;
+
+    public Tokenizer()
+    {
+        currentToken = 0;
+        finalToken = 0;
+    }
+
+    public void tokenize(String command)
+    {
+        this.command = command;
+        tokenArrayList = new ArrayList<>();
+        String[] tokenArray = command.split("\\s+(?![^(]*\\))");
+        for (String s : tokenArray) {
+            token = new Token(s);
+            tokenArrayList.add(token);
+            finalToken++;
+        }
+//        System.out.println(finalToken);
+//        System.out.println(tokenArrayList.size());
+    }
+
+//  Will need to add a getToken method for this?
+    public void tokenizeBrackets(String tokenBrackets)
+    {
+        bracketsArrayList = new ArrayList<>();
+        String[] bracketsArray = tokenBrackets.substring(1,tokenBrackets.length()-1).split(",");
+        for (String s : bracketsArray) {
+            token = new Token(s.trim());
+            bracketsArrayList.add(token);
+        }
+    }
+
+//  Might not need if in Token class?
+    public Token getToken(int index)
+    {
+        return tokenArrayList.get(index);
+    }
+
+    public Token nextToken()
+    {
+        token = tokenArrayList.get(currentToken++);
+        return token;
+    }
+
+    public void setCurrentTokenIndex(int index)
+    {
+        currentToken = index;
+    }
+
+    public int getCurrentTokenIndex()
+    {
+        return currentToken;
+    }
+
+}

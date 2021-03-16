@@ -1,3 +1,5 @@
+package Database;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -14,6 +16,7 @@ public class Record
     public Record ()
     {
         records = new LinkedHashMap<String, String>();
+        //records.getOrDefault()
     }
 
     public void addToRecords(String columnName, String columnData)

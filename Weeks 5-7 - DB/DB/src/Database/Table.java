@@ -1,3 +1,5 @@
+package Database;
+
 import java.io.*;
 import java.util.*;
 
@@ -61,7 +63,7 @@ public class Table
         return table;
     }
 
-//  Add records to ArrayList<Record> where Record is a LinkedHashMap
+//  Add records to ArrayList<Database.Record> where Database.Record is a LinkedHashMap
 //  Allows for easier record finding
     public void addRecords()
     {
@@ -99,7 +101,7 @@ public class Table
             }
         }
         else {
-            System.out.println("Table of same name already exists.");
+            System.out.println("Table: "+tableName+" of same name already exists.");
         }
     }
 
@@ -108,7 +110,7 @@ public class Table
         File writeToTable = new File(databasePath + File.separator + tableName + extension);
 
         if (!writeToTable.exists()) {
-            System.out.println("\nTable does not exist.");
+            System.out.println("\nDatabase.Table does not exist.");
         }
         else {
             try {
