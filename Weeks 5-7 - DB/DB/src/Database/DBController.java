@@ -1,10 +1,25 @@
 package Database;
 
-public class DBController {
+import DBExceptions.EmptyCommandException;
+import Input.Token;
+import Input.Tokenizer;
 
-    public void processQuery (String command)
+import java.util.ArrayList;
+
+public class DBController
+{
+    private Database currentDatabase;
+
+    public DBController()
     {
-        command.toUpperCase();
+        currentDatabase = null;
+    }
+
+    public void processQuery (String command) throws EmptyCommandException
+    {
+        Tokenizer tokenizer = new Tokenizer(command);
+        ArrayList<Token> tokenList = tokenizer.tokenize();
+//        Parser parseCommand = new Parser(tokenList, command);
 
         Database testDB = new Database("JobsDB");
         testDB.listTables();

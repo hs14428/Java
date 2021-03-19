@@ -1,15 +1,16 @@
 package Database;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-
+import DBExceptions.EmptyCommandException;
 import Input.Token;
 import Input.Tokenizer;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 public class DBTesting {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws EmptyCommandException {
 	// write your code here
         FileActions createFile = new FileActions();
 
@@ -67,8 +68,9 @@ public class DBTesting {
         table.writeToTable("writeToTableTest");
 
 //      Test tokensizer class with the Tokenize fn
-        Tokenizer tokenizer = new Tokenizer();
-        tokenizer.tokenize("CREATE TABLE Table1 (id, name, email, address)");
+        String command = "CREATE TABLE Table1 (id, name, email, address)";
+        Tokenizer tokenizer = new Tokenizer(command);
+        tokenizer.tokenize();
         System.out.println("\n"+tokenizer.getToken(3).getTokenString());
 //      Test tokensizer class with the TokenizeBrackets fn
         tokenizer.tokenizeBrackets(tokenizer.getToken(3).getTokenString());

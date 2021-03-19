@@ -23,6 +23,8 @@ class OXOModel
         players = new ArrayList(2);
     }
 
+
+
     public int getNumberOfPlayers()
     {
         return players.size();

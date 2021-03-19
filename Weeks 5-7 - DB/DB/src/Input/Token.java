@@ -2,8 +2,8 @@ package Input;
 
 public class Token
 {
-    public TokenType tokenType;
-    public String token;
+    private TokenType tokenType;
+    private String token;
 
     public Token(String token)
     {

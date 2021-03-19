@@ -1,5 +1,7 @@
 package Input;
 
+import DBExceptions.EmptyCommandException;
+
 import java.util.ArrayList;
 
 public class Tokenizer
@@ -11,24 +13,29 @@ public class Tokenizer
     private int currentToken;
     private int finalToken;
 
-    public Tokenizer()
+    public Tokenizer(String incomingCommand)
     {
+        command = incomingCommand;
         currentToken = 0;
         finalToken = 0;
     }
 
-    public void tokenize(String command)
+//  name='clive' doesnt need spaces --> will need to check strings char by char to split here
+//  Or include = into split regex
+    public ArrayList<Token> tokenize() throws EmptyCommandException
     {
-        this.command = command;
         tokenArrayList = new ArrayList<>();
         String[] tokenArray = command.split("\\s+(?![^(]*\\))");
+        if (tokenArray.length == 1)
+        {
+            throw new EmptyCommandException();
+        }
         for (String s : tokenArray) {
             token = new Token(s);
             tokenArrayList.add(token);
             finalToken++;
         }
-//        System.out.println(finalToken);
-//        System.out.println(tokenArrayList.size());
+        return tokenArrayList;
     }
 
 //  Will need to add a getToken method for this?

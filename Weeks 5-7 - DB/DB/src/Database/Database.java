@@ -13,13 +13,13 @@ public class Database
     public Database(String databaseName)
     {
         this.database = new HashMap<String, Table>();
-        this.databaseName = databaseName;
         currentDirectory = ".";
     }
 
 // "Make" a database by creating a directory/folder in desired location
     public void createDatabase(String databaseName) throws IOException
     {
+        this.databaseName = databaseName;
         File database = new File(currentDirectory + File.separator + databaseName);
 
         if (!database.exists()) {

@@ -1,21 +1,19 @@
 package DBExceptions;
 
-import Input.Token;
+import java.io.IOException;
 
-public class InvalidTokenException
+public class InvalidTokenException extends IOException
 {
-    private Token tokenGiven;
-    private Token tokenExpected;
+    private String tokenGiven;
 
-    public InvalidTokenException(Token tokenGiven, Token tokenExpected)
+    public InvalidTokenException(String tokenGiven)
     {
         this.tokenGiven = tokenGiven;
-        this.tokenExpected = tokenExpected;
     }
 
     @Override
     public String toString() {
-        return String.format("Given token: %s, does not match expected token: %s",
-                tokenGiven.toString(), tokenExpected.toString());
+        return String.format("[Error] - Given token: %s, can not be processed.",
+                tokenGiven);
     }
 }
