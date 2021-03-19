@@ -1,8 +1,6 @@
 package DBExceptions;
 
-import java.io.IOException;
-
-public class EmptyCommandException extends IOException
+public class EmptyCommandException extends DatabaseException
 {
 //    String errorMessage;
 
@@ -12,7 +10,8 @@ public class EmptyCommandException extends IOException
     }
 
     @Override
-    public String toString() {
-        return String.format("Error with input command.");
+    public String toString()
+    {
+        return "[Error] - Input command appears to be too short.";
     }
 }

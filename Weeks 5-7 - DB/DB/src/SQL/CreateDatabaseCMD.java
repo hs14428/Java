@@ -4,8 +4,6 @@ import DBExceptions.InvalidTokenException;
 import Database.DBServer;
 import Database.Database;
 
-import java.io.IOException;
-
 public class CreateDatabaseCMD extends DBcmd
 {
 
@@ -25,14 +23,11 @@ public class CreateDatabaseCMD extends DBcmd
         {
             databaseName = token;
             Database database = new Database(databaseName);
-            try {
-                database.createDatabase(databaseName);
-                return "Database created.";
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            database.createDatabase(databaseName);
+            return "[OK] Database created";
         }
         // Add custom messages to ITE
+        System.out.println("CreateDatabaseCMD runCommand() error.");
         throw new InvalidTokenException(token);
     }
 

@@ -1,7 +1,6 @@
 package Database;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
 public class Database
@@ -13,21 +12,34 @@ public class Database
     public Database(String databaseName)
     {
         this.database = new HashMap<String, Table>();
+        this.databaseName = databaseName;
         currentDirectory = ".";
     }
 
 // "Make" a database by creating a directory/folder in desired location
-    public void createDatabase(String databaseName) throws IOException
+    public void createDatabase(String databaseName)
     {
         this.databaseName = databaseName;
         File database = new File(currentDirectory + File.separator + databaseName);
 
-        if (!database.exists()) {
+        if (!database.exists())
+        {
             database.mkdirs();
         }
         else {
             System.out.println("Database: "+databaseName+" of same name already exists.");
         }
+    }
+
+    public boolean checkDatabaseExists()
+    {
+        File database = new File(currentDirectory + File.separator + databaseName);
+
+        if (database.exists())
+        {
+            return true;
+        }
+        return false;
     }
 
     public Table addTable(String tableName)

@@ -1,8 +1,8 @@
 package SQL;
 
+import DBExceptions.DatabaseException;
 import Database.DBServer;
 
-import java.io.IOException;
 import java.util.List;
 
 public abstract class DBcmd
@@ -21,7 +21,7 @@ public abstract class DBcmd
         // set all the other shit from here?
     }
 
-    public abstract String runCommand(DBServer dbServer) throws IOException;
+    public abstract String runCommand(DBServer dbServer) throws DatabaseException;
 
     public abstract String getCommand();
 }

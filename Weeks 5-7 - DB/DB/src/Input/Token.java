@@ -29,4 +29,9 @@ public class Token
     {
         return token;
     }
+
+    public void setTokenString(String newToken)
+    {
+        token = newToken;
+    }
 }

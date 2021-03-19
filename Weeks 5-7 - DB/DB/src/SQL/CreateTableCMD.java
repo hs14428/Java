@@ -18,9 +18,15 @@ public class CreateTableCMD extends DBcmd
         String token = dbServer.nextToken();
         System.out.println("Hello CreateTableCMD class: nextToken = " + token);
         System.out.println(dbServer.getDatabaseName());
-        return null;
+
+        if (token.matches(RegEx.VARIABLENAME.getRegex()))
+        {
+            token = dbServer.nextToken();
+
+        }
         // Add custom messages to ITE
-//        throw new InvalidTokenException(token);
+        System.out.println("CreateTableCMD runCommand() error.");
+        throw new InvalidTokenException(token);
     }
 
     @Override

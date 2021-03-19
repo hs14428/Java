@@ -24,6 +24,7 @@ public class Parser
     {
         int currentToken = dbServer.getCurrentTokenNum();
         String token = dbServer.getTokens().get(currentToken).getTokenString().toUpperCase();
+        System.out.println("parse() token: " + token);
         for (DBcmd command : commandType)
         {
             if (command.getCommand().equals(token))
@@ -31,6 +32,7 @@ public class Parser
                 return command;
             }
         }
+        System.out.println("Parser parse() error.");
         throw new InvalidTokenException(token);
     }
 }

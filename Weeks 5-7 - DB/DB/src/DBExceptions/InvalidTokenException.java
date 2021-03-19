@@ -1,8 +1,6 @@
 package DBExceptions;
 
-import java.io.IOException;
-
-public class InvalidTokenException extends IOException
+public class InvalidTokenException extends DatabaseException
 {
     private String tokenGiven;
 
@@ -12,8 +10,8 @@ public class InvalidTokenException extends IOException
     }
 
     @Override
-    public String toString() {
-        return String.format("[Error] - Given token: %s, can not be processed.",
-                tokenGiven);
+    public String toString()
+    {
+        return String.format("[Error] - Given token: %s, can not be processed.", tokenGiven);
     }
 }

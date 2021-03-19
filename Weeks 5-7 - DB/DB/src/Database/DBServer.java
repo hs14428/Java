@@ -1,5 +1,6 @@
 package Database;
 
+import DBExceptions.DatabaseException;
 import Input.Parser;
 import Input.Token;
 import Input.Tokenizer;
@@ -47,17 +48,22 @@ public class DBServer
         String incomingCommand = socketReader.readLine();
         System.out.println("Received message: " + incomingCommand);
         try {
+            System.out.println("Try 1");
             tokenizer = new Tokenizer(incomingCommand);
+            System.out.println("Try 2");
             tokenList = tokenizer.tokenize();
+            System.out.println("Try 3");
             currentTokenNum = 0;
+            System.out.println("Try 4");
             Parser parser = new Parser(this);
-            parser.parse().runCommand(this);
-        } catch (IOException e) {
-            System.out.println("Breaking in processNextCommand");
+            System.out.println("Try 5");
+            socketWriter.write(parser.parse().runCommand(this));
+        } catch (DatabaseException e) {
+            System.out.println("In Catch");
             e.printStackTrace();
-            socketWriter.write(e.getMessage());
+            socketWriter.write(e.toString());
         }
-        socketWriter.write("[OK] Thanks for your message: " + incomingCommand);
+        System.out.println("Rest of Program");
         socketWriter.write("\n" + ((char)4) + "\n");
         socketWriter.flush();
     }

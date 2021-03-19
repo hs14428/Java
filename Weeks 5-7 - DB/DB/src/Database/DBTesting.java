@@ -1,6 +1,6 @@
 package Database;
 
-import DBExceptions.EmptyCommandException;
+import DBExceptions.InvalidQueryException;
 import Input.Token;
 import Input.Tokenizer;
 
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DBTesting {
 
-    public static void main(String[] args) throws EmptyCommandException {
+    public static void main(String[] args) throws InvalidQueryException {
 	// write your code here
         FileActions createFile = new FileActions();
 

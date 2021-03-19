@@ -1,6 +1,6 @@
 package Input;
 
-import DBExceptions.EmptyCommandException;
+import DBExceptions.InvalidQueryException;
 
 import java.util.ArrayList;
 
@@ -22,20 +22,34 @@ public class Tokenizer
 
 //  name='clive' doesnt need spaces --> will need to check strings char by char to split here
 //  Or include = into split regex
-    public ArrayList<Token> tokenize() throws EmptyCommandException
+    public ArrayList<Token> tokenize() throws InvalidQueryException
     {
-        tokenArrayList = new ArrayList<>();
         String[] tokenArray = command.split("\\s+(?![^(]*\\))");
-        if (tokenArray.length == 1)
+        int endTokenIndex = tokenArray.length-1;
+        String endToken = tokenArray[endTokenIndex];
+
+        if (tokenArray.length == 1 || !checkValidEnd(endToken))
         {
-            throw new EmptyCommandException();
+            System.out.println("Tokenizer tokenize() error.");
+            throw new InvalidQueryException();
         }
+        tokenArray[endTokenIndex] = endToken.replace(";","");
+        tokenArrayList = new ArrayList<>();
         for (String s : tokenArray) {
             token = new Token(s);
             tokenArrayList.add(token);
             finalToken++;
         }
         return tokenArrayList;
+    }
+
+    public boolean checkValidEnd(String endToken)
+    {
+        if (endToken.substring(endToken.length()-1).equals(";"))
+        {
+            return true;
+        }
+        return false;
     }
 
 //  Will need to add a getToken method for this?

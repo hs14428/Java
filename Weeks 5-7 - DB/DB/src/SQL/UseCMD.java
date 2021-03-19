@@ -1,6 +1,8 @@
 package SQL;
 
+import DBExceptions.MissingDatabaseException;
 import Database.DBServer;
+import Database.Database;
 
 public class UseCMD extends DBcmd
 {
@@ -11,22 +13,22 @@ public class UseCMD extends DBcmd
     }
 
     @Override
-    public String runCommand(DBServer dbServer)
+    public String runCommand(DBServer dbServer) throws MissingDatabaseException
     {
         String token = dbServer.nextToken();
         System.out.println("Hello UseCMD class: nextToken = " + token);
 
-        if (dbServer.previousToken().equals(command))
+        if (token.matches(RegEx.VARIABLENAME.getRegex()))
         {
-            if (token.matches(RegEx.VARIABLENAME.getRegex()))
-            {
+            Database database = new Database(token);
+            if (database.checkDatabaseExists()) {
                 databaseName = token;
                 dbServer.setDatabaseName(databaseName);
-                System.out.println("In UseCMD dbName = "+databaseName);
+                return "[OK] - Database: "+databaseName+" selected";
             }
         }
-
-        return null;
+        System.out.println("UseCMD runCommand() error.");
+        throw new MissingDatabaseException(token);
     }
 
     @Override

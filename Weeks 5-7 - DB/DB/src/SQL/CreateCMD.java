@@ -25,6 +25,7 @@ public class CreateCMD extends DBcmd
             case("TABLE"):
                 return new CreateTableCMD().runCommand(dbServer);
         }
+        System.out.println("CreateCMD runCommand() error.");
         throw new InvalidTokenException(token);
     }
 
