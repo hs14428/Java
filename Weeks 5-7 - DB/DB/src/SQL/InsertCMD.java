@@ -6,30 +6,36 @@ import Database.DBServer;
 
 import java.io.IOException;
 
-public class CreateCMD extends DBcmd
+public class InsertCMD extends DBcmd
 {
 
-    public CreateCMD()
+    public InsertCMD()
     {
         commandType = "CommandType";
-        command = "CREATE";
+        command = "INSERT";
     }
 
     @Override
     public String runCommand(DBServer dbServer) throws DatabaseException, IOException
     {
         String token = dbServer.nextToken().toUpperCase();
-        System.out.println("Hello CreateCMD class: nextToken = " + token);
+        System.out.println("Hello InsertCMD class: nextToken = " + token);
 
-        switch (token)
+        if (token.equals("INTO"))
         {
-            case("DATABASE"):
-                return new CreateDatabaseCMD().runCommand(dbServer);
-            case("TABLE"):
-                return new CreateTableCMD().runCommand(dbServer);
+            token = dbServer.nextToken();
+            if (token.matches(RegEx.VARIABLENAME.getRegex()))
+            {
+                token = dbServer.nextToken();
+                if (token.equals("VALUES"))
+                {
+
+                }
+            }
+            return "[OK] - Values inserted";
         }
-        System.out.println("CreateCMD runCommand() error.");
         throw new InvalidTokenException(token);
+
     }
 
     @Override

@@ -1,27 +1,30 @@
 package Database;
 
+import DBExceptions.TableException;
+
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Table
 {
     private String tableName;
-    private String tablePath;
     private String databaseName;
     private String databasePath;
     private String currentDirectory;
     private String extension;
     private Database database;
 
-    public ArrayList<List<String>> table;
-    public ArrayList<Record> records;
+    private ArrayList<ArrayList<String>> table;
+    private ArrayList<Record> records;
     private Record record;
+    private int numberOfRows;
 
 
     // tableName is really just the .tab file name and database is really just the directory/folder
-    public Table(String tableName, String databaseName)
+    public Table(String databaseName)
     {
-        table = new ArrayList<List<String>>();
         records = new ArrayList<Record>();
         record = new Record();
 
@@ -31,12 +34,12 @@ public class Table
         currentDirectory = database.getCurrentDirectory();
         databasePath = currentDirectory + File.separator + this.databaseName;
         extension = ".tab";
-        tablePath = databasePath + File.separator + this.tableName + extension;
     }
 
-    public ArrayList<List<String>> readTable()
+    public ArrayList<ArrayList<String>> readTable(String tableName)
     {
-        File readTable = new File(tablePath);
+        File readTable = new File(databasePath + File.separator + tableName + extension);
+        table = new ArrayList<ArrayList<String>>();
 
         try {
             if (!readTable.exists()) {
@@ -47,10 +50,9 @@ public class Table
                 BufferedReader bufferedReader = new BufferedReader(reader);
                 String line;
                 String[] lineArray;
-                List<String> lineArrayList = new ArrayList<>();
                 while ((line = bufferedReader.readLine()) != null) {
                     lineArray = line.split("\t");
-                    lineArrayList = Arrays.asList(lineArray);
+                    ArrayList<String> lineArrayList = new ArrayList<>(Arrays.asList(lineArray));
                     table.add(lineArrayList);
                 }
                 reader.close();
@@ -63,7 +65,7 @@ public class Table
         return table;
     }
 
-//  Add records to ArrayList<Database.Record> where Database.Record is a LinkedHashMap
+//  Add records to ArrayList<Database.Record> where Database. Record is a LinkedHashMap
 //  Allows for easier record finding
     public void addRecords()
     {
@@ -88,53 +90,92 @@ public class Table
     }
 
 //  "Make" a database by creating a directory/folder in desired location
-    public void createTable(String tableName)
+    public void createTable(String tableName) throws IOException
     {
-        File table = new File(databasePath + File.separator + tableName + extension);
+        File newTable = new File(databasePath + File.separator + tableName + extension);
 
-        if (!table.exists()) {
-            try {
-                table.createNewFile();
-                System.out.println("Table created.");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (!newTable.exists())
+        {
+            newTable.createNewFile();
+            FileWriter writer = new FileWriter(newTable);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+//            bufferedWriter.write("id" + "\t");
+            bufferedWriter.write("id");
+            bufferedWriter.write("\n");
+//            bufferedWriter.write("1" + "\t");
+            bufferedWriter.write("1");
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            writer.close();
+            System.out.println("Table created.");
         }
         else {
-            System.out.println("Table: "+tableName+" of same name already exists.");
+            throw new TableException("[Error] - Table: "+tableName+" of same name already exists");
         }
     }
 
-    public void writeToTable(String tableName)
+    public void removeTable(String tableName) throws IOException
+    {
+        File newTable = new File(databasePath + File.separator + tableName + extension);
+        if (newTable.exists())
+        {
+            newTable.delete();
+        }
+        else {
+            throw new TableException("[Error] - Table: "+tableName+" does not exist");
+        }
+    }
+
+    public void writeToTable(String tableName) throws IOException
     {
         File writeToTable = new File(databasePath + File.separator + tableName + extension);
 
-        if (!writeToTable.exists()) {
-            System.out.println("\nDatabase.Table does not exist.");
+        if (!writeToTable.exists())
+        {
+            throw new TableException("[Error] - Table: "+tableName+" does not exists. Failed to write");
         }
         else {
-            try {
-                FileWriter writer = new FileWriter(writeToTable);
-                BufferedWriter bufferedWriter = new BufferedWriter(writer);
-                for (List<String> strings : table) {
-                    for (String string : strings) {
-                        bufferedWriter.write(string + "\t");
-                    }
-                    bufferedWriter.write("\n");
+            FileWriter writer = new FileWriter(writeToTable);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+            for (List<String> strings : table) {
+                for (String string : strings) {
+                    bufferedWriter.write(string + "\t");
                 }
-                bufferedWriter.flush();
-                bufferedWriter.close();
-                writer.close();
-            } catch (IOException e) {
-                System.out.println("An error occurred: " + e + ".\nFailed to write to file.");
-                e.printStackTrace();
+                bufferedWriter.write("\n");
             }
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            writer.close();
         }
     }
 
-    public void printTable()
+    public void addColumn(String tableName, String columnName) throws IOException
     {
-        table = readTable();
+        File tableToAddTo = new File(databasePath + File.separator + tableName + extension);
+        table = readTable(tableName);
+
+        if (tableToAddTo.exists())
+        {
+            // Add column name to end of table columns
+            table.get(0).add(columnName);
+            // Go down each row and add an empty string at the end of each entry for new column
+            for (int i = 1; i < table.size(); i++)
+            {
+                System.out.println(i);
+                table.get(i).add("");
+            }
+            // Write new table back out to .tab file
+            writeToTable(tableName);
+            System.out.println("Column added.");
+        }
+        else {
+            throw new TableException("[Error] - Table: "+tableName+" does not exist.");
+        }
+    }
+
+    public void printTable(String tableName)
+    {
+        table = readTable(tableName);
         for (List<String> strings : table) {
             for (String string : strings) {
                 System.out.print(string + "\t");

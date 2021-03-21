@@ -1,6 +1,9 @@
 package Database;
 
+import DBExceptions.DatabaseException;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Database
@@ -17,7 +20,7 @@ public class Database
     }
 
 // "Make" a database by creating a directory/folder in desired location
-    public void createDatabase(String databaseName)
+    public void createDatabase(String databaseName) throws DatabaseException
     {
         this.databaseName = databaseName;
         File database = new File(currentDirectory + File.separator + databaseName);
@@ -27,7 +30,25 @@ public class Database
             database.mkdirs();
         }
         else {
-            System.out.println("Database: "+databaseName+" of same name already exists.");
+            throw new DatabaseException("[Error] - Database already exists");
+        }
+    }
+
+    public void removeDatabase(String databaseName) throws DatabaseException
+    {
+        File database = new File(currentDirectory + File.separator + databaseName);
+        File[] tableNames = listTables();
+
+        if (database.exists())
+        {
+            for (File table : tableNames)
+            {
+                table.delete();
+            }
+            database.delete();
+        }
+        else {
+            throw new DatabaseException("[Error] - Database does not exist");
         }
     }
 
@@ -42,25 +63,26 @@ public class Database
         return false;
     }
 
-    public Table addTable(String tableName)
+    public Table addTable(String tableName) throws IOException
     {
-        Table table = new Table(tableName, databaseName);
+        Table table = new Table(databaseName);
         table.createTable(tableName);
         return table;
     }
 
-    public void listTables()
+    public File[] listTables()
     {
-        File databaseTables = new File(currentDirectory + File.separator + this.databaseName);
+        File databaseTables = new File(currentDirectory + File.separator + databaseName);
         File[] listOfFiles = databaseTables.listFiles();
         assert listOfFiles != null;
         for (File listOfFile : listOfFiles) {
             if (listOfFile.isFile()) {
-                System.out.println("Database.Table: " + listOfFile.getName());
+                System.out.println("Table: " + listOfFile.getName());
             } else if (listOfFile.isDirectory()) {
-                System.out.println("Database.Database: " + listOfFile.getName());
+                System.out.println("Database: " + listOfFile.getName());
             }
         }
+        return listOfFiles;
     }
 
     public String getDatabaseName()

@@ -1,15 +1,17 @@
 package DBExceptions;
 
-public class DatabaseException extends Exception
+import java.io.IOException;
+
+public class TableException extends IOException
 {
     String errorMessage;
 
-    public DatabaseException()
+    public TableException()
     {
 
     }
 
-    public DatabaseException(String errorMessage)
+    public TableException(String errorMessage)
     {
         this.errorMessage = errorMessage;
     }

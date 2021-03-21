@@ -1,16 +1,17 @@
 package Database;
 
+import DBExceptions.DatabaseException;
 import DBExceptions.InvalidQueryException;
-import Input.Token;
 import Input.Tokenizer;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBTesting {
 
-    public static void main(String[] args) throws InvalidQueryException {
+    public static void main(String[] args) throws InvalidQueryException, DatabaseException, IOException {
 	// write your code here
         FileActions createFile = new FileActions();
 
@@ -41,14 +42,15 @@ public class DBTesting {
 
 //      Test the readTable method and check it stores each line of table in ArrayList<List<String>>
         System.out.println("\nreadTable tests:");
-        Table table = new Table("contact-details", "JobsDB");
-        ArrayList<List<String>> tableArrayList = table.readTable();
+        Table table = new Table("JobsDB");
+        ArrayList<ArrayList<String>> tableArrayList = table.readTable("contact-details");
         for (List<String> strings : tableArrayList) {
             for (String string : strings) {
                 System.out.print(string + "\t");
             }
             System.out.println();
         }
+        System.out.println(tableArrayList.get(2).get(2));
 
 //      Test getRecords method and check it does add the individual records to LinkedHashMap
         System.out.println("\naddRecords test:");
@@ -64,18 +66,16 @@ public class DBTesting {
 
 //      Test table creating and writing methods
         System.out.println("\n\ncreateTable and writeToTable tests:");
-        table.createTable("writeToTableTest");
-        table.writeToTable("writeToTableTest");
+//        table.createTable("writeToTableTest");
+//        table.writeToTable("writeToTableTest");
+        table.addColumn("writeToTableTest", "test1");
 
 //      Test tokensizer class with the Tokenize fn
-        String command = "CREATE TABLE Table1 (id, name, email, address)";
+        String command = "CREATE TABLE Table1 (id, name, email, address);";
         Tokenizer tokenizer = new Tokenizer(command);
         tokenizer.tokenize();
         System.out.println("\n"+tokenizer.getToken(3).getTokenString());
 //      Test tokensizer class with the TokenizeBrackets fn
         tokenizer.tokenizeBrackets(tokenizer.getToken(3).getTokenString());
-
-
-        Token tokenType = new Token("use");
     }
 }

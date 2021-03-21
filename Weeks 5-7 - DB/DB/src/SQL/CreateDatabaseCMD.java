@@ -1,5 +1,6 @@
 package SQL;
 
+import DBExceptions.DatabaseException;
 import DBExceptions.InvalidTokenException;
 import Database.DBServer;
 import Database.Database;
@@ -9,12 +10,12 @@ public class CreateDatabaseCMD extends DBcmd
 
     public CreateDatabaseCMD()
     {
-        commandType = "ID";
+        commandType = "STRUCTURE";
         command = "DATABASE";
     }
 
     @Override
-    public String runCommand(DBServer dbServer) throws InvalidTokenException
+    public String runCommand(DBServer dbServer) throws DatabaseException
     {
         String token = dbServer.nextToken();
         System.out.println("Hello CreateDatabaseCMD class: nextToken = " + token);
@@ -24,9 +25,8 @@ public class CreateDatabaseCMD extends DBcmd
             databaseName = token;
             Database database = new Database(databaseName);
             database.createDatabase(databaseName);
-            return "[OK] Database created";
+            return "[OK] - "+databaseName+" database created";
         }
-        // Add custom messages to ITE
         System.out.println("CreateDatabaseCMD runCommand() error.");
         throw new InvalidTokenException(token);
     }

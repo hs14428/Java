@@ -1,6 +1,7 @@
 package Database;
 
 import DBExceptions.DatabaseException;
+import DBExceptions.InvalidQueryException;
 import Input.Parser;
 import Input.Token;
 import Input.Tokenizer;
@@ -16,6 +17,7 @@ public class DBServer
     private Tokenizer tokenizer;
     private String databaseName;
     private int currentTokenNum;
+    private int queryLength;
 
     public DBServer(int portNumber)
     {
@@ -58,7 +60,7 @@ public class DBServer
             Parser parser = new Parser(this);
             System.out.println("Try 5");
             socketWriter.write(parser.parse().runCommand(this));
-        } catch (DatabaseException e) {
+        } catch (DatabaseException | IOException e) {
             System.out.println("In Catch");
             e.printStackTrace();
             socketWriter.write(e.toString());
@@ -81,6 +83,13 @@ public class DBServer
     public ArrayList<Token> getTokens()
     {
         return tokenList;
+    }
+
+    public ArrayList<Token> getBrackets(String tokenBrackets) throws InvalidQueryException
+    {
+        ArrayList<Token> bracketsList;
+        bracketsList = tokenizer.tokenizeBrackets(tokenBrackets);
+        return bracketsList;
     }
 
     public String nextToken()
@@ -109,6 +118,11 @@ public class DBServer
     public void incCurrentTokenNum()
     {
         currentTokenNum++;
+    }
+
+    public int getQueryLength()
+    {
+        return tokenList.size();
     }
 
     public void setDatabaseName(String databaseName)

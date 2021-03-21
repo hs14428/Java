@@ -2,9 +2,7 @@ package Input;
 
 import DBExceptions.InvalidTokenException;
 import Database.DBServer;
-import SQL.CreateCMD;
-import SQL.DBcmd;
-import SQL.UseCMD;
+import SQL.*;
 
 // Parser needs to firstly check that the input string is valid before any commands
 public class Parser
@@ -17,7 +15,9 @@ public class Parser
         this.dbServer = dbServer;
         DBcmd create = new CreateCMD();
         DBcmd use = new UseCMD();
-        commandType = new DBcmd[]{create, use};
+        DBcmd drop = new DropCMD();
+        DBcmd insert = new InsertCMD();
+        commandType = new DBcmd[]{create, use, drop, insert};
     }
 
     public DBcmd parse() throws InvalidTokenException

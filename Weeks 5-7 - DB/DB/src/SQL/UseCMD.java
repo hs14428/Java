@@ -1,5 +1,6 @@
 package SQL;
 
+import DBExceptions.DatabaseException;
 import DBExceptions.MissingDatabaseException;
 import Database.DBServer;
 import Database.Database;
@@ -13,7 +14,7 @@ public class UseCMD extends DBcmd
     }
 
     @Override
-    public String runCommand(DBServer dbServer) throws MissingDatabaseException
+    public String runCommand(DBServer dbServer) throws DatabaseException
     {
         String token = dbServer.nextToken();
         System.out.println("Hello UseCMD class: nextToken = " + token);
@@ -24,7 +25,7 @@ public class UseCMD extends DBcmd
             if (database.checkDatabaseExists()) {
                 databaseName = token;
                 dbServer.setDatabaseName(databaseName);
-                return "[OK] - Database: "+databaseName+" selected";
+                return "[OK] - "+databaseName+" database selected";
             }
         }
         System.out.println("UseCMD runCommand() error.");

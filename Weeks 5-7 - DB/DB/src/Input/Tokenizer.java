@@ -11,13 +11,11 @@ public class Tokenizer
     private Token token;
     private String command;
     private int currentToken;
-    private int finalToken;
 
     public Tokenizer(String incomingCommand)
     {
         command = incomingCommand;
         currentToken = 0;
-        finalToken = 0;
     }
 
 //  name='clive' doesnt need spaces --> will need to check strings char by char to split here
@@ -38,7 +36,6 @@ public class Tokenizer
         for (String s : tokenArray) {
             token = new Token(s);
             tokenArrayList.add(token);
-            finalToken++;
         }
         return tokenArrayList;
     }
@@ -53,14 +50,22 @@ public class Tokenizer
     }
 
 //  Will need to add a getToken method for this?
-    public void tokenizeBrackets(String tokenBrackets)
+    public ArrayList<Token> tokenizeBrackets(String tokenBrackets) throws InvalidQueryException
     {
         bracketsArrayList = new ArrayList<>();
         String[] bracketsArray = tokenBrackets.substring(1,tokenBrackets.length()-1).split(",");
+
+        if (bracketsArray.length == 1)
+        {
+            System.out.println("Brackets tokenize() error.");
+            throw new InvalidQueryException();
+        }
+
         for (String s : bracketsArray) {
             token = new Token(s.trim());
             bracketsArrayList.add(token);
         }
+        return bracketsArrayList;
     }
 
 //  Might not need if in Token class?
