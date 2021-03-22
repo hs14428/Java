@@ -16,6 +16,7 @@ public class InsertCMD extends DBcmd
     {
         commandType = "CommandType";
         command = "INSERT";
+        columnNames = new ArrayList<>();
     }
 
     @Override
@@ -27,34 +28,32 @@ public class InsertCMD extends DBcmd
 
         if (token.equals("INTO"))
         {
-            System.out.println("After INTO");
             token = dbServer.nextToken();
             if (token.matches(RegEx.VARIABLENAME.getRegex()))
             {
-                System.out.println("After tablename:" + token);
-//                dbServer.setTableName(token);
                 tableName = token;
-                System.out.println(tableName);
                 token = dbServer.nextToken().toUpperCase();
                 if (token.equals("VALUES"))
                 {
-                    System.out.println("After VALUES");
                     token = dbServer.nextToken();
+                    // Need to add a check for the amount of things inside bracks == num columns
                     if (token.matches(RegEx.BRACKETS.getRegex()))
                     {
-                        System.out.println("After valuelist match");
                         ArrayList<Token> bracketsTokens;
                         bracketsTokens = dbServer.getBrackets(token);
-                        System.out.println("db name:" + databaseName);
+                        // Can cut out to reduce complexity
+                        for (Token bracketsToken : bracketsTokens)
+                        {
+                            columnNames.add(bracketsToken.getTokenString());
+                        }
                         Table table = new Table(databaseName);
-                        table.addRow(tableName, bracketsTokens);
+                        table.addRow(tableName, columnNames);
                         return "[OK] - Values inserted";
                     }
                 }
             }
         }
         throw new InvalidTokenException(token);
-
     }
 
     @Override

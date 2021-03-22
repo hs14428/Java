@@ -40,39 +40,36 @@ public class Table
         extension = ".tab";
     }
 
-    public ArrayList<ArrayList<String>> readTable(String tableName)
+    public ArrayList<ArrayList<String>> readTable(String tableName) throws IOException
     {
         File readTable = new File(databasePath + File.separator + tableName + extension);
         table = new ArrayList<ArrayList<String>>();
 
-        try {
-            if (!readTable.exists()) {
-                System.out.println("Table does not exists.");
+        if (!readTable.exists())
+        {
+            throw new TableException("[Error] - Table does not exist.");
+        }
+        else {
+            FileReader reader = new FileReader(readTable);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+            String line;
+            String[] lineArray;
+            while ((line = bufferedReader.readLine()) != null) {
+                lineArray = line.split("\t");
+                ArrayList<String> lineArrayList = new ArrayList<>(Arrays.asList(lineArray));
+                table.add(lineArrayList);
             }
-            else {
-                FileReader reader = new FileReader(readTable);
-                BufferedReader bufferedReader = new BufferedReader(reader);
-                String line;
-                String[] lineArray;
-                while ((line = bufferedReader.readLine()) != null) {
-                    lineArray = line.split("\t");
-                    ArrayList<String> lineArrayList = new ArrayList<>(Arrays.asList(lineArray));
-                    table.add(lineArrayList);
-                }
-                reader.close();
-                bufferedReader.close();
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
+            reader.close();
+            bufferedReader.close();
         }
         return table;
     }
 
-//  Add records to ArrayList<Database.Record> where Database. Record is a LinkedHashMap
+//  Adds the contents of a table into a Record hashmap format
 //  Allows for easier record finding
     public void addRecords()
     {
+        records = new ArrayList<Record>();
         int numberOfColumns = table.get(0).size();
         int numberOfRows = table.size();
         Object[] columnNames = table.get(0).toArray();
@@ -182,29 +179,16 @@ public class Table
         }
     }
 
-    public void addRow(String tableName, ArrayList<Token> rowValues) throws IOException, InvalidTokenException
+    public void addRow(String tableName, ArrayList<String> rowValues) throws IOException
     {
         File tableToAddTo = new File(databasePath + File.separator + tableName + extension);
-        System.out.println("addRow filepath:"+databasePath + File.separator + tableName + extension);
         table = readTable(tableName);
         String newIdNum = String.valueOf(table.size());
-        System.out.println(newIdNum);
 
         if (tableToAddTo.exists())
         {
-            ArrayList<String> rowValueStrings = new ArrayList<>();
-            rowValueStrings.add(newIdNum);
-            for (Token value : rowValues)
-            {
-                System.out.println(value.getTokenString());
-                if (!value.getTokenString().matches(RegEx.VALUE.getRegex()))
-                {
-                    System.out.println("Hello.");
-                    throw new InvalidTokenException(value.getTokenString());
-                }
-                rowValueStrings.add(value.getTokenString());
-            }
-            table.add(rowValueStrings);
+            rowValues.add(0, newIdNum);
+            table.add(rowValues);
             writeToTable(tableName);
             System.out.println("Row added.");
         }
@@ -213,15 +197,51 @@ public class Table
         }
     }
 
-    public void printTable(String tableName)
+    public String printTable(String tableName) throws IOException
     {
-        table = readTable(tableName);
-        for (List<String> strings : table) {
+//        table = readTable(tableName);
+        String tableString = "";
+        for (ArrayList<String> strings : table) {
             for (String string : strings) {
-                System.out.print(string + "\t");
+                tableString += string;
+                tableString += "\t";
             }
-            System.out.println();
+            tableString += "\n";
         }
+        return tableString;
     }
 
+    public String printSome(String tableName, ArrayList<String> columnNames) throws IOException
+    {
+        table = readTable(tableName);
+        addRecords();
+        int size = columnNames.size();
+        ArrayList<ArrayList<String>> newTable = new ArrayList<>();
+        ArrayList<String> row = new ArrayList<>();
+
+//        String newTableString = "";
+        for (String columnName : columnNames)
+        {
+//            newTableString += columnName;
+//            newTableString += "\t";
+            row.add(columnName);
+        }
+        newTable.add(row);
+//        newTableString += "\n";
+        for (int j = 0; j < records.size(); j++)
+        {
+            row = new ArrayList<>();
+            for (int i = 0; i < size; i++)
+            {
+//                columnNames.add(records.get(j).getColumnData(columnNames.get(i)));
+//                newTableString += records.get(j).getColumnData(columnNames.get(i));
+//                newTableString += "\t";
+                row.add(records.get(j).getColumnData(columnNames.get(i)));
+            }
+//            newTableString += "\n";
+            newTable.add(row);
+        }
+        table = newTable;
+        return "";
+    }
 }

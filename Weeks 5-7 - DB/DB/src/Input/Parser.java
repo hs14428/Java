@@ -17,7 +17,8 @@ public class Parser
         DBcmd use = new UseCMD();
         DBcmd drop = new DropCMD();
         DBcmd insert = new InsertCMD();
-        commandType = new DBcmd[]{create, use, drop, insert};
+        DBcmd select = new SelectCMD();
+        commandType = new DBcmd[]{create, use, drop, insert, select};
     }
 
     public DBcmd parse() throws InvalidTokenException

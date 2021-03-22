@@ -89,11 +89,21 @@ public class DBTesting {
         rowValues.add(token6);
 //        table.addRow("writeToTableTest", rowValues);
 
+//      test regex matching
         String trueString = "'tony'";
         if (trueString.matches(RegEx.VALUE.getRegex()))
         {
             System.out.println("Big time success.");
         }
+
+//      test printTable
+        table.readTable("contactdetails");
+        System.out.println(table.printTable("contactdetails"));
+        ArrayList<String> columnNamesString = new ArrayList<>();
+        columnNamesString.add("Name");
+        columnNamesString.add("Age");
+        System.out.println(table.printSome("contactdetails", columnNamesString));
+        System.out.println(table.printTable("contactdetails"));
 
 //      Test tokensizer class with the Tokenize fn
         String command = "CREATE TABLE Table1 (id, name, email, address);";
