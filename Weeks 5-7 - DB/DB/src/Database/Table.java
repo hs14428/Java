@@ -1,6 +1,9 @@
 package Database;
 
+import DBExceptions.InvalidTokenException;
 import DBExceptions.TableException;
+import Input.Token;
+import SQL.RegEx;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ public class Table
 
 
     // tableName is really just the .tab file name and database is really just the directory/folder
+    // Need to check that a DBServer folder exists and use this as the landing for the DB
     public Table(String databaseName)
     {
         records = new ArrayList<Record>();
@@ -99,11 +103,9 @@ public class Table
             newTable.createNewFile();
             FileWriter writer = new FileWriter(newTable);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
-//            bufferedWriter.write("id" + "\t");
             bufferedWriter.write("id");
-            bufferedWriter.write("\n");
-//            bufferedWriter.write("1" + "\t");
-            bufferedWriter.write("1");
+//            bufferedWriter.write("\n");
+//            bufferedWriter.write("1");
             bufferedWriter.flush();
             bufferedWriter.close();
             writer.close();
@@ -149,24 +151,62 @@ public class Table
         }
     }
 
-    public void addColumn(String tableName, String columnName) throws IOException
+    public void addColumns(String tableName, ArrayList<Token> columnNames) throws IOException, InvalidTokenException
     {
         File tableToAddTo = new File(databasePath + File.separator + tableName + extension);
         table = readTable(tableName);
 
         if (tableToAddTo.exists())
         {
-            // Add column name to end of table columns
-            table.get(0).add(columnName);
-            // Go down each row and add an empty string at the end of each entry for new column
-            for (int i = 1; i < table.size(); i++)
+            for (Token columnName : columnNames)
             {
-                System.out.println(i);
-                table.get(i).add("");
+                // Check the contents of the columnNames arraylist are valid
+                if (!columnName.toString().matches(RegEx.VARIABLENAME.getRegex()))
+                {
+                    throw new InvalidTokenException(columnName.getTokenString());
+                }
+                // Add column name to end of table columns
+                table.get(0).add(columnName.getTokenString());
+                // Go down each row and add an empty string at the end of each entry for new column
+                for (int i = 1; i < table.size(); i++)
+                {
+                    table.get(i).add("");
+                }
+                // Write new table back out to .tab file
+                writeToTable(tableName);
+                System.out.println("Column added.");
             }
-            // Write new table back out to .tab file
+        }
+        else {
+            throw new TableException("[Error] - Table: "+tableName+" does not exist.");
+        }
+    }
+
+    public void addRow(String tableName, ArrayList<Token> rowValues) throws IOException, InvalidTokenException
+    {
+        File tableToAddTo = new File(databasePath + File.separator + tableName + extension);
+        System.out.println("addRow filepath:"+databasePath + File.separator + tableName + extension);
+        table = readTable(tableName);
+        String newIdNum = String.valueOf(table.size());
+        System.out.println(newIdNum);
+
+        if (tableToAddTo.exists())
+        {
+            ArrayList<String> rowValueStrings = new ArrayList<>();
+            rowValueStrings.add(newIdNum);
+            for (Token value : rowValues)
+            {
+                System.out.println(value.getTokenString());
+                if (!value.getTokenString().matches(RegEx.VALUE.getRegex()))
+                {
+                    System.out.println("Hello.");
+                    throw new InvalidTokenException(value.getTokenString());
+                }
+                rowValueStrings.add(value.getTokenString());
+            }
+            table.add(rowValueStrings);
             writeToTable(tableName);
-            System.out.println("Column added.");
+            System.out.println("Row added.");
         }
         else {
             throw new TableException("[Error] - Table: "+tableName+" does not exist.");

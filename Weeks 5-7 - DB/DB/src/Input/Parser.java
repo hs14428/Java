@@ -36,22 +36,3 @@ public class Parser
         throw new InvalidTokenException(token);
     }
 }
-
-//        System.out.println(token);
-////        switch (token)
-////        {
-////            case "CREATE":
-//////                CreateCMD create = new CreateCMD(dbServer);
-//////                create.runCommand();
-////                return new CreateCMD();
-//////                return new CreateCMD(dbServer);
-////            case "USE":
-//////                return new UseCommand(query);
-////            case "DROP":
-////            case "ALTER":
-////            case "INSERT":
-////            case "SELECT":
-////            case "UPDATE":
-////            case "DELETE":
-////            case "JOIN":
-////        }

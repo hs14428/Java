@@ -2,7 +2,9 @@ package Database;
 
 import DBExceptions.DatabaseException;
 import DBExceptions.InvalidQueryException;
+import Input.Token;
 import Input.Tokenizer;
+import SQL.RegEx;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +45,7 @@ public class DBTesting {
 //      Test the readTable method and check it stores each line of table in ArrayList<List<String>>
         System.out.println("\nreadTable tests:");
         Table table = new Table("JobsDB");
-        ArrayList<ArrayList<String>> tableArrayList = table.readTable("contact-details");
+        ArrayList<ArrayList<String>> tableArrayList = table.readTable("contactdetails");
         for (List<String> strings : tableArrayList) {
             for (String string : strings) {
                 System.out.print(string + "\t");
@@ -68,7 +70,30 @@ public class DBTesting {
         System.out.println("\n\ncreateTable and writeToTable tests:");
 //        table.createTable("writeToTableTest");
 //        table.writeToTable("writeToTableTest");
-        table.addColumn("writeToTableTest", "test1");
+//      Test addColumns method in Table class
+        ArrayList<Token> columnNames = new ArrayList<>();
+        Token token1 = new Token("name");
+        Token token2 = new Token("mark");
+        Token token3 = new Token("pass");
+        columnNames.add(token1);
+        columnNames.add(token2);
+        columnNames.add(token3);
+//        table.addColumns("writeToTableTest", columnNames);
+//      Test addRow method in Table class
+        ArrayList<Token> rowValues = new ArrayList<>();
+        Token token4 = new Token("'Steve'");
+        Token token5 = new Token("55");
+        Token token6 = new Token("true");
+        rowValues.add(token4);
+        rowValues.add(token5);
+        rowValues.add(token6);
+//        table.addRow("writeToTableTest", rowValues);
+
+        String trueString = "'tony'";
+        if (trueString.matches(RegEx.VALUE.getRegex()))
+        {
+            System.out.println("Big time success.");
+        }
 
 //      Test tokensizer class with the Tokenize fn
         String command = "CREATE TABLE Table1 (id, name, email, address);";

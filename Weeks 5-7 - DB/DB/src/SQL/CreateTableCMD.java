@@ -24,8 +24,7 @@ public class CreateTableCMD extends DBcmd
     {
         String token = dbServer.nextToken();
         int queryLength = dbServer.getQueryLength();
-        int tableNum = 0;
-        System.out.println("Hello CreateTableCMD class: nextToken = " + token);
+//        System.out.println("Hello CreateTableCMD class: nextToken = " + token);
 
         // Need to add error handling for having not selected a DB
 //        if (databaseName.equals(""))
@@ -36,45 +35,26 @@ public class CreateTableCMD extends DBcmd
 
         if (token.matches(RegEx.VARIABLENAME.getRegex()))
         {
-            tableNames.add(token);
-            tableNum = tableNames.size()-1;
+            tableName = token;
             databaseName = dbServer.getDatabaseName();
             Database database = new Database(databaseName);
             database.addTable(token);
-            // Change to if? and split up
             if (queryLength == 4)
             {
+                // Maybe split out to reduce complexity
                 token = dbServer.nextToken();
-                System.out.println("in switch(4): "+token);
                 if (token.matches(RegEx.BRACKETS.getRegex()))
                 {
                     ArrayList<Token> bracketsTokens;
                     bracketsTokens = dbServer.getBrackets(token);
                     Table newTable = new Table(databaseName);
-                    for (Token bracketsToken : bracketsTokens)
-                    {
-                        newTable.addColumn(tableNames.get(tableNum), bracketsToken.getTokenString());
-                    }
+                    newTable.addColumns(tableName, bracketsTokens);
+                }
+                else {
+                    throw new InvalidTokenException(token);
                 }
             }
-//            switch (queryLength)
-//            {
-//                // If query length == 4 then column headers have been specified
-//                case (4):
-//                    token = dbServer.nextToken();
-//                    System.out.println("in switch(4): "+token);
-//                    if (token.matches(RegEx.BRACKETS.getRegex()))
-//                    {
-//                        ArrayList<Token> bracketsTokens;
-//                        bracketsTokens = dbServer.getBrackets(token);
-//                        Table newTable = new Table(databaseName);
-//                        for (Token bracketsToken : bracketsTokens)
-//                        {
-//                            newTable.addColumn(tableNames.get(tableNum), bracketsToken.getTokenString());
-//                        }
-//                    }
-//            }
-            return "[OK] - "+tableNames.get(tableNum)+" table created";
+            return "[OK] - "+tableName+" table created";
         }
         // Add custom messages to ITE
         System.out.println("CreateTableCMD runCommand() error.");

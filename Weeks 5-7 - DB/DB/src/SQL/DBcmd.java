@@ -14,6 +14,7 @@ public abstract class DBcmd
     List<String> columnNames;
     // Might need to save all table names in a DB down here and send back to DBSever?
     List<String> tableNames;
+    String tableName;
     String databaseName;
     String commandType;
     String command;
