@@ -12,11 +12,15 @@ public class Database
     private String databaseName;
     private HashMap<String, Table> database;
 
-    public Database(String databaseName)
+    public Database(String databaseName) throws DatabaseException
     {
         this.database = new HashMap<String, Table>();
         this.databaseName = databaseName;
         currentDirectory = ".";
+        if (!checkDatabaseExists())
+        {
+            throw new DatabaseException("[Error] - Database "+databaseName+" does not exists");
+        }
     }
 
 // "Make" a database by creating a directory/folder in desired location
@@ -63,7 +67,7 @@ public class Database
         return false;
     }
 
-    public Table addTable(String tableName) throws IOException
+    public Table addTable(String tableName) throws IOException, DatabaseException
     {
         Table table = new Table(databaseName);
         table.createTable(tableName);

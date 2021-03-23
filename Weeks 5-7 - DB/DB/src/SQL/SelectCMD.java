@@ -11,18 +11,25 @@ import java.util.ArrayList;
 
 public class SelectCMD extends DBcmd
 {
+    private boolean whereClause;
+    private boolean logicClause;
+    private String token;
+
     public SelectCMD()
     {
         commandType = "CommandType";
         command = "SELECT";
         columnNames = new ArrayList<>();
+        tableArrayList = new ArrayList<>();
     }
 
     @Override
     public String runCommand(DBServer dbServer) throws DatabaseException, IOException
     {
-        String token = dbServer.nextToken();
+        scanForWhere(dbServer);
+        token = dbServer.nextToken();
         databaseName = dbServer.getDatabaseName();
+        System.out.println("Hello SelectCMD class: nextToken = " + token);
 
         if (token.equals("*"))
         {
@@ -36,7 +43,8 @@ public class SelectCMD extends DBcmd
             {
                 columnNames.add(bracketsToken.getTokenString());
             }
-            return selectSome(dbServer, columnNames);
+            dbServer.setColumnNames(columnNames);
+            return selectSome(dbServer);
         }
         else {
             throw new InvalidTokenException(token);
@@ -45,7 +53,7 @@ public class SelectCMD extends DBcmd
 
     public String selectAll(DBServer dbServer) throws DatabaseException, IOException
     {
-        String token = dbServer.nextToken().toUpperCase();
+        token = dbServer.nextToken().toUpperCase();
         Table table = new Table(databaseName);
 
         if (token.equals("FROM"))
@@ -53,17 +61,27 @@ public class SelectCMD extends DBcmd
             token = dbServer.nextToken();
             if (token.matches(RegEx.VARIABLENAME.getRegex()))
             {
-//                table.readTable(token);
-                String printTable = table.printTable(token);
+                tableName = token;
+                table.readTable("contactdetails");
+                tableArrayList = table.getTable();
+                System.out.println(tableArrayList.get(0));
+                if (whereClause)
+                {
+                    dbServer.setTableName(tableName);
+                    dbServer.setTable(tableArrayList);
+                    return new ConditionCMD().runCommand(dbServer);
+                }
+                table.readTable(tableName);
+                String printTable = table.printTable(tableName);
                 return "[OK]\n"+printTable;
             }
         }
         throw new InvalidTokenException(token);
     }
 
-    public String selectSome(DBServer dbServer, ArrayList<String> columnNames) throws DatabaseException, IOException
+    public String selectSome(DBServer dbServer) throws DatabaseException, IOException
     {
-        String token = dbServer.nextToken().toUpperCase();
+        token = dbServer.nextToken().toUpperCase();
         Table table = new Table(databaseName);
 
         if (token.equals("FROM"))
@@ -71,13 +89,50 @@ public class SelectCMD extends DBcmd
             token = dbServer.nextToken();
             if (token.matches(RegEx.VARIABLENAME.getRegex()))
             {
-//                table.readTable(token);
-                String printTable = table.printSome(token, columnNames);
-                printTable = table.printTable(token);
+                tableName = token;
+                tableArrayList = table.selectTable(tableName, columnNames);
+                if (whereClause)
+                {
+                    dbServer.setTableName(tableName);
+                    dbServer.setTable(tableArrayList);
+                    return new ConditionCMD().runCommand(dbServer);
+                }
+                // make sure cut down table passes through with where clause
+                String printTable = table.printTable(tableName);
                 return "[OK]\n"+printTable;
             }
         }
         throw new InvalidTokenException(token);
+    }
+
+    public void scanForWhere(DBServer dbServer) throws DatabaseException
+    {
+        whereClause = false;
+        int startTokenNum = dbServer.getCurrentTokenNum();
+        for (int i = startTokenNum; i < dbServer.getQueryLength()-1; i++)
+        {
+            token = dbServer.nextToken().toUpperCase();
+            if (token.equals("WHERE"))
+            {
+                whereClause = true;
+            }
+        }
+        dbServer.setCurrentTokenNum(startTokenNum);
+    }
+
+    public void scanForLogic(DBServer dbServer) throws DatabaseException
+    {
+        logicClause = false;
+        int startTokenNum = dbServer.getCurrentTokenNum();
+        for (int i = startTokenNum; i < dbServer.getQueryLength()-1; i++)
+        {
+            token = dbServer.nextToken().toUpperCase();
+            if (token.equals("AND") || token.equals("OR"))
+            {
+                logicClause = true;
+            }
+        }
+        dbServer.setCurrentTokenNum(startTokenNum);
     }
 
     @Override

@@ -1,8 +1,12 @@
 package Input;
 
 import DBExceptions.InvalidQueryException;
+import SQL.RegEx;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Tokenizer
 {
@@ -18,26 +22,53 @@ public class Tokenizer
         currentToken = 0;
     }
 
-//  name='clive' doesnt need spaces --> will need to check strings char by char to split here
-//  Or include = into split regex
     public ArrayList<Token> tokenize() throws InvalidQueryException
     {
         String[] tokenArray = command.split("\\s+(?![^(]*\\))");
+        tokenArray = tokenizeCondition(tokenArray);
+
         int endTokenIndex = tokenArray.length-1;
         String endToken = tokenArray[endTokenIndex];
 
-        if (tokenArray.length == 1 || !checkValidEnd(endToken))
+        if (!checkValidEnd(endToken))
         {
             System.out.println("Tokenizer tokenize() error.");
             throw new InvalidQueryException();
         }
         tokenArray[endTokenIndex] = endToken.replace(";","");
         tokenArrayList = new ArrayList<>();
-        for (String s : tokenArray) {
+        for (String s : tokenArray)
+        {
             token = new Token(s);
             tokenArrayList.add(token);
         }
         return tokenArrayList;
+    }
+
+//  split out conditions with operators without spaces STILL NEED TO FIX >= <= operators
+    public String[] tokenizeCondition(String[] tokenArray)
+    {
+        String[] operatorSplit;
+        int arraySize;
+        for (int i=0; i<tokenArray.length;i++)
+        {
+            Pattern p = Pattern.compile(RegEx.WHERESPLIT.getRegex());
+            Matcher m = p.matcher(tokenArray[i]);
+            if (m.find())
+            {
+                operatorSplit = tokenArray[i].split(RegEx.WHERESPLIT.getRegex());
+                tokenArray[i++] = operatorSplit[0];
+                arraySize = tokenArray.length + operatorSplit.length-1;
+                tokenArray = Arrays.copyOf(tokenArray, arraySize);
+                for (int j = 1; j < operatorSplit.length; j++)
+                {
+                    tokenArray[i++] = operatorSplit[j];
+                }
+                // kill loop to save time
+                i = arraySize;
+            }
+        }
+        return tokenArray;
     }
 
     public boolean checkValidEnd(String endToken)

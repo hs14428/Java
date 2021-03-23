@@ -1,8 +1,10 @@
 package Database;
 
+import DBExceptions.DatabaseException;
 import DBExceptions.InvalidTokenException;
 import DBExceptions.TableException;
 import Input.Token;
+import SQL.Operator;
 import SQL.RegEx;
 
 import java.io.*;
@@ -19,6 +21,10 @@ public class Table
     private String extension;
     private Database database;
 
+    private String columnName;
+    private String operator;
+    private String value;
+
     private ArrayList<ArrayList<String>> table;
     private ArrayList<Record> records;
     private Record record;
@@ -27,12 +33,11 @@ public class Table
 
     // tableName is really just the .tab file name and database is really just the directory/folder
     // Need to check that a DBServer folder exists and use this as the landing for the DB
-    public Table(String databaseName)
+    public Table(String databaseName) throws DatabaseException
     {
         records = new ArrayList<Record>();
         record = new Record();
 
-        this.tableName = tableName;
         this.databaseName = databaseName;
         database = new Database(databaseName);
         currentDirectory = database.getCurrentDirectory();
@@ -211,7 +216,7 @@ public class Table
         return tableString;
     }
 
-    public String printSome(String tableName, ArrayList<String> columnNames) throws IOException
+    public ArrayList<ArrayList<String>> selectTable(String tableName, ArrayList<String> columnNames) throws IOException
     {
         table = readTable(tableName);
         addRecords();
@@ -219,29 +224,137 @@ public class Table
         ArrayList<ArrayList<String>> newTable = new ArrayList<>();
         ArrayList<String> row = new ArrayList<>();
 
-//        String newTableString = "";
         for (String columnName : columnNames)
         {
-//            newTableString += columnName;
-//            newTableString += "\t";
             row.add(columnName);
         }
         newTable.add(row);
-//        newTableString += "\n";
         for (int j = 0; j < records.size(); j++)
         {
             row = new ArrayList<>();
             for (int i = 0; i < size; i++)
             {
-//                columnNames.add(records.get(j).getColumnData(columnNames.get(i)));
-//                newTableString += records.get(j).getColumnData(columnNames.get(i));
-//                newTableString += "\t";
                 row.add(records.get(j).getColumnData(columnNames.get(i)));
             }
-//            newTableString += "\n";
             newTable.add(row);
         }
         table = newTable;
-        return "";
+        return table;
     }
+
+    public ArrayList<String> readColumnNames(String tableName) throws IOException
+    {
+        table = readTable(tableName);
+        ArrayList<String> columnNames = new ArrayList<>();
+        String columnName;
+
+        for (int i = 0; i < table.get(0).size(); i++)
+        {
+            columnName = table.get(0).get(i);
+            columnNames.add(columnName);
+        }
+
+        return columnNames;
+    }
+
+    public ArrayList<ArrayList<String>> conditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
+    {
+        System.out.println("try 1");
+        table = tableInput;
+        System.out.println("try 2");
+        System.out.println(tableInput.get(0));
+        System.out.println(printTable("contactdetaiils"));
+        addRecords();
+        System.out.println("try 3");
+
+        columnName = conditions.get(conditionNum++);
+        operator = conditions.get(conditionNum++);
+        value = conditions.get(conditionNum++);
+        System.out.println("conditionNum after assigning col, op and val: "+conditionNum);
+        Operator op = new Operator(operator, value);
+
+        if (op.isNumber())
+        {
+            return numberOperation();
+        }
+        if (!op.isNumber())
+        {
+            System.out.println("Passed !op.isNumber() check");
+            return stringBoolOperation();
+        }
+        throw new DatabaseException("[Error] - Could not carry out WHERE clause");
+    }
+
+    public ArrayList<ArrayList<String>> stringBoolOperation() throws DatabaseException, IOException
+    {
+        String entry;
+        int i = 0;
+        int size = table.size();
+        ArrayList<ArrayList<String>> newTable = table;
+        System.out.println(table.size());
+        System.out.println("operator in bool op "+operator);
+        System.out.println("value in bool op "+value);
+        for (int j = 1; i < records.size(); i++, j++)
+        {
+            System.out.println("i = "+i+" and j = "+j);
+            System.out.println(printTable("contactdetails"));
+            entry = records.get(i).getColumnData(columnName);
+            switch (operator)
+            {
+                case ("=="):
+                    System.out.println(entry+" == "+value);
+                    if (!entry.equals(value))
+                    {
+                        table.remove(j--);
+                    }
+                    break;
+                case ("!="):
+                    System.out.println("shouldnt be here");
+                    if (entry.equals(value))
+                    {
+                        table.remove(j--);
+                    }
+                    break;
+                default:
+                    throw new DatabaseException("[Error] - "+operator+" is invalid");
+            }
+        }
+        table = newTable;
+        return table;
+    }
+
+    public ArrayList<ArrayList<String>> numberOperation()
+    {
+        String entry;
+        for (int i = 0; i < records.size(); i++)
+        {
+            entry = records.get(i).getColumnData(columnName);
+            switch (operator)
+            {
+                case ("=="):
+                    if (!entry.equals(value))
+                    {
+                        table.remove(i);
+                    }
+                case (">"):
+
+                case ("<"):
+
+                case (">="):
+
+                case ("<="):
+
+                case ("!="):
+                    if (entry.equals(value))
+                    {
+                        table.remove(i);
+                    }
+                case ("LIKE"):
+
+            }
+        }
+        return table;
+    }
+
+    public ArrayList<ArrayList<String>> getTable() { return table ; }
 }

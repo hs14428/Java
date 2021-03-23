@@ -13,9 +13,12 @@ import java.util.ArrayList;
 
 public class DBServer
 {
+    private ArrayList<ArrayList<String>> table = new ArrayList<>();
     private ArrayList<Token> tokenList = new ArrayList<>();
+    private ArrayList<String> columnNames = new ArrayList<>();
     private Tokenizer tokenizer;
     private String databaseName;
+    private String tableName;
     private int currentTokenNum;
     private int queryLength;
 
@@ -92,11 +95,18 @@ public class DBServer
         return bracketsList;
     }
 
-    public String nextToken()
+    public String nextToken() throws DatabaseException
     {
+        String token;
         incCurrentTokenNum();
-        String token = tokenList.get(currentTokenNum).getTokenString();
-        return token;
+        if (getCurrentTokenNum() < getQueryLength())
+        {
+            System.out.println("In nextToken: "+currentTokenNum);
+            token = tokenList.get(currentTokenNum).getTokenString();
+            System.out.println(token+" = in nextToken");
+            return token;
+        }
+        throw new DatabaseException("[Error] - Run out of tokens");
     }
 
     public String previousToken()
@@ -135,9 +145,27 @@ public class DBServer
         return databaseName;
     }
 
-//    public String getOriginalCommand()
-//    {
-//        return originalCommand;
-//    }
+    public void setTableName(String tableName)
+    {
+        this.tableName = tableName;
+    }
 
+    public String getTableName()
+    {
+        return tableName;
+    }
+
+    public void setTable(ArrayList<ArrayList<String>> table) { this.table = table; }
+
+    public ArrayList<ArrayList<String>> getTable() { return table; }
+
+    public void setColumnNames(ArrayList<String> columnNames)
+    {
+        this.columnNames = columnNames;
+    }
+
+    public ArrayList<String> getColumnNames()
+    {
+        return columnNames;
+    }
 }

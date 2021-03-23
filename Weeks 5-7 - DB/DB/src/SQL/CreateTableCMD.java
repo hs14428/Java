@@ -26,7 +26,7 @@ public class CreateTableCMD extends DBcmd
         int queryLength = dbServer.getQueryLength();
 //        System.out.println("Hello CreateTableCMD class: nextToken = " + token);
 
-        // Need to add error handling for having not selected a DB
+        // Need to add error handling for having not selected a DB?
 //        if (databaseName.equals(""))
 //        {
 //            System.out.println("In .equals");

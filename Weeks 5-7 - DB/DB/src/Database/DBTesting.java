@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DBTesting {
 
@@ -90,10 +92,10 @@ public class DBTesting {
 //        table.addRow("writeToTableTest", rowValues);
 
 //      test regex matching
-        String trueString = "'tony'";
+        String trueString = "42.9";
         if (trueString.matches(RegEx.VALUE.getRegex()))
         {
-            System.out.println("Big time success.");
+            System.out.println("Big time success value.");
         }
 
 //      test printTable
@@ -102,15 +104,48 @@ public class DBTesting {
         ArrayList<String> columnNamesString = new ArrayList<>();
         columnNamesString.add("Name");
         columnNamesString.add("Age");
-        System.out.println(table.printSome("contactdetails", columnNamesString));
+        System.out.println(table.selectTable("contactdetails", columnNamesString));
         System.out.println(table.printTable("contactdetails"));
 
-//      Test tokensizer class with the Tokenize fn
-        String command = "CREATE TABLE Table1 (id, name, email, address);";
-        Tokenizer tokenizer = new Tokenizer(command);
-        tokenizer.tokenize();
-        System.out.println("\n"+tokenizer.getToken(3).getTokenString());
-//      Test tokensizer class with the TokenizeBrackets fn
-        tokenizer.tokenizeBrackets(tokenizer.getToken(3).getTokenString());
+//      test regex matching
+        trueString = "LIKE";
+        if (trueString.matches(RegEx.OPERATOR.getRegex()))
+        {
+            System.out.println("Big time success operator.");
+        }
+
+        trueString = "name=='clive';";
+        if (trueString.matches(RegEx.WHERESPLIT.getRegex()))
+        {
+            System.out.println("Big time success WHERESPLIT.");
+        }
+        String[] trueStringArray = trueString.split(RegEx.WHERESPLIT.getRegex());
+        System.out.println("trueString1: "+trueStringArray[0]);
+        System.out.println("trueString2: "+trueStringArray[1]);
+        System.out.println("trueString3: "+trueStringArray[2]);
+        System.out.println();
+
+        Pattern p = Pattern.compile(RegEx.WHERESPLIT.getRegex());
+        Matcher m = p.matcher("name<='clive';");
+        if (m.find())
+        {
+            System.out.println("pattern success");
+        }
+
+        Tokenizer tok = new Tokenizer("select * from contactdetails where name=='clive';");
+        tok.tokenize();
+        System.out.println();
+
+////      test readColumnNames
+//        table = new Table("JobsDB");
+//        System.out.println(table.readColumnNames("contactdetails"));
+//
+////      Test tokensizer class with the Tokenize fn
+//        String command = "CREATE TABLE Table1 (id, name, email, address);";
+//        Tokenizer tokenizer = new Tokenizer(command);
+//        tokenizer.tokenize();
+//        System.out.println("\n"+tokenizer.getToken(3).getTokenString());
+////      Test tokensizer class with the TokenizeBrackets fn
+//        tokenizer.tokenizeBrackets(tokenizer.getToken(3).getTokenString());
     }
 }
