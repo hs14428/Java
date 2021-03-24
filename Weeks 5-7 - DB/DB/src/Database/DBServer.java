@@ -17,6 +17,8 @@ public class DBServer
     private ArrayList<Token> tokenList = new ArrayList<>();
     private ArrayList<String> columnNames = new ArrayList<>();
     private Tokenizer tokenizer;
+    private String currentDirectory;
+    private String baseDirectory;
     private String databaseName;
     private String tableName;
     private int currentTokenNum;
@@ -60,6 +62,7 @@ public class DBServer
             System.out.println("Try 3");
             currentTokenNum = 0;
             System.out.println("Try 4");
+            createDBEnvironment();
             Parser parser = new Parser(this);
             System.out.println("Try 5");
             socketWriter.write(parser.parse().runCommand(this));
@@ -76,6 +79,19 @@ public class DBServer
     public static void main(String args[])
     {
         DBServer server = new DBServer(8888);
+    }
+
+    public void createDBEnvironment()
+    {
+        currentDirectory = ".";
+        baseDirectory = "Databases";
+        File database = new File(currentDirectory + File.separator + baseDirectory);
+        System.out.println("createDBEnvironmet:" +currentDirectory + File.separator + baseDirectory);
+
+        if (!database.exists())
+        {
+            database.mkdirs();
+        }
     }
 
     public Tokenizer getTokenizer()

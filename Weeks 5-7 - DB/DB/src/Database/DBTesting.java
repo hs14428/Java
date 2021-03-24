@@ -132,20 +132,22 @@ public class DBTesting {
             System.out.println("pattern success");
         }
 
-        Tokenizer tok = new Tokenizer("select * from contactdetails where name=='clive';");
+
+
+        Tokenizer tok = new Tokenizer("select * from contactdetails where Name=='clive';");
         tok.tokenize();
         System.out.println();
 
-////      test readColumnNames
-//        table = new Table("JobsDB");
-//        System.out.println(table.readColumnNames("contactdetails"));
-//
-////      Test tokensizer class with the Tokenize fn
-//        String command = "CREATE TABLE Table1 (id, name, email, address);";
-//        Tokenizer tokenizer = new Tokenizer(command);
-//        tokenizer.tokenize();
-//        System.out.println("\n"+tokenizer.getToken(3).getTokenString());
-////      Test tokensizer class with the TokenizeBrackets fn
-//        tokenizer.tokenizeBrackets(tokenizer.getToken(3).getTokenString());
+//      test readColumnNames
+        table = new Table("JobsDB");
+        System.out.println(table.readColumnNames("contactdetails"));
+
+//      Test tokensizer class with the Tokenize fn
+        String command = "CREATE TABLE Table1 (id, name, email, address);";
+        Tokenizer tokenizer = new Tokenizer(command);
+        tokenizer.tokenize();
+        System.out.println("\n"+tokenizer.getToken(3).getTokenString());
+//      Test tokensizer class with the TokenizeBrackets fn
+        tokenizer.tokenizeBrackets(tokenizer.getToken(3).getTokenString());
     }
 }

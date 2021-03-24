@@ -61,30 +61,53 @@ public class ConditionCMD extends DBcmd
     public String storeCondition(DBServer dbServer) throws DatabaseException, IOException
     {
         // Add column name to conditions
-        System.out.println(token+" in storeCondition");
+//        System.out.println(token+" in storeCondition");
         conditions.add(token);
-        System.out.println(conditions+" in storeCondition");
+//        System.out.println(conditions+" in storeCondition");
         token = dbServer.nextToken();
-        System.out.println(token+" before operator match");
+//        System.out.println(token+" before operator match");
         if (token.matches(RegEx.OPERATOR.getRegex()))
         {
             // Add operator to conditions
             conditions.add(token);
-            System.out.println(conditions+" in operator match");
+//            System.out.println(conditions+" in operator match");
             token = dbServer.nextToken();
-            System.out.println(token+" in operator match");
+//            System.out.println(token+" in operator match");
             if (token.matches(RegEx.VALUE.getRegex()))
             {
                 // Add value to conditions
                 conditions.add(token);
-                System.out.println(conditions+" in value match");
-                return processCondition(dbServer);
+//                System.out.println(conditions+" in value match");
+                switch(command)
+                {
+                    case ("SELECT"):
+                        return selectCondition(dbServer);
+                    case ("UPDATE"):
+                        return updateCondition(dbServer);
+                    case ("DELETE"):
+                        return deleteCondition(dbServer);
+                    default:
+                        throw new DatabaseException("[Error] - Missing condition type command.");
+                }
+
             }
         }
         throw new InvalidTokenException(token);
     }
 
-    public String processCondition(DBServer dbServer) throws DatabaseException, IOException
+    public String updateCondition(DBServer dbServer)
+    {
+
+        return null;
+    }
+
+    public String deleteCondition(DBServer dbServer)
+    {
+
+        return null;
+    }
+
+    public String selectCondition(DBServer dbServer) throws DatabaseException, IOException
     {
         Table table = new Table(databaseName);
         System.out.println("we made it into processCondition");

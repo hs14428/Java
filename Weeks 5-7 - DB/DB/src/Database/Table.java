@@ -42,6 +42,22 @@ public class Table
         database = new Database(databaseName);
         currentDirectory = database.getCurrentDirectory();
         databasePath = currentDirectory + File.separator + this.databaseName;
+        System.out.println("in Table - dbPath: " + databasePath);
+        extension = ".tab";
+    }
+
+//  Second constructor for creating HashMap of tables in database
+    public Table(String databaseName, String tableName) throws DatabaseException
+    {
+        records = new ArrayList<Record>();
+        record = new Record();
+
+        this.tableName = tableName;
+        this.databaseName = databaseName;
+        database = new Database(databaseName);
+        currentDirectory = database.getCurrentDirectory();
+        databasePath = currentDirectory + File.separator + this.databaseName;
+        System.out.println("in Table - dbPath: " + databasePath);
         extension = ".tab";
     }
 
@@ -52,7 +68,7 @@ public class Table
 
         if (!readTable.exists())
         {
-            throw new TableException("[Error] - Table does not exist.");
+            throw new TableException("[Error] - "+tableName +" does not exist.");
         }
         else {
             FileReader reader = new FileReader(readTable);
@@ -99,10 +115,15 @@ public class Table
     public void createTable(String tableName) throws IOException
     {
         File newTable = new File(databasePath + File.separator + tableName + extension);
+        System.out.println("in createTable - filepath: "+databasePath + File.separator + tableName + extension);
 
         if (!newTable.exists())
         {
-            newTable.createNewFile();
+            if (!newTable.createNewFile())
+            {
+                throw new TableException("[Error] - Cannot find the path specified");
+            }
+
             FileWriter writer = new FileWriter(newTable);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
             bufferedWriter.write("id");
@@ -162,9 +183,13 @@ public class Table
         {
             for (Token columnName : columnNames)
             {
-                // Check the contents of the columnNames arraylist are valid
-                if (!columnName.toString().matches(RegEx.VARIABLENAME.getRegex()))
+                System.out.println("in addColumns - columnName = "+columnName.getTokenString());
+//                // Check the contents of the columnNames arraylist are valid
+//                Pattern p = Pattern.compile(RegEx.VARIABLENAME.getRegex());
+//                Matcher m = p.matcher(columnName.)
+                if (!columnName.getTokenString().matches(RegEx.VARIABLENAME.getRegex()))
                 {
+                    System.out.println("shouldnt be here");
                     throw new InvalidTokenException(columnName.getTokenString());
                 }
                 // Add column name to end of table columns
@@ -263,7 +288,7 @@ public class Table
         table = tableInput;
         System.out.println("try 2");
         System.out.println(tableInput.get(0));
-        System.out.println(printTable("contactdetaiils"));
+        System.out.println(printTable(tableName));
         addRecords();
         System.out.println("try 3");
 
@@ -272,6 +297,7 @@ public class Table
         value = conditions.get(conditionNum++);
         System.out.println("conditionNum after assigning col, op and val: "+conditionNum);
         Operator op = new Operator(operator, value);
+        op.numberOrString();
 
         if (op.isNumber())
         {
@@ -285,6 +311,7 @@ public class Table
         throw new DatabaseException("[Error] - Could not carry out WHERE clause");
     }
 
+//  Might need to move to Operator class?
     public ArrayList<ArrayList<String>> stringBoolOperation() throws DatabaseException, IOException
     {
         String entry;
@@ -309,7 +336,6 @@ public class Table
                     }
                     break;
                 case ("!="):
-                    System.out.println("shouldnt be here");
                     if (entry.equals(value))
                     {
                         table.remove(j--);

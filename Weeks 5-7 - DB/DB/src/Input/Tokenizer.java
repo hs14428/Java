@@ -27,6 +27,10 @@ public class Tokenizer
         String[] tokenArray = command.split("\\s+(?![^(]*\\))");
         tokenArray = tokenizeCondition(tokenArray);
 
+//        for (String value : tokenArray) {
+//            System.out.println(value);
+//        }
+
         int endTokenIndex = tokenArray.length-1;
         String endToken = tokenArray[endTokenIndex];
 
@@ -58,15 +62,27 @@ public class Tokenizer
             {
                 operatorSplit = tokenArray[i].split(RegEx.WHERESPLIT.getRegex());
                 tokenArray[i++] = operatorSplit[0];
-                arraySize = tokenArray.length + operatorSplit.length-1;
-                tokenArray = Arrays.copyOf(tokenArray, arraySize);
-                for (int j = 1; j < operatorSplit.length; j++)
-                {
-                    tokenArray[i++] = operatorSplit[j];
-                }
+                tokenArray = copyArray(i, tokenArray, operatorSplit);
+//                arraySize = tokenArray.length + operatorSplit.length-1;
+//                tokenArray = Arrays.copyOf(tokenArray, arraySize);
+//                for (int j = 1; j < operatorSplit.length; j++)
+//                {
+//                    tokenArray[i++] = operatorSplit[j];
+//                }
                 // kill loop to save time
-                i = arraySize;
+                i = tokenArray.length;
             }
+        }
+        return tokenArray;
+    }
+
+    private String[] copyArray(int i, String[] tokenArray, String[] operatorSplit)
+    {
+        int arraySize = tokenArray.length + operatorSplit.length-1;
+        tokenArray = Arrays.copyOf(tokenArray, arraySize);
+        for (int j = 1; j < operatorSplit.length; j++)
+        {
+            tokenArray[i++] = operatorSplit[j];
         }
         return tokenArray;
     }

@@ -22,6 +22,7 @@ public class CreateDatabaseCMD extends DBcmd
 
         if (token.matches(RegEx.VARIABLENAME.getRegex()))
         {
+            System.out.println(token);
             databaseName = token;
             Database database = new Database(databaseName);
             database.createDatabase(databaseName);

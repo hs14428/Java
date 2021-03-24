@@ -16,11 +16,23 @@ public class Database
     {
         this.database = new HashMap<String, Table>();
         this.databaseName = databaseName;
-        currentDirectory = ".";
-        if (!checkDatabaseExists())
+        currentDirectory = "."+File.separator+"Databases";
+//        if (!checkDatabaseExists())
+//        {
+//            throw new DatabaseException("[Error] - Database "+databaseName+" does not exists");
+//        }
+    }
+
+    public HashMap<String, Table> scanDBForTables() throws DatabaseException
+    {
+        Table table;
+        File[] tables = listTables();
+        for (int i = 0; i < tables.length; i++)
         {
-            throw new DatabaseException("[Error] - Database "+databaseName+" does not exists");
+            table = new Table(databaseName, tables[i].getName());
+            database.put(tables[i].getName(), table);
         }
+        return database;
     }
 
 // "Make" a database by creating a directory/folder in desired location
@@ -59,7 +71,7 @@ public class Database
     public boolean checkDatabaseExists()
     {
         File database = new File(currentDirectory + File.separator + databaseName);
-
+        System.out.println("checkDatabaseExists: "+currentDirectory + File.separator + databaseName);
         if (database.exists())
         {
             return true;
@@ -69,6 +81,9 @@ public class Database
 
     public Table addTable(String tableName) throws IOException, DatabaseException
     {
+        System.out.println("In addTable - dbName: "+databaseName);
+        System.out.println("In addTable - tableName: "+tableName);
+
         Table table = new Table(databaseName);
         table.createTable(tableName);
         return table;

@@ -2,7 +2,7 @@ package SQL;
 
 public enum RegEx
 {
-    VARIABLENAME ("[a-zA-Z0-9]+"),
+    VARIABLENAME ("[a-zA-Z0-9_.]+"),
     BRACKETS ("\\(\\s*(.*)\\s*\\)"),
     STRINGLITERAL ("'[a-zA-Z0-9_.-@ ]+'"),
     BOOLEANLITERAL ("true|false"),

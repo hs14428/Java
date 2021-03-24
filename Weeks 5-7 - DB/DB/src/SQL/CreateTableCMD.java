@@ -37,6 +37,7 @@ public class CreateTableCMD extends DBcmd
         {
             tableName = token;
             databaseName = dbServer.getDatabaseName();
+            System.out.println("in CreateTableCMD - dbname:"+databaseName);
             Database database = new Database(databaseName);
             database.addTable(token);
             if (queryLength == 4)

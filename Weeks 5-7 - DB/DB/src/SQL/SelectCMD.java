@@ -62,7 +62,7 @@ public class SelectCMD extends DBcmd
             if (token.matches(RegEx.VARIABLENAME.getRegex()))
             {
                 tableName = token;
-                table.readTable("contactdetails");
+                table.readTable(token);
                 tableArrayList = table.getTable();
                 System.out.println(tableArrayList.get(0));
                 if (whereClause)
