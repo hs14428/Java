@@ -69,7 +69,7 @@ public class SelectCMD extends DBcmd
                 {
                     dbServer.setTableName(tableName);
                     dbServer.setTable(tableArrayList);
-                    return new ConditionCMD().runCommand(dbServer);
+                    return new ConditionCMD(command).runCommand(dbServer);
                 }
                 table.readTable(tableName);
                 String printTable = table.printTable(tableName);
@@ -95,7 +95,7 @@ public class SelectCMD extends DBcmd
                 {
                     dbServer.setTableName(tableName);
                     dbServer.setTable(tableArrayList);
-                    return new ConditionCMD().runCommand(dbServer);
+                    return new ConditionCMD(command).runCommand(dbServer);
                 }
                 // make sure cut down table passes through with where clause
                 String printTable = table.printTable(tableName);

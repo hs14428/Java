@@ -117,9 +117,7 @@ public class DBServer
         incCurrentTokenNum();
         if (getCurrentTokenNum() < getQueryLength())
         {
-            System.out.println("In nextToken: "+currentTokenNum);
             token = tokenList.get(currentTokenNum).getTokenString();
-            System.out.println(token+" = in nextToken");
             return token;
         }
         throw new DatabaseException("[Error] - Run out of tokens");

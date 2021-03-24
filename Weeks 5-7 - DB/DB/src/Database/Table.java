@@ -297,10 +297,13 @@ public class Table
         value = conditions.get(conditionNum++);
         System.out.println("conditionNum after assigning col, op and val: "+conditionNum);
         Operator op = new Operator(operator, value);
+//      Check if column being operator on is a String/Bool or Int/Float type column and then
+//      perform the correct operation on it
         op.numberOrString();
 
         if (op.isNumber())
         {
+            System.out.println("Passed op.isNumber() check (ie. number)");
             return numberOperation();
         }
         if (!op.isNumber())
@@ -317,7 +320,6 @@ public class Table
         String entry;
         int i = 0;
         int size = table.size();
-        ArrayList<ArrayList<String>> newTable = table;
         System.out.println(table.size());
         System.out.println("operator in bool op "+operator);
         System.out.println("value in bool op "+value);
@@ -345,25 +347,26 @@ public class Table
                     throw new DatabaseException("[Error] - "+operator+" is invalid");
             }
         }
-        table = newTable;
         return table;
     }
 
-    public ArrayList<ArrayList<String>> numberOperation()
+    public ArrayList<ArrayList<String>> numberOperation() throws DatabaseException
     {
         String entry;
+        Float floatValue = Float.parseFloat(value);
+        Float floatEntry;
         for (int i = 0; i < records.size(); i++)
         {
             entry = records.get(i).getColumnData(columnName);
+            floatEntry = Float.parseFloat(entry);
+            System.out.println(floatEntry);
+
             switch (operator)
             {
                 case ("=="):
-                    if (!entry.equals(value))
-                    {
-                        table.remove(i);
-                    }
+                    i = floatOperate(operator, floatEntry, floatValue, i);
                 case (">"):
-
+                    i = floatOperate(operator, floatEntry, floatValue, i);
                 case ("<"):
 
                 case (">="):
@@ -376,10 +379,45 @@ public class Table
                         table.remove(i);
                     }
                 case ("LIKE"):
-
             }
         }
         return table;
+    }
+
+    public int floatOperate(String operator, Float entry, Float value, int i) throws DatabaseException
+    {
+        int index = i;
+
+        switch (operator)
+        {
+            case("=="):
+                if (entry.compareTo(value) != 0)
+                {
+                    table.remove(index--);
+                }
+//                return index;
+            case("!="):
+                if (entry.compareTo(value) == 0)
+                {
+                    table.remove(index--);
+                }
+//                return index;
+            case(">"):
+                if (entry.compareTo(value) < 0)
+                {
+                    table.remove(index--);
+                }
+//                return index;
+            case("<"):
+                if (entry.compareTo(value) > 0)
+                {
+                    table.remove(index--);
+                }
+//                return index;
+//            default:
+//                throw new DatabaseException("[Error] - "+operator+" is invalid");
+        }
+        return index;
     }
 
     public ArrayList<ArrayList<String>> getTable() { return table ; }

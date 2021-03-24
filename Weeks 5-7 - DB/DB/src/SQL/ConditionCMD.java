@@ -12,13 +12,11 @@ import java.util.ArrayList;
 public class ConditionCMD extends DBcmd
 {
     String token;
-    String columnName;
-    String operator;
-    String value;
     int conditionNum;
 
-    public ConditionCMD()
+    public ConditionCMD(String command)
     {
+        this.command = command;
         conditions = new ArrayList<>();
     }
 
@@ -61,23 +59,24 @@ public class ConditionCMD extends DBcmd
     public String storeCondition(DBServer dbServer) throws DatabaseException, IOException
     {
         // Add column name to conditions
-//        System.out.println(token+" in storeCondition");
+        System.out.println(token+" in storeCondition");
         conditions.add(token);
-//        System.out.println(conditions+" in storeCondition");
+        System.out.println(conditions+" in storeCondition");
         token = dbServer.nextToken();
-//        System.out.println(token+" before operator match");
+        System.out.println(token+" before operator match");
         if (token.matches(RegEx.OPERATOR.getRegex()))
         {
             // Add operator to conditions
             conditions.add(token);
-//            System.out.println(conditions+" in operator match");
+            System.out.println(conditions+" in operator match");
             token = dbServer.nextToken();
-//            System.out.println(token+" in operator match");
+            System.out.println(token+" in operator match");
             if (token.matches(RegEx.VALUE.getRegex()))
             {
                 // Add value to conditions
                 conditions.add(token);
-//                System.out.println(conditions+" in value match");
+                System.out.println(conditions+" in value match");
+                System.out.println("command before switch: "+command);
                 switch(command)
                 {
                     case ("SELECT"):
