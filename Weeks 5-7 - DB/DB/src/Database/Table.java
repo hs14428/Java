@@ -282,7 +282,8 @@ public class Table
         return columnNames;
     }
 
-    public ArrayList<ArrayList<String>> conditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
+//    public ArrayList<ArrayList<String>> conditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
+    public String conditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
     {
         System.out.println("try 1");
         table = tableInput;
@@ -304,34 +305,39 @@ public class Table
         if (op.isNumber())
         {
             System.out.println("Passed op.isNumber() check (ie. number)");
-            return numberOperation();
+            numberOperation();
+            return printTable(tableName);
+//            return numberOperation();
         }
         if (!op.isNumber())
         {
             System.out.println("Passed !op.isNumber() check");
-            return stringBoolOperation();
+            stringBoolOperation();
+            return printTable(tableName);
+//            return stringBoolOperation();
         }
-        throw new DatabaseException("[Error] - Could not carry out WHERE clause");
+        throw new DatabaseException("[Error] - Could not carry out WHERE clause. Check inputs.");
     }
 
 //  Might need to move to Operator class?
-    public ArrayList<ArrayList<String>> stringBoolOperation() throws DatabaseException, IOException
+//    public ArrayList<ArrayList<String>> stringBoolOperation() throws DatabaseException, IOException
+    public void stringBoolOperation() throws DatabaseException, IOException
     {
         String entry;
-        int i = 0;
+        int j = 1;
         int size = table.size();
         System.out.println(table.size());
-        System.out.println("operator in bool op "+operator);
-        System.out.println("value in bool op "+value);
-        for (int j = 1; i < records.size(); i++, j++)
+//        System.out.println("operator in bool op "+operator);
+//        System.out.println("value in bool op "+value);
+        for (int i = 0; i < records.size(); i++, j++)
         {
-            System.out.println("i = "+i+" and j = "+j);
-            System.out.println(printTable("contactdetails"));
+//            System.out.println("i = "+i+" and j = "+j);
+            System.out.println(printTable(tableName));
             entry = records.get(i).getColumnData(columnName);
+
             switch (operator)
             {
                 case ("=="):
-                    System.out.println(entry+" == "+value);
                     if (!entry.equals(value))
                     {
                         table.remove(j--);
@@ -347,77 +353,73 @@ public class Table
                     throw new DatabaseException("[Error] - "+operator+" is invalid");
             }
         }
-        return table;
     }
 
-    public ArrayList<ArrayList<String>> numberOperation() throws DatabaseException
+//    public ArrayList<ArrayList<String>> numberOperation() throws DatabaseException
+    public void numberOperation() throws DatabaseException
     {
         String entry;
-        Float floatValue = Float.parseFloat(value);
-        Float floatEntry;
-        for (int i = 0; i < records.size(); i++)
+        float floatValue = Float.parseFloat(value);
+        float floatEntry;
+        int j = 1;
+        for (int i = 0; i < records.size(); i++, j++)
         {
             entry = records.get(i).getColumnData(columnName);
             floatEntry = Float.parseFloat(entry);
-            System.out.println(floatEntry);
-
-            switch (operator)
-            {
-                case ("=="):
-                    i = floatOperate(operator, floatEntry, floatValue, i);
-                case (">"):
-                    i = floatOperate(operator, floatEntry, floatValue, i);
-                case ("<"):
-
-                case (">="):
-
-                case ("<="):
-
-                case ("!="):
-                    if (entry.equals(value))
-                    {
-                        table.remove(i);
-                    }
-                case ("LIKE"):
-            }
+            j = floatOperate(operator, floatEntry, floatValue, j);
         }
-        return table;
     }
 
-    public int floatOperate(String operator, Float entry, Float value, int i) throws DatabaseException
+    public int floatOperate(String operator, Float entry, Float value, int j) throws DatabaseException
     {
-        int index = i;
-
+        int index = j;
+        System.out.println(operator);
+        Operator op = new Operator();
         switch (operator)
         {
             case("=="):
-                if (entry.compareTo(value) != 0)
+                if (!op.floatEqualsTo(entry, value))
                 {
                     table.remove(index--);
                 }
-//                return index;
+                return index;
             case("!="):
-                if (entry.compareTo(value) == 0)
+                if (op.floatEqualsTo(entry, value))
                 {
                     table.remove(index--);
                 }
-//                return index;
+                return index;
             case(">"):
-                if (entry.compareTo(value) < 0)
+                if (!op.floatGreaterThan(entry, value))
                 {
                     table.remove(index--);
                 }
-//                return index;
+                return index;
             case("<"):
-                if (entry.compareTo(value) > 0)
+                if (!op.floatLessThan(entry, value))
                 {
                     table.remove(index--);
                 }
-//                return index;
-//            default:
-//                throw new DatabaseException("[Error] - "+operator+" is invalid");
+                return index;
+            // needs testing
+            case (">="):
+                if (!op.floatGreaterThanEqual(entry, value))
+                {
+                    table.remove(index--);
+                }
+                return index;
+            // needs testing
+            case ("<="):
+                if (!op.floatLessThanEqual(entry, value))
+                {
+                    table.remove(index--);
+                }
+                return index;
+            case ("LIKE"):
+                return index;
+            default:
+                throw new DatabaseException("[Error] - "+operator+" is invalid");
         }
-        return index;
     }
 
     public ArrayList<ArrayList<String>> getTable() { return table ; }

@@ -120,8 +120,9 @@ public class ConditionCMD extends DBcmd
         System.out.println("before condition table shit");
         System.out.println("conditionNum before entering CT: " + conditionNum);
         System.out.println(tableArrayList.get(0));
-        tableArrayList = table.conditionTable(tableArrayList, conditions, conditionNum);
-        String printTable = table.printTable(tableName);
+//        tableArrayList = table.conditionTable(tableArrayList, conditions, conditionNum);
+        String printTable  = table.conditionTable(tableArrayList, conditions, conditionNum);
+//        String printTable = table.printTable(tableName);
         System.out.println("after CT shit");
         return "[OK]\n" + printTable;
     }
