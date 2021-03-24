@@ -93,6 +93,7 @@ public class Table
         records = new ArrayList<Record>();
         int numberOfColumns = table.get(0).size();
         int numberOfRows = table.size();
+        //Change to String[]?
         Object[] columnNames = table.get(0).toArray();
         for (int i = 0; i < numberOfRows-1; i++) {
             Object[] rowData = table.get(i+1).toArray();
@@ -104,6 +105,28 @@ public class Table
             }
             records.add(i, record);
         }
+    }
+
+    public void recordsToTable() throws IOException
+    {
+        ArrayList<ArrayList<String>> newTable = new ArrayList<>();
+        System.out.println("recordsToTable tableName = "+tableName);
+        ArrayList<String> columnNames = readColumnNames(tableName);
+        System.out.println("col: "+ columnNames.get(0));
+        ArrayList<String> row;
+        int size = columnNames.size();
+        newTable.add(columnNames);
+
+        for (int j = 0; j < records.size(); j++)
+        {
+            row = new ArrayList<>();
+            for (String name : columnNames)
+            {
+                row.add(records.get(j).getColumnData(name));
+            }
+            newTable.add(row);
+        }
+        table = newTable;
     }
 
     public ArrayList<Record> getRecords()
@@ -257,9 +280,9 @@ public class Table
         for (int j = 0; j < records.size(); j++)
         {
             row = new ArrayList<>();
-            for (int i = 0; i < size; i++)
+            for (String name : columnNames)
             {
-                row.add(records.get(j).getColumnData(columnNames.get(i)));
+                row.add(records.get(j).getColumnData(name));
             }
             newTable.add(row);
         }
@@ -282,21 +305,84 @@ public class Table
         return columnNames;
     }
 
+    public void updateTable(String tableName, ArrayList<String> updateValues, ArrayList<String> conditions, int conditionNum) throws IOException, DatabaseException
+    {
+        table = readTable(tableName);
+        this.tableName = tableName;
+        addRecords();
+
+        columnName = conditions.get(conditionNum++);
+        operator = conditions.get(conditionNum++);
+        System.out.println("operator "+operator);
+        value = conditions.get(conditionNum++);
+        Operator op = new Operator(operator, value);
+        op.numberOrString();
+
+        if (op.isNumber())
+        {
+            System.out.println("Passed op.isNumber() check (ie. number)");
+//            updateNumberOp();
+        }
+        else if (!op.isNumber())
+        {
+            System.out.println("Passed !op.isNumber() check");
+            updateStringBoolOp(updateValues);
+        }
+        else {
+            throw new DatabaseException("[Error] - Could not update table. Check inputs.");
+        }
+    }
+
+    private void updateStringBoolOp(ArrayList<String> updateValues) throws DatabaseException, IOException
+    {
+//      While loop for if there are multiple values to update
+        while (updateValues.size() != 0)
+        {
+            int j = 1;
+            for (int i = 0; i < records.size(); i++, j++)
+            {
+                String updateColumnName = updateValues.get(0);
+                String updateValue = updateValues.get(1);
+                switch(operator)
+                {
+                    case ("=="):
+                        if (records.get(i).getColumnData(columnName).equals(value))
+                        {
+                            updateTableValues(i, updateColumnName, updateValue);
+                        }
+                        break;
+                    case ("!="):
+                        if (!records.get(i).getColumnData(columnName).equals(value))
+                        {
+                            updateTableValues(i, updateColumnName, updateValue);
+                        }
+                        break;
+                    default:
+                        throw new DatabaseException("[Error] - Error updating the table.");
+                }
+            }
+            // Remove the update value pairs and "bring forward" the next pair (if there is more)
+            updateValues.remove(0);
+            updateValues.remove(0);
+        }
+    }
+
+    private void updateTableValues(int i, String updateColumnName, String updateValue) throws IOException
+    {
+        records.get(i).addToRecords(updateColumnName, updateValue);
+        recordsToTable();
+        writeToTable(tableName);
+    }
+
 //    public ArrayList<ArrayList<String>> conditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
     public String conditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
     {
-        System.out.println("try 1");
         table = tableInput;
-        System.out.println("try 2");
-        System.out.println(tableInput.get(0));
-        System.out.println(printTable(tableName));
         addRecords();
-        System.out.println("try 3");
 
         columnName = conditions.get(conditionNum++);
         operator = conditions.get(conditionNum++);
         value = conditions.get(conditionNum++);
-        System.out.println("conditionNum after assigning col, op and val: "+conditionNum);
         Operator op = new Operator(operator, value);
 //      Check if column being operator on is a String/Bool or Int/Float type column and then
 //      perform the correct operation on it
@@ -305,23 +391,23 @@ public class Table
         if (op.isNumber())
         {
             System.out.println("Passed op.isNumber() check (ie. number)");
-            numberOperation();
+            selectNumberOp();
             return printTable(tableName);
 //            return numberOperation();
         }
         if (!op.isNumber())
         {
             System.out.println("Passed !op.isNumber() check");
-            stringBoolOperation();
+            selectStringBoolOp();
             return printTable(tableName);
 //            return stringBoolOperation();
         }
         throw new DatabaseException("[Error] - Could not carry out WHERE clause. Check inputs.");
     }
 
-//  Might need to move to Operator class?
+//  Method for operating on Strings and Bools for the SELECT command
 //    public ArrayList<ArrayList<String>> stringBoolOperation() throws DatabaseException, IOException
-    public void stringBoolOperation() throws DatabaseException, IOException
+    public void selectStringBoolOp() throws DatabaseException, IOException
     {
         String entry;
         int j = 1;
@@ -355,8 +441,9 @@ public class Table
         }
     }
 
+//  Method for handling operations on ints and floats for the SELECT command
 //    public ArrayList<ArrayList<String>> numberOperation() throws DatabaseException
-    public void numberOperation() throws DatabaseException
+    public void selectNumberOp() throws DatabaseException
     {
         String entry;
         float floatValue = Float.parseFloat(value);
@@ -366,11 +453,12 @@ public class Table
         {
             entry = records.get(i).getColumnData(columnName);
             floatEntry = Float.parseFloat(entry);
-            j = floatOperate(operator, floatEntry, floatValue, j);
+            j = selectFloatOp(operator, floatEntry, floatValue, j);
         }
     }
 
-    public int floatOperate(String operator, Float entry, Float value, int j) throws DatabaseException
+//  Method for comparing floats and removing rows of table based on operator for the SELECT command
+    public int selectFloatOp(String operator, Float entry, Float value, int j) throws DatabaseException
     {
         int index = j;
         System.out.println(operator);

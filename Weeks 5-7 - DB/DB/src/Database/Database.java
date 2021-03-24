@@ -26,11 +26,15 @@ public class Database
     public HashMap<String, Table> scanDBForTables() throws DatabaseException
     {
         Table table;
+        String tableName;
         File[] tables = listTables();
+        System.out.println("listTables length: "+tables.length);
         for (int i = 0; i < tables.length; i++)
         {
-            table = new Table(databaseName, tables[i].getName());
-            database.put(tables[i].getName(), table);
+            tableName = tables[i].getName().split("\\.")[0];
+            System.out.println("Table name "+tableName);
+            table = new Table(databaseName, tableName);
+            database.put(tableName, table);
         }
         return database;
     }

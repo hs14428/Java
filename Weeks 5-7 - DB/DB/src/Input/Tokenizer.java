@@ -25,6 +25,8 @@ public class Tokenizer
     public ArrayList<Token> tokenize() throws InvalidQueryException
     {
         String[] tokenArray = command.split("\\s+(?![^(]*\\))");
+
+        // Currently doesnt work for Name== 'Harry'; Age< 42; etc
         tokenArray = tokenizeCondition(tokenArray);
 
 //        for (String value : tokenArray) {
@@ -53,7 +55,6 @@ public class Tokenizer
     public String[] tokenizeCondition(String[] tokenArray)
     {
         String[] operatorSplit;
-        int arraySize;
         for (int i=0; i<tokenArray.length;i++)
         {
             Pattern p = Pattern.compile(RegEx.WHERESPLIT.getRegex());
@@ -63,12 +64,6 @@ public class Tokenizer
                 operatorSplit = tokenArray[i].split(RegEx.WHERESPLIT.getRegex());
                 tokenArray[i++] = operatorSplit[0];
                 tokenArray = copyArray(i, tokenArray, operatorSplit);
-//                arraySize = tokenArray.length + operatorSplit.length-1;
-//                tokenArray = Arrays.copyOf(tokenArray, arraySize);
-//                for (int j = 1; j < operatorSplit.length; j++)
-//                {
-//                    tokenArray[i++] = operatorSplit[j];
-//                }
                 // kill loop to save time
                 i = tokenArray.length;
             }

@@ -132,7 +132,22 @@ public class DBTesting {
             System.out.println("pattern success");
         }
 
+        String set = "mark=38, age=43";
+        String[] splitSet = set.split("((?<==)|(?==))");
+        System.out.println(splitSet[0]);
+        System.out.println(splitSet[1]);
+        System.out.println(splitSet[2]);
 
+        System.out.println("array print test");
+        ArrayList<String> test = new ArrayList<>();
+        test.add("test1");
+        test.add("test2");
+        test.add("test3");
+        System.out.println(test);
+        test.remove(0);
+        System.out.println(test);
+        test.remove(0);
+        System.out.println(test);
 
         Tokenizer tok = new Tokenizer("select * from contactdetails where Name=='clive';");
         tok.tokenize();

@@ -11,6 +11,7 @@ import java.util.HashMap;
 public abstract class DBcmd
 {
 //    DBServer dbServer;
+    ArrayList<String> updateValues;
     ArrayList<ArrayList<String>> tableArrayList;
     HashMap<String, Table> tables;
     ArrayList<String> conditions;

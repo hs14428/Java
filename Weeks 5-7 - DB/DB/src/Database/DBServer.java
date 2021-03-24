@@ -16,6 +16,7 @@ public class DBServer
     private ArrayList<ArrayList<String>> table = new ArrayList<>();
     private ArrayList<Token> tokenList = new ArrayList<>();
     private ArrayList<String> columnNames = new ArrayList<>();
+    private ArrayList<String> updateValues = new ArrayList<>();
     private Tokenizer tokenizer;
     private String currentDirectory;
     private String baseDirectory;
@@ -104,6 +105,12 @@ public class DBServer
         return tokenList;
     }
 
+    public void addTokens(int index, Token token)
+    {
+        tokenList.add(index, token);
+//        tokenList.
+    }
+
     public ArrayList<Token> getBrackets(String tokenBrackets) throws InvalidQueryException
     {
         ArrayList<Token> bracketsList;
@@ -144,6 +151,11 @@ public class DBServer
         currentTokenNum++;
     }
 
+    public void decCurrentTokenNum()
+    {
+        currentTokenNum--;
+    }
+
     public int getQueryLength()
     {
         return tokenList.size();
@@ -181,5 +193,15 @@ public class DBServer
     public ArrayList<String> getColumnNames()
     {
         return columnNames;
+    }
+
+    public void setUpdateValues(ArrayList<String> updateValues)
+    {
+        this.updateValues = updateValues;
+    }
+
+    public ArrayList<String> getUpdateValues()
+    {
+        return updateValues;
     }
 }
