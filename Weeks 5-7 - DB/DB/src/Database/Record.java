@@ -26,5 +26,8 @@ public class Record
         return records.get(columnName);
     }
 
-
+    public void removeRecords(String columnName)
+    {
+        records.remove(columnName);
+    }
 }

@@ -103,8 +103,9 @@ public class DBTesting {
         System.out.println(table.printTable("contactdetails"));
         ArrayList<String> columnNamesString = new ArrayList<>();
         columnNamesString.add("Name");
+
         columnNamesString.add("Age");
-        System.out.println(table.selectTable("contactdetails", columnNamesString));
+//        System.out.println(table.selectTable("contactdetails", columnNamesString));
         System.out.println(table.printTable("contactdetails"));
 
 //      test regex matching
@@ -132,11 +133,13 @@ public class DBTesting {
             System.out.println("pattern success");
         }
 
-        String set = "mark=38, age=43";
-        String[] splitSet = set.split("((?<==)|(?==))");
-        System.out.println(splitSet[0]);
-        System.out.println(splitSet[1]);
-        System.out.println(splitSet[2]);
+        String set = "UPDATE marks SET mark = 90 WHERE name != 'Clive';";
+//        String[] splitSet = set.split("((?<==)|(?==))");
+        String[] splitSet = set.split(",*\\s+(?![^(]*\\))");
+        for (int i = 0; i < splitSet.length; i++)
+        {
+            System.out.println(splitSet[i].trim());
+        }
 
         System.out.println("array print test");
         ArrayList<String> test = new ArrayList<>();

@@ -42,14 +42,19 @@ public class UpdateCMD extends DBcmd
             if (token.equals("SET"))
             {
                 token = dbServer.nextToken();
-                checkNameValuePair(dbServer);
-//                columnName = token;
-//                checkValidColumn();
-                token = dbServer.nextToken().toUpperCase();
+                while (!token.toUpperCase().equals("WHERE"))
+                {
+                    checkNameValuePair(dbServer);
+                    token = dbServer.nextToken();
+                }
+                token = token.toUpperCase();
+                System.out.println(updateValues.get(0));
+                System.out.println(updateValues.get(1));
+//                System.out.println(updateValues.get(2));
+//                System.out.println(updateValues.get(3));
+                System.out.println("token = "+token);
                 if (token.equals("WHERE"))
                 {
-//                    Table table = new Table(databaseName);
-//                    tableArrayList = table.getTable();
                     dbServer.decCurrentTokenNum();
                     return new ConditionCMD(command).runCommand(dbServer);
                 }
@@ -57,32 +62,23 @@ public class UpdateCMD extends DBcmd
         }
         throw new InvalidTokenException(token);
     }
-//  Note to self check for multiple sets (stretch goal)
+
+//  Note to self fix for if mix of spaces and no spaces. works for multiple conditions
     public void checkNameValuePair(DBServer dbServer) throws DatabaseException, IOException
     {
-        System.out.println("in checkNameValuePair");
-        System.out.println(dbServer.getCurrentTokenNum());
-        int index = dbServer.getCurrentTokenNum();
-        System.out.println(token);
         String[] splitNameValuePair = token.split(RegEx.SPLITSET.getRegex());
 
         int i = 0;
         String value;
         if (splitNameValuePair.length == 3)
         {
-            System.out.println(splitNameValuePair[0]);
-            System.out.println(splitNameValuePair[1]);
-            System.out.println(splitNameValuePair[2]);
             columnName = splitNameValuePair[i++];
-            System.out.println("columnName "+columnName);
             checkValidColumn();
             if (splitNameValuePair[i++].equals("="))
             {
                 value = splitNameValuePair[i];
                 if (value.matches(RegEx.VALUE.getRegex()))
                 {
-                    System.out.println(value);
-                    System.out.println(columnName);
                     updateValues.add(columnName);
                     updateValues.add(value);
                     dbServer.setUpdateValues(updateValues);
@@ -91,19 +87,14 @@ public class UpdateCMD extends DBcmd
         }
         else {
             columnName = token;
-            System.out.println(columnName);
             checkValidColumn();
             token = dbServer.nextToken();
-            System.out.println("line 95: "+token);
             if (token.equals("="))
             {
                 token = dbServer.nextToken();
-                System.out.println("line 99: "+token);
                 value = token;
                 if (value.matches(RegEx.VALUE.getRegex()))
                 {
-                    System.out.println(value);
-                    System.out.println(columnName);
                     updateValues.add(columnName);
                     updateValues.add(value);
                     dbServer.setUpdateValues(updateValues);

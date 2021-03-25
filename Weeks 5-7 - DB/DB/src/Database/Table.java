@@ -42,7 +42,6 @@ public class Table
         database = new Database(databaseName);
         currentDirectory = database.getCurrentDirectory();
         databasePath = currentDirectory + File.separator + this.databaseName;
-        System.out.println("in Table - dbPath: " + databasePath);
         extension = ".tab";
     }
 
@@ -57,7 +56,6 @@ public class Table
         database = new Database(databaseName);
         currentDirectory = database.getCurrentDirectory();
         databasePath = currentDirectory + File.separator + this.databaseName;
-        System.out.println("in Table - dbPath: " + databasePath);
         extension = ".tab";
     }
 
@@ -114,15 +112,14 @@ public class Table
         ArrayList<String> columnNames = readColumnNames(tableName);
         System.out.println("col: "+ columnNames.get(0));
         ArrayList<String> row;
-        int size = columnNames.size();
-        newTable.add(columnNames);
 
-        for (int j = 0; j < records.size(); j++)
+        newTable.add(columnNames);
+        for (Record item : records)
         {
             row = new ArrayList<>();
             for (String name : columnNames)
             {
-                row.add(records.get(j).getColumnData(name));
+                row.add(item.getColumnData(name));
             }
             newTable.add(row);
         }
@@ -138,7 +135,6 @@ public class Table
     public void createTable(String tableName) throws IOException
     {
         File newTable = new File(databasePath + File.separator + tableName + extension);
-        System.out.println("in createTable - filepath: "+databasePath + File.separator + tableName + extension);
 
         if (!newTable.exists())
         {
@@ -150,8 +146,6 @@ public class Table
             FileWriter writer = new FileWriter(newTable);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
             bufferedWriter.write("id");
-//            bufferedWriter.write("\n");
-//            bufferedWriter.write("1");
             bufferedWriter.flush();
             bufferedWriter.close();
             writer.close();
@@ -264,30 +258,34 @@ public class Table
         return tableString;
     }
 
-    public ArrayList<ArrayList<String>> selectTable(String tableName, ArrayList<String> columnNames) throws IOException
+//    public ArrayList<ArrayList<String>> selectTable(String tableName, ArrayList<String> columnNames) throws IOException
+    public ArrayList<ArrayList<String>> selectTable(ArrayList<ArrayList<String>> table, ArrayList<String> columnNames) throws IOException
     {
-        table = readTable(tableName);
+        this.table = table;
+//        table = readTable(tableName);
         addRecords();
-        int size = columnNames.size();
         ArrayList<ArrayList<String>> newTable = new ArrayList<>();
-        ArrayList<String> row = new ArrayList<>();
+        ArrayList<String> row = new ArrayList<>(columnNames);
 
-        for (String columnName : columnNames)
-        {
-            row.add(columnName);
-        }
+//        ArrayList<String> row = new ArrayList<>();
+//
+//        for (String columnName : columnNames)
+//        {
+//            row.add(columnName);
+//        }
+
         newTable.add(row);
-        for (int j = 0; j < records.size(); j++)
+        for (Record item : records)
         {
             row = new ArrayList<>();
             for (String name : columnNames)
             {
-                row.add(records.get(j).getColumnData(name));
+                row.add(item.getColumnData(name));
             }
             newTable.add(row);
         }
-        table = newTable;
-        return table;
+        this.table = newTable;
+        return this.table;
     }
 
     public ArrayList<String> readColumnNames(String tableName) throws IOException
@@ -374,10 +372,12 @@ public class Table
         writeToTable(tableName);
     }
 
-//    public ArrayList<ArrayList<String>> conditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
-    public String conditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
+//    public String selectConditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
+    public String selectConditionTable(String tableName, ArrayList<String> columnNames, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
     {
-        table = tableInput;
+        this.tableName = tableName;
+        System.out.println("Table name in selectConditionTable "+tableName);
+        table = readTable(tableName);
         addRecords();
 
         columnName = conditions.get(conditionNum++);
@@ -393,14 +393,14 @@ public class Table
             System.out.println("Passed op.isNumber() check (ie. number)");
             selectNumberOp();
             return printTable(tableName);
-//            return numberOperation();
         }
         if (!op.isNumber())
         {
             System.out.println("Passed !op.isNumber() check");
             selectStringBoolOp();
+            System.out.println("columnName[0] in sCT "+columnNames.get(0));
+            selectTable(table, columnNames);
             return printTable(tableName);
-//            return stringBoolOperation();
         }
         throw new DatabaseException("[Error] - Could not carry out WHERE clause. Check inputs.");
     }
@@ -413,13 +413,14 @@ public class Table
         int j = 1;
         int size = table.size();
         System.out.println(table.size());
-//        System.out.println("operator in bool op "+operator);
-//        System.out.println("value in bool op "+value);
+        System.out.println("operator in bool op "+operator);
+        System.out.println("value in bool op "+value);
         for (int i = 0; i < records.size(); i++, j++)
         {
-//            System.out.println("i = "+i+" and j = "+j);
+            System.out.println("i = "+i+" and j = "+j);
             System.out.println(printTable(tableName));
             entry = records.get(i).getColumnData(columnName);
+            System.out.println(entry+" = "+value);
 
             switch (operator)
             {
@@ -427,18 +428,23 @@ public class Table
                     if (!entry.equals(value))
                     {
                         table.remove(j--);
+//                        records.remove(i--);
+//                        records.get(i).removeRecords(columnName);
                     }
                     break;
                 case ("!="):
                     if (entry.equals(value))
                     {
                         table.remove(j--);
+//                        records.remove(i--);
+//                        records.get(i).removeRecords(columnName);
                     }
                     break;
                 default:
                     throw new DatabaseException("[Error] - "+operator+" is invalid");
             }
         }
+        System.out.println(printTable(tableName));
     }
 
 //  Method for handling operations on ints and floats for the SELECT command

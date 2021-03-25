@@ -27,6 +27,7 @@ public class DBServer
 
     public DBServer(int portNumber)
     {
+        createDBEnvironment();
         try {
             ServerSocket serverSocket = new ServerSocket(portNumber);
             System.out.println("Server Listening");
@@ -56,23 +57,16 @@ public class DBServer
         String incomingCommand = socketReader.readLine();
         System.out.println("Received message: " + incomingCommand);
         try {
-            System.out.println("Try 1");
             tokenizer = new Tokenizer(incomingCommand);
-            System.out.println("Try 2");
             tokenList = tokenizer.tokenize();
-            System.out.println("Try 3");
             currentTokenNum = 0;
-            System.out.println("Try 4");
-            createDBEnvironment();
+//            createDBEnvironment();
             Parser parser = new Parser(this);
-            System.out.println("Try 5");
             socketWriter.write(parser.parse().runCommand(this));
         } catch (DatabaseException | IOException e) {
-            System.out.println("In Catch");
             e.printStackTrace();
             socketWriter.write(e.toString());
         }
-        System.out.println("Rest of Program");
         socketWriter.write("\n" + ((char)4) + "\n");
         socketWriter.flush();
     }

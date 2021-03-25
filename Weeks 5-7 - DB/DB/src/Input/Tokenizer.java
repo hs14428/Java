@@ -24,7 +24,7 @@ public class Tokenizer
 
     public ArrayList<Token> tokenize() throws InvalidQueryException
     {
-        String[] tokenArray = command.split("\\s+(?![^(]*\\))");
+        String[] tokenArray = command.split(",*\\s+(?![^(]*\\))");
 
         // Currently doesnt work for Name== 'Harry'; Age< 42; etc
         tokenArray = tokenizeCondition(tokenArray);

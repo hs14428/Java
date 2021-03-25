@@ -101,6 +101,9 @@ public class ConditionCMD extends DBcmd
     {
         // If this breaks i moved this from the runCommand method
         tableArrayList = dbServer.getTable();
+        System.out.println("tableName "+tableName);
+        columnNames = dbServer.getColumnNames();
+        System.out.println("columnNames in selectCondition "+columnNames);
         Table table = new Table(databaseName);
 
         if (conditions.get(conditionNum).matches(RegEx.ANDOR.getRegex()))
@@ -109,7 +112,8 @@ public class ConditionCMD extends DBcmd
             System.out.println("check not in ANDOR");
             conditionNum++;
         }
-        String printTable  = table.conditionTable(tableArrayList, conditions, conditionNum);
+        String printTable  = table.selectConditionTable(tableName, columnNames, conditions, conditionNum);
+//        String printTable  = table.selectConditionTable(tableArrayList, conditions, conditionNum);
         return "[OK]\n" + printTable;
     }
 

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 public class SelectCMD extends DBcmd
 {
+    private ArrayList<String> selectColumns;
     private boolean whereClause;
     private boolean logicClause;
     private String token;
@@ -19,6 +20,7 @@ public class SelectCMD extends DBcmd
     {
         commandType = "CommandType";
         command = "SELECT";
+        selectColumns = new ArrayList<>();
         columnNames = new ArrayList<>();
         tableArrayList = new ArrayList<>();
     }
@@ -41,9 +43,9 @@ public class SelectCMD extends DBcmd
             bracketsTokens = dbServer.getBrackets(token);
             for (Token bracketsToken : bracketsTokens)
             {
-                columnNames.add(bracketsToken.getTokenString());
+                selectColumns.add(bracketsToken.getTokenString());
             }
-            dbServer.setColumnNames(columnNames);
+//            dbServer.setColumnNames(selectColumns);
             return selectSome(dbServer);
         }
         else {
@@ -62,13 +64,15 @@ public class SelectCMD extends DBcmd
             if (token.matches(RegEx.VARIABLENAME.getRegex()))
             {
                 tableName = token;
-                table.readTable(token);
-                tableArrayList = table.getTable();
-                System.out.println(tableArrayList.get(0));
+                getColumnNames(tableName);
+                dbServer.setColumnNames(columnNames);
+                System.out.println("select *: "+columnNames);
+//                table.readTable(tableName);
+//                tableArrayList = table.getTable();
                 if (whereClause)
                 {
                     dbServer.setTableName(tableName);
-                    dbServer.setTable(tableArrayList);
+//                    dbServer.setTable(tableArrayList);
                     return new ConditionCMD(command).runCommand(dbServer);
                 }
                 table.readTable(tableName);
@@ -90,14 +94,19 @@ public class SelectCMD extends DBcmd
             if (token.matches(RegEx.VARIABLENAME.getRegex()))
             {
                 tableName = token;
-                tableArrayList = table.selectTable(tableName, columnNames);
+                checkValidColumn();
+                columnNames = selectColumns;
+                dbServer.setColumnNames(columnNames);
+                System.out.println("selectSome: "+columnNames);
+//                tableArrayList = table.selectTable(tableName, columnNames);
                 if (whereClause)
                 {
                     dbServer.setTableName(tableName);
-                    dbServer.setTable(tableArrayList);
+//                    dbServer.setTable(tableArrayList);
                     return new ConditionCMD(command).runCommand(dbServer);
                 }
-                // make sure cut down table passes through with where clause
+                tableArrayList = table.readTable(tableName);
+                table.selectTable(tableArrayList, columnNames);
                 String printTable = table.printTable(tableName);
                 return "[OK]\n"+printTable;
             }
@@ -133,6 +142,37 @@ public class SelectCMD extends DBcmd
             }
         }
         dbServer.setCurrentTokenNum(startTokenNum);
+    }
+
+    public void checkValidColumn() throws DatabaseException, IOException
+    {
+        System.out.println("table "+tableName);
+        System.out.println("columns "+selectColumns);
+
+        getColumnNames(tableName);
+        int validColumns = 0;
+        for (String selectColumn : selectColumns)
+        {
+            for (String columnName : columnNames)
+            {
+                if (selectColumn.equals(columnName))
+                {
+                    validColumns++;
+                }
+            }
+        }
+        if (!(validColumns == selectColumns.size()))
+        {
+            throw new DatabaseException("[Error] - Incorrect columns given. "+selectColumns+" do not match "+columnNames+" columns from "+tableName+" table");
+        }
+    }
+
+    public void getColumnNames(String tableName) throws DatabaseException, IOException
+    {
+        System.out.println("db "+databaseName);
+        Table table = new Table(databaseName);
+        columnNames = new ArrayList<>();
+        columnNames = table.readColumnNames(tableName);
     }
 
     @Override
