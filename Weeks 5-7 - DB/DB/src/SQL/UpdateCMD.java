@@ -103,6 +103,12 @@ public class UpdateCMD extends DBcmd
         }
     }
 
+    public void getTableNames() throws DatabaseException, IOException
+    {
+        tables = new HashMap<String, Table>();
+        tables = database.scanDBForTables();
+    }
+
     public void checkValidColumn() throws DatabaseException, IOException
     {
         getColumnNames(tableName);
@@ -115,12 +121,6 @@ public class UpdateCMD extends DBcmd
             }
         }
         throw new DatabaseException("[Error] - No columns in \""+tableName+"\" table match \""+columnName+"\" input");
-    }
-
-    public void getTableNames() throws DatabaseException, IOException
-    {
-        tables = new HashMap<String, Table>();
-        tables = database.scanDBForTables();
     }
 
     public void getColumnNames(String tableName) throws DatabaseException, IOException

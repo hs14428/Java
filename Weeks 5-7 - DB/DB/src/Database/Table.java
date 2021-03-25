@@ -201,9 +201,7 @@ public class Table
             for (Token columnName : columnNames)
             {
                 System.out.println("in addColumns - columnName = "+columnName.getTokenString());
-//                // Check the contents of the columnNames arraylist are valid
-//                Pattern p = Pattern.compile(RegEx.VARIABLENAME.getRegex());
-//                Matcher m = p.matcher(columnName.)
+//              Check the contents of the columnNames arraylist are valid
                 if (!columnName.getTokenString().matches(RegEx.VARIABLENAME.getRegex()))
                 {
                     System.out.println("shouldnt be here");
@@ -214,12 +212,51 @@ public class Table
                 // Go down each row and add an empty string at the end of each entry for new column
                 for (int i = 1; i < table.size(); i++)
                 {
-                    table.get(i).add("");
+                    table.get(i).add(" ");
                 }
                 // Write new table back out to .tab file
                 writeToTable(tableName);
                 System.out.println("Column added.");
             }
+        }
+        else {
+            throw new TableException("[Error] - Table: "+tableName+" does not exist.");
+        }
+    }
+
+    public void removeColumn(String tableName, String columnToDrop) throws IOException, InvalidTokenException
+    {
+        File tableToRemoveToFrom = new File(databasePath + File.separator + tableName + extension);
+        table = readTable(tableName);
+        int tableColumnSize = table.get(0).size();
+        int tableColumnIndex = 0;
+
+        if (tableToRemoveToFrom.exists())
+        {
+//          Loop through columns and find index of column to drop
+            for (int i = 0; i < tableColumnSize; i++)
+            {
+                if (table.get(0).get(i).equals(columnToDrop))
+                {
+                    tableColumnIndex = i;
+                }
+            }
+//          Remove column name from end of table columns
+            System.out.println("tCI: "+tableColumnIndex);
+            table.get(0).remove(tableColumnIndex);
+//          Go down each row and add an empty string at the end of each entry for new column
+            for (int i = 1; i < table.size(); i++)
+            {
+                System.out.println("table row size: "+table.size());
+                System.out.println("table col size: "+table.get(i).size());
+                System.out.println("in loop");
+                System.out.println("tableColumnIndex-1 val: "+table.get(i).get(tableColumnIndex-1));
+                System.out.println("tableColumnIndex val: "+table.get(i).get(tableColumnIndex));
+                table.get(i).remove(tableColumnIndex);
+            }
+            // Write new table back out to .tab file
+            writeToTable(tableName);
+            System.out.println("Column dropped.");
         }
         else {
             throw new TableException("[Error] - Table: "+tableName+" does not exist.");
