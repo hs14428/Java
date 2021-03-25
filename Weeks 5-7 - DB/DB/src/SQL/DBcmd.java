@@ -16,6 +16,7 @@ public abstract class DBcmd
     HashMap<String, Table> tables;
     ArrayList<String> conditions;
     ArrayList<String> columnNames;
+    ArrayList<String> tableNames;
     // Might need to save all table names in a DB down here and send back to DBSever?
     String tableName;
     String databaseName;

@@ -11,7 +11,8 @@ public enum RegEx
     VALUE (STRINGLITERAL.getRegex()+"|"+BOOLEANLITERAL.getRegex()+"|"+FLOATLITERAL.getRegex()+"|"+INTLITERAL.getRegex()),
     OPERATOR ("\\s*==\\s*|\\s*>\\s*|\\s*<\\s*|\\s*>=\\s*|\\s*<=\\s*|\\s*!=\\s*|\\s*LIKE\\s*"),
     OPERATOR2 ("==|>|<|>=|<=|!=|LIKE"),
-    WHERESPLIT ("((?<===)|(?===))|((?<=>)|(?=>))|((?<=<)|(?=<))|((?<=>=)|(?=>=))|((?<=<=)|(?=<=))|((?<=LIKE)|(?=LIKE))"),
+    WHERESPLIT ("((?<===)|(?===))|((?<=>[^=])|(?=>[^=]))|((?<=<[^=])|(?=<[^=]))|((?<=>=)|(?=>=))|((?<=<=)|(?=<=))|((?<=LIKE)|(?=LIKE))"),
+    WHERESPLIT2 ("(==|>[^=]|<[^=]|>=|<=|!=)"),
     SPLITSET ("((?<==)|(?==))"),
 
     ANDOR ("AND|OR");

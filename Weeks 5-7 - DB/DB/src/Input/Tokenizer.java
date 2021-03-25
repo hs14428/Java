@@ -15,6 +15,7 @@ public class Tokenizer
     private Token token;
     private String command;
     private int currentToken;
+    private boolean whereClause;
 
     public Tokenizer(String incomingCommand)
     {
@@ -22,20 +23,22 @@ public class Tokenizer
         currentToken = 0;
     }
 
+//  Apologies for the bootleg fix here - I know it's not pretty, but I realised an error late on
+//  and time was against me!
     public ArrayList<Token> tokenize() throws InvalidQueryException
     {
-        String[] tokenArray = command.split(",*\\s+(?![^(]*\\))");
+        String[] tokenArray = command.split("\\s+(?![^(]*\\))");
 
         // Currently doesnt work for Name== 'Harry'; Age< 42; etc
         tokenArray = tokenizeCondition(tokenArray);
 
-//        for (String value : tokenArray) {
-//            System.out.println(value);
-//        }
+        for (String value : tokenArray)
+        {
+            System.out.println(value);
+        }
 
         int endTokenIndex = tokenArray.length-1;
         String endToken = tokenArray[endTokenIndex];
-
         if (!checkValidEnd(endToken))
         {
             System.out.println("Tokenizer tokenize() error.");
@@ -49,6 +52,12 @@ public class Tokenizer
             tokenArrayList.add(token);
         }
         return tokenArrayList;
+    }
+
+    public void scanForWhere(String query)
+    {
+        whereClause = false;
+//        Pattern p = Pattern.compile()
     }
 
 //  split out conditions with operators without spaces STILL NEED TO FIX >= <= operators

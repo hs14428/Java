@@ -350,6 +350,12 @@ public class Table
         return columnNames;
     }
 
+    public String joinTables(String tableName) throws IOException
+    {
+        this.tableName = tableName;
+        return printTable(tableName);
+    }
+
     public void deleteRowsFromTable(String tableName, ArrayList<String> conditions, int conditionNum) throws IOException, DatabaseException
     {
         table = readTable(tableName);

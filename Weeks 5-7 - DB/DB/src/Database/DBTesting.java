@@ -152,8 +152,26 @@ public class DBTesting {
         test.remove(0);
         System.out.println(test);
 
-        Tokenizer tok = new Tokenizer("select * from contactdetails where Name=='clive';");
+        System.out.println();
+        System.out.println("Start here");
+        Tokenizer tok = new Tokenizer("SELECT (name, age) from marks WHERE name < 'mark smith';");
         tok.tokenize();
+        for (int i = 0; i < 6; i++)
+        {
+//            System.out.println(tok.getToken(i));
+        }
+        System.out.println("end here");
+
+
+
+        String query = "SELECT (name, age) FROM marks WHERE name == 'mark smith';";
+        var pattern = Pattern.compile("\\(.*\\)|'.*'|"+RegEx.WHERESPLIT2.getRegex()+"|\\w+");
+        var matcher = pattern.matcher(query);
+        while (matcher.find())
+        {
+            System.out.println(matcher.group());
+        }
+
         System.out.println();
 
 //      test readColumnNames
@@ -161,11 +179,11 @@ public class DBTesting {
         System.out.println(table.readColumnNames("contactdetails"));
 
 //      Test tokensizer class with the Tokenize fn
-        String command = "CREATE TABLE Table1 (id, name, email, address);";
-        Tokenizer tokenizer = new Tokenizer(command);
-        tokenizer.tokenize();
-        System.out.println("\n"+tokenizer.getToken(3).getTokenString());
-//      Test tokensizer class with the TokenizeBrackets fn
-        tokenizer.tokenizeBrackets(tokenizer.getToken(3).getTokenString());
+//        String command = "CREATE TABLE Table1 (id, name, email, address);";
+//        Tokenizer tokenizer = new Tokenizer(command);
+//        tokenizer.tokenize();
+//        System.out.println("\n"+tokenizer.getToken(3).getTokenString());
+////      Test tokensizer class with the TokenizeBrackets fn
+//        tokenizer.tokenizeBrackets(tokenizer.getToken(3).getTokenString());
     }
 }
