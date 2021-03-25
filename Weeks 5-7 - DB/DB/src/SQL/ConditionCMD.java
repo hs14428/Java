@@ -18,6 +18,7 @@ public class ConditionCMD extends DBcmd
     {
         this.command = command;
         conditions = new ArrayList<>();
+        conditionNum = 0;
     }
 
     @Override
@@ -49,6 +50,7 @@ public class ConditionCMD extends DBcmd
 
     public String storeCondition(DBServer dbServer) throws DatabaseException, IOException
     {
+        // Need to add some kind of catch/loop for multiple conditions with AND OR
         // Add column name to conditions
         conditions.add(token);
         token = dbServer.nextToken();
@@ -79,11 +81,6 @@ public class ConditionCMD extends DBcmd
 
     public String updateCondition(DBServer dbServer) throws DatabaseException, IOException
     {
-        System.out.println("hello, you made it");
-        System.out.println(conditions.get(0));
-        System.out.println(conditions.get(1));
-        System.out.println(conditions.get(2));
-
         Table table = new Table(databaseName);
         updateValues = dbServer.getUpdateValues();
         System.out.println(tableName);
@@ -91,10 +88,11 @@ public class ConditionCMD extends DBcmd
         return "[OK] - Values updated";
     }
 
-    public String deleteCondition(DBServer dbServer)
+    public String deleteCondition(DBServer dbServer) throws IOException, DatabaseException
     {
-
-        return null;
+        Table table = new Table(databaseName);
+        table.deleteRowsFromTable(tableName, conditions, conditionNum);
+        return "[OK] - Values deleted";
     }
 
     public String selectCondition(DBServer dbServer) throws DatabaseException, IOException
@@ -112,7 +110,7 @@ public class ConditionCMD extends DBcmd
             System.out.println("check not in ANDOR");
             conditionNum++;
         }
-        String printTable  = table.selectConditionTable(tableName, columnNames, conditions, conditionNum);
+        String printTable  = table.selectTable(tableName, columnNames, conditions, conditionNum);
 //        String printTable  = table.selectConditionTable(tableArrayList, conditions, conditionNum);
         return "[OK]\n" + printTable;
     }

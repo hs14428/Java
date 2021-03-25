@@ -21,9 +21,9 @@ public class Table
     private String extension;
     private Database database;
 
-    private String columnName;
-    private String operator;
-    private String value;
+    private String conditionColumnName;
+    private String conditionOperator;
+    private String conditionValue;
 
     private ArrayList<ArrayList<String>> table;
     private ArrayList<Record> records;
@@ -230,7 +230,24 @@ public class Table
     {
         File tableToAddTo = new File(databasePath + File.separator + tableName + extension);
         table = readTable(tableName);
-        String newIdNum = String.valueOf(table.size());
+        addRecords();
+        String dynamicId;
+        int intDynamicId; // = Integer.parseInt(dynamicId);
+
+        if (records.size() == 0)
+        {
+            intDynamicId = 1;
+        }
+        else {
+            dynamicId = records.get(records.size()-1).getColumnData("id");
+            intDynamicId = Integer.parseInt(dynamicId);
+            intDynamicId += 1;
+        }
+
+        System.out.println("dynamic int: "+intDynamicId);
+
+//        String newIdNum = String.valueOf(table.size());
+        String newIdNum = String.valueOf(intDynamicId);
 
         if (tableToAddTo.exists())
         {
@@ -259,20 +276,13 @@ public class Table
     }
 
 //    public ArrayList<ArrayList<String>> selectTable(String tableName, ArrayList<String> columnNames) throws IOException
-    public ArrayList<ArrayList<String>> selectTable(ArrayList<ArrayList<String>> table, ArrayList<String> columnNames) throws IOException
+    public ArrayList<ArrayList<String>> trimTable(ArrayList<ArrayList<String>> table, ArrayList<String> columnNames) throws IOException
     {
         this.table = table;
 //        table = readTable(tableName);
         addRecords();
         ArrayList<ArrayList<String>> newTable = new ArrayList<>();
         ArrayList<String> row = new ArrayList<>(columnNames);
-
-//        ArrayList<String> row = new ArrayList<>();
-//
-//        for (String columnName : columnNames)
-//        {
-//            row.add(columnName);
-//        }
 
         newTable.add(row);
         for (Record item : records)
@@ -303,23 +313,143 @@ public class Table
         return columnNames;
     }
 
+    public void deleteRowsFromTable(String tableName, ArrayList<String> conditions, int conditionNum) throws IOException, DatabaseException
+    {
+        table = readTable(tableName);
+        this.tableName = tableName;
+        addRecords();
+
+        conditionColumnName = conditions.get(conditionNum++);
+        conditionOperator = conditions.get(conditionNum++);
+        conditionValue = conditions.get(conditionNum++);
+        Operator op = new Operator(conditionOperator, conditionValue);
+        op.numberOrString();
+
+        if (op.isNumber())
+        {
+            System.out.println("Passed op.isNumber() check (ie. number)");
+            deleteNumberOp();
+        }
+        else if (!op.isNumber())
+        {
+            System.out.println("Passed !op.isNumber() check");
+            deleteStringBoolOp();
+        }
+        else {
+            throw new DatabaseException("[Error] - Could not update table. Check inputs.");
+        }
+    }
+
+    private void deleteNumberOp() throws DatabaseException, IOException
+    {
+        float floatCondValue = Float.parseFloat(conditionValue);
+        Operator op = new Operator();
+
+        int j = 1;
+        for (int i = 0; i < records.size(); i++, j++)
+        {
+            System.out.println("records.size(): "+records.size());
+            System.out.println(printTable(tableName));
+            float floatCondColumnData = Float.parseFloat(records.get(i).getColumnData(conditionColumnName));
+            System.out.println("floatCCD: "+floatCondColumnData+" fCV: "+floatCondValue);
+            switch(conditionOperator)
+            {
+                case ("=="):
+                    if (op.floatEqualsTo(floatCondColumnData, floatCondValue))
+                    {
+                        deleteTableValues(i--);
+                    }
+                    break;
+                case ("!="):
+                    if (!op.floatEqualsTo(floatCondColumnData, floatCondValue))
+                    {
+                        deleteTableValues(i--);
+                    }
+                    break;
+                case(">"):
+                    System.out.println(floatCondColumnData+" > "+floatCondValue);
+                    if (op.floatGreaterThan(floatCondColumnData, floatCondValue))
+                    {
+                        deleteTableValues(i--);
+                    }
+                    break;
+                case("<"):
+                    if (op.floatLessThan(floatCondColumnData, floatCondValue))
+                    {
+                        deleteTableValues(i--);
+                    }
+                    break;
+                // needs testing
+                case (">="):
+                    if (op.floatGreaterThanEqual(floatCondColumnData, floatCondValue))
+                    {
+                        deleteTableValues(i--);
+                    }
+                    break;
+                // needs testing
+                case ("<="):
+                    if (op.floatLessThanEqual(floatCondColumnData, floatCondValue))
+                    {
+                        deleteTableValues(i--);
+                    }
+                    break;
+                default:
+                    throw new DatabaseException("[Error] - Error deleting from the table.");
+            }
+        }
+    }
+
+    private void deleteStringBoolOp() throws DatabaseException, IOException
+    {
+        int j = 1;
+        for (int i = 0; i < records.size(); i++, j++)
+        {
+            System.out.println("records.size(): "+records.size());
+            System.out.println(printTable(tableName));
+            switch(conditionOperator)
+            {
+                case ("=="):
+                    if (records.get(i).getColumnData(conditionColumnName).equals(conditionValue))
+                    {
+                        deleteTableValues(i--);
+                    }
+                    break;
+                case ("!="):
+                    if (!records.get(i).getColumnData(conditionColumnName).equals(conditionValue))
+                    {
+                        deleteTableValues(i--);
+                    }
+                    break;
+                default:
+                    throw new DatabaseException("[Error] - Error deleting from the table.");
+            }
+        }
+    }
+
+    private void deleteTableValues(int i) throws IOException
+    {
+        records.remove(i);
+        recordsToTable();
+        writeToTable(tableName);
+    }
+
     public void updateTable(String tableName, ArrayList<String> updateValues, ArrayList<String> conditions, int conditionNum) throws IOException, DatabaseException
     {
         table = readTable(tableName);
         this.tableName = tableName;
         addRecords();
 
-        columnName = conditions.get(conditionNum++);
-        operator = conditions.get(conditionNum++);
-        System.out.println("operator "+operator);
-        value = conditions.get(conditionNum++);
-        Operator op = new Operator(operator, value);
+        conditionColumnName = conditions.get(conditionNum++);
+        conditionOperator = conditions.get(conditionNum++);
+        System.out.println("operator "+ conditionOperator);
+        conditionValue = conditions.get(conditionNum++);
+        Operator op = new Operator(conditionOperator, conditionValue);
         op.numberOrString();
 
         if (op.isNumber())
         {
             System.out.println("Passed op.isNumber() check (ie. number)");
-//            updateNumberOp();
+            updateNumberOp(updateValues);
         }
         else if (!op.isNumber())
         {
@@ -328,6 +458,75 @@ public class Table
         }
         else {
             throw new DatabaseException("[Error] - Could not update table. Check inputs.");
+        }
+    }
+
+    public void updateNumberOp(ArrayList<String> updateValues) throws DatabaseException, IOException
+    {
+        float floatCondValue = Float.parseFloat(conditionValue);
+        Operator op = new Operator();
+
+        System.out.println(updateValues.size());
+        //      While loop for if there are multiple values to update
+        while (updateValues.size() != 0)
+        {
+            int j = 1;
+            for (int i = 0; i < records.size(); i++, j++)
+            {
+                String updateColumnName = updateValues.get(0);
+                String updateValue = updateValues.get(1);
+                float floatCondColumnData = Float.parseFloat(records.get(i).getColumnData(conditionColumnName));
+
+                switch(conditionOperator)
+                {
+                    case ("=="):
+                        if (op.floatEqualsTo(floatCondColumnData, floatCondValue))
+                        {
+                            updateTableValues(i, updateColumnName, updateValue);
+                        }
+                        break;
+                    case ("!="):
+                        if (!op.floatEqualsTo(floatCondColumnData, floatCondValue))
+                        {
+                            updateTableValues(i, updateColumnName, updateValue);
+                        }
+                        break;
+                    case(">"):
+                        System.out.println(floatCondColumnData+" > "+floatCondValue);
+                        if (op.floatGreaterThan(floatCondColumnData, floatCondValue))
+                        {
+                            System.out.println("made it in > ");
+                            System.out.println("col = "+updateColumnName+" val = "+updateValue);
+                            updateTableValues(i, updateColumnName, updateValue);
+                        }
+                        break;
+                    case("<"):
+                        if (op.floatLessThan(floatCondColumnData, floatCondValue))
+                        {
+                            updateTableValues(i, updateColumnName, updateValue);
+                        }
+                        break;
+                    // needs testing
+                    case (">="):
+                        if (op.floatGreaterThanEqual(floatCondColumnData, floatCondValue))
+                        {
+                            updateTableValues(i, updateColumnName, updateValue);
+                        }
+                        break;
+                    // needs testing
+                    case ("<="):
+                        if (op.floatLessThanEqual(floatCondColumnData, floatCondValue))
+                        {
+                            updateTableValues(i, updateColumnName, updateValue);
+                        }
+                        break;
+                    default:
+                        throw new DatabaseException("[Error] - Error updating the table.");
+                }
+            }
+            // Remove the update value pairs and "bring forward" the next pair (if there is more)
+            updateValues.remove(0);
+            updateValues.remove(0);
         }
     }
 
@@ -341,16 +540,16 @@ public class Table
             {
                 String updateColumnName = updateValues.get(0);
                 String updateValue = updateValues.get(1);
-                switch(operator)
+                switch(conditionOperator)
                 {
                     case ("=="):
-                        if (records.get(i).getColumnData(columnName).equals(value))
+                        if (records.get(i).getColumnData(conditionColumnName).equals(conditionValue))
                         {
                             updateTableValues(i, updateColumnName, updateValue);
                         }
                         break;
                     case ("!="):
-                        if (!records.get(i).getColumnData(columnName).equals(value))
+                        if (!records.get(i).getColumnData(conditionColumnName).equals(conditionValue))
                         {
                             updateTableValues(i, updateColumnName, updateValue);
                         }
@@ -373,17 +572,17 @@ public class Table
     }
 
 //    public String selectConditionTable(ArrayList<ArrayList<String>> tableInput, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
-    public String selectConditionTable(String tableName, ArrayList<String> columnNames, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
+    public String selectTable(String tableName, ArrayList<String> columnNames, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
     {
         this.tableName = tableName;
         System.out.println("Table name in selectConditionTable "+tableName);
         table = readTable(tableName);
         addRecords();
 
-        columnName = conditions.get(conditionNum++);
-        operator = conditions.get(conditionNum++);
-        value = conditions.get(conditionNum++);
-        Operator op = new Operator(operator, value);
+        conditionColumnName = conditions.get(conditionNum++);
+        conditionOperator = conditions.get(conditionNum++);
+        conditionValue = conditions.get(conditionNum++);
+        Operator op = new Operator(conditionOperator, conditionValue);
 //      Check if column being operator on is a String/Bool or Int/Float type column and then
 //      perform the correct operation on it
         op.numberOrString();
@@ -392,14 +591,14 @@ public class Table
         {
             System.out.println("Passed op.isNumber() check (ie. number)");
             selectNumberOp();
+            trimTable(table, columnNames);
             return printTable(tableName);
         }
         if (!op.isNumber())
         {
             System.out.println("Passed !op.isNumber() check");
             selectStringBoolOp();
-            System.out.println("columnName[0] in sCT "+columnNames.get(0));
-            selectTable(table, columnNames);
+            trimTable(table, columnNames);
             return printTable(tableName);
         }
         throw new DatabaseException("[Error] - Could not carry out WHERE clause. Check inputs.");
@@ -413,19 +612,19 @@ public class Table
         int j = 1;
         int size = table.size();
         System.out.println(table.size());
-        System.out.println("operator in bool op "+operator);
-        System.out.println("value in bool op "+value);
+        System.out.println("operator in bool op "+ conditionOperator);
+        System.out.println("value in bool op "+ conditionValue);
         for (int i = 0; i < records.size(); i++, j++)
         {
             System.out.println("i = "+i+" and j = "+j);
             System.out.println(printTable(tableName));
-            entry = records.get(i).getColumnData(columnName);
-            System.out.println(entry+" = "+value);
+            entry = records.get(i).getColumnData(conditionColumnName);
+            System.out.println(entry+" = "+ conditionValue);
 
-            switch (operator)
+            switch (conditionOperator)
             {
                 case ("=="):
-                    if (!entry.equals(value))
+                    if (!entry.equals(conditionValue))
                     {
                         table.remove(j--);
 //                        records.remove(i--);
@@ -433,7 +632,7 @@ public class Table
                     }
                     break;
                 case ("!="):
-                    if (entry.equals(value))
+                    if (entry.equals(conditionValue))
                     {
                         table.remove(j--);
 //                        records.remove(i--);
@@ -441,7 +640,7 @@ public class Table
                     }
                     break;
                 default:
-                    throw new DatabaseException("[Error] - "+operator+" is invalid");
+                    throw new DatabaseException("[Error] - "+ conditionOperator +" is invalid");
             }
         }
         System.out.println(printTable(tableName));
@@ -452,14 +651,14 @@ public class Table
     public void selectNumberOp() throws DatabaseException
     {
         String entry;
-        float floatValue = Float.parseFloat(value);
+        float floatValue = Float.parseFloat(conditionValue);
         float floatEntry;
         int j = 1;
         for (int i = 0; i < records.size(); i++, j++)
         {
-            entry = records.get(i).getColumnData(columnName);
+            entry = records.get(i).getColumnData(conditionColumnName);
             floatEntry = Float.parseFloat(entry);
-            j = selectFloatOp(operator, floatEntry, floatValue, j);
+            j = selectFloatOp(conditionOperator, floatEntry, floatValue, j);
         }
     }
 

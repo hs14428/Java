@@ -27,12 +27,18 @@ public class DropCMD extends DBcmd
         {
             case("DATABASE"):
                 token = dbServer.nextToken();
+                if (databaseName == null)
+                {
+                    databaseName = token;
+                }
+                System.out.println(token);
+                System.out.println(databaseName);
                 if (!token.equals(databaseName))
                 {
                     throw new DatabaseException("[Error] - Selected database and database to be dropped don't match");
                 }
-                Database databaseToDrop = new Database(databaseName);
-                databaseToDrop.removeDatabase(databaseName);
+                Database databaseToDrop = new Database(token);
+                databaseToDrop.removeDatabase(token);
                 return "[OK] - "+token+" database dropped";
             case("TABLE"):
                 token = dbServer.nextToken();

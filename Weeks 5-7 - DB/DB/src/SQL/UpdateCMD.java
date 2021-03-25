@@ -32,32 +32,23 @@ public class UpdateCMD extends DBcmd
         token = dbServer.nextToken();
         System.out.println("Hello UpdateCMD class: nextToken = " + token);
 
-        if (token.matches(RegEx.VARIABLENAME.getRegex()))
+        tableName = token;
+        dbServer.setTableName(tableName);
+        checkValidTable();
+        token = dbServer.nextToken().toUpperCase();
+        if (token.equals("SET"))
         {
-            tableName = token;
-            dbServer.setTableName(tableName);
-            checkValidTable();
-            System.out.println("after checkValidTable");
-            token = dbServer.nextToken().toUpperCase();
-            if (token.equals("SET"))
+            token = dbServer.nextToken();
+            while (!token.toUpperCase().equals("WHERE"))
             {
+                checkNameValuePair(dbServer);
                 token = dbServer.nextToken();
-                while (!token.toUpperCase().equals("WHERE"))
-                {
-                    checkNameValuePair(dbServer);
-                    token = dbServer.nextToken();
-                }
-                token = token.toUpperCase();
-                System.out.println(updateValues.get(0));
-                System.out.println(updateValues.get(1));
-//                System.out.println(updateValues.get(2));
-//                System.out.println(updateValues.get(3));
-                System.out.println("token = "+token);
-                if (token.equals("WHERE"))
-                {
-                    dbServer.decCurrentTokenNum();
-                    return new ConditionCMD(command).runCommand(dbServer);
-                }
+            }
+            token = token.toUpperCase();
+            if (token.equals("WHERE"))
+            {
+                dbServer.decCurrentTokenNum();
+                return new ConditionCMD(command).runCommand(dbServer);
             }
         }
         throw new InvalidTokenException(token);

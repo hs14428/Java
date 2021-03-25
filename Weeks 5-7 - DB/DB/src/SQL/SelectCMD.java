@@ -67,12 +67,9 @@ public class SelectCMD extends DBcmd
                 getColumnNames(tableName);
                 dbServer.setColumnNames(columnNames);
                 System.out.println("select *: "+columnNames);
-//                table.readTable(tableName);
-//                tableArrayList = table.getTable();
                 if (whereClause)
                 {
                     dbServer.setTableName(tableName);
-//                    dbServer.setTable(tableArrayList);
                     return new ConditionCMD(command).runCommand(dbServer);
                 }
                 table.readTable(tableName);
@@ -106,7 +103,7 @@ public class SelectCMD extends DBcmd
                     return new ConditionCMD(command).runCommand(dbServer);
                 }
                 tableArrayList = table.readTable(tableName);
-                table.selectTable(tableArrayList, columnNames);
+                table.trimTable(tableArrayList, columnNames);
                 String printTable = table.printTable(tableName);
                 return "[OK]\n"+printTable;
             }
