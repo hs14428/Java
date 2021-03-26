@@ -425,13 +425,9 @@ public class Table
         table = readTable(tableName);
         this.tableName = tableName;
         addRecords();
-        System.out.println("condNum "+ conditionNum);
         conditionColumnName = conditions.get(conditionNum++);
-        System.out.println("col "+conditionColumnName);
         conditionOperator = conditions.get(conditionNum++);
-        System.out.println("op "+conditionOperator);
         conditionValue = conditions.get(conditionNum++);
-        System.out.println("val "+conditionValue);
         op = new Operator(conditionOperator, conditionValue);
 //      Check if column being operator on is a String/Bool or Int/Float type column and then
 //      perform the correct operation on it
@@ -441,15 +437,6 @@ public class Table
 //  Delete rows from table based on a WHERE condition. Use of conditionNum allow for multiple conditions to be processed
     public void deleteRowsFromTable(String tableName, ArrayList<String> conditions, int conditionNum) throws IOException, DatabaseException
     {
-//        table = readTable(tableName);
-//        this.tableName = tableName;
-//        addRecords();
-//
-//        conditionColumnName = conditions.get(conditionNum++);
-//        conditionOperator = conditions.get(conditionNum++);
-//        conditionValue = conditions.get(conditionNum++);
-//        Operator op = new Operator(conditionOperator, conditionValue);
-//        op.valueNumberOrString();
 
         setUpConditionVars(tableName, conditions, conditionNum);
 
@@ -540,6 +527,13 @@ public class Table
                         deleteTableValues(i--);
                     }
                     break;
+                case ("LIKE"):
+                    String trimmedEntry = conditionValue.replace("'","");
+                    if (records.get(i).getColumnData(conditionColumnName).contains(trimmedEntry))
+                    {
+                        deleteTableValues(i--);
+                    }
+                    break;
                 default:
                     throw new DatabaseException("[ERROR] - Error deleting from the table.");
             }
@@ -557,15 +551,6 @@ public class Table
 //  Update values in a table based on a WHERE condition. Use of conditionNum allow for multiple conditions to be processed
     public void updateTable(String tableName, ArrayList<String> updateValues, ArrayList<String> conditions, int conditionNum) throws IOException, DatabaseException
     {
-//        table = readTable(tableName);
-//        this.tableName = tableName;
-//        addRecords();
-//
-//        conditionColumnName = conditions.get(conditionNum++);
-//        conditionOperator = conditions.get(conditionNum++);
-//        conditionValue = conditions.get(conditionNum++);
-//        Operator op = new Operator(conditionOperator, conditionValue);
-//        op.valueNumberOrString();
 
         setUpConditionVars(tableName, conditions, conditionNum);
 
@@ -673,6 +658,13 @@ public class Table
                             updateTableValues(i, updateColumnName, updateValue);
                         }
                         break;
+                    case ("LIKE"):
+                        String trimmedEntry = conditionValue.replace("'","");
+                        if (records.get(i).getColumnData(conditionColumnName).contains(trimmedEntry))
+                        {
+                            updateTableValues(i, updateColumnName, updateValue);
+                        }
+                        break;
                     default:
                         throw new DatabaseException("[ERROR] - Error updating the table.");
                 }
@@ -764,6 +756,13 @@ public class Table
                         table.remove(j--);
                     }
                     break;
+                case ("LIKE"):
+                    String trimmedEntry = conditionValue.replace("'","");
+                    if (!entry.contains(trimmedEntry))
+                    {
+                        table.remove(j--);
+                    }
+                    break;
                 default:
                     throw new DatabaseException("[ERROR] - "+ conditionOperator +" is invalid");
             }
@@ -831,8 +830,6 @@ public class Table
                 {
                     table.remove(index--);
                 }
-                return index;
-            case ("LIKE"):
                 return index;
             default:
                 throw new DatabaseException("[ERROR] - "+operator+" is invalid");

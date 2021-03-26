@@ -62,6 +62,7 @@ public class UpdateCMD extends DBcmd
 
         int i = 0;
         String value;
+//      If no spaces between e.g. SET age=40, split and assign update values
         if (splitNameValuePair.length == 3)
         {
             columnName = splitNameValuePair[i++];
@@ -77,11 +78,11 @@ public class UpdateCMD extends DBcmd
                 }
             }
         }
-        else {
-            columnName = token;
+//      If one space after =, e.g. SET age= 40, split age= and assign update values
+        else if (splitNameValuePair.length == 2) {
+            columnName = splitNameValuePair[i++];
             checkValidColumn();
-            token = dbServer.nextToken();
-            if (token.equals("="))
+            if (splitNameValuePair[i].equals("="))
             {
                 token = dbServer.nextToken();
                 value = token;
@@ -90,6 +91,42 @@ public class UpdateCMD extends DBcmd
                     updateValues.add(columnName);
                     updateValues.add(value);
                     dbServer.setUpdateValues(updateValues);
+                }
+            }
+        }
+//      If there are spaces, split wont split token and token == columnName
+        else {
+            columnName = token;
+            checkValidColumn();
+            token = dbServer.nextToken();
+            String[] splitNameValuePair2 = token.split(RegEx.SPLITSET.getRegex());
+//          If second split length == 1, then spaces both side of = sign
+            if (splitNameValuePair2.length == 1)
+            {
+                if (token.equals("="))
+                {
+                    token = dbServer.nextToken();
+                    value = token;
+                    if (value.matches(RegEx.VALUE.getRegex()))
+                    {
+                        updateValues.add(columnName);
+                        updateValues.add(value);
+                        dbServer.setUpdateValues(updateValues);
+                    }
+                }
+            }
+//          If got here, means input was like age =40 - split e.g. =40 and assign
+            else {
+                i = 0;
+                if (splitNameValuePair2[i++].equals("="))
+                {
+                    value = splitNameValuePair2[i];
+                    if (value.matches(RegEx.VALUE.getRegex()))
+                    {
+                        updateValues.add(columnName);
+                        updateValues.add(value);
+                        dbServer.setUpdateValues(updateValues);
+                    }
                 }
             }
         }

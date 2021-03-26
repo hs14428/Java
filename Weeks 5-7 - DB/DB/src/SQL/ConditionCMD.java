@@ -150,12 +150,10 @@ public class ConditionCMD extends DBcmd
         while ((dbServer.getCurrentTokenNum() != dbServer.getQueryLength()-1))
         {
             token = dbServer.nextToken();
-            System.out.println("token before split "+token);
             conditionsArray = token.split(RegEx.WHERESPLIT.getRegex());
             for (int i = 0; i < conditionsArray.length; i++)
             {
                 conditionsArray[i] = conditionsArray[i].trim();
-                System.out.println(conditionsArray[i]);
 //              Check if each part of the condition matches allowed input
                 if (conditionsArray[i].matches(RegEx.OPERATOR.getRegex()) || conditionsArray[i].matches(RegEx.ANDOR.getRegex())
                         || conditionsArray[i].matches(RegEx.VALUE.getRegex()) || checkValidColumn(conditionsArray[i]))
@@ -163,8 +161,6 @@ public class ConditionCMD extends DBcmd
                     conditions.add(conditionsArray[i].trim());
                 }
             }
-            System.out.println("conditions: "+conditions.get(0));
-            System.out.println("conditions: "+conditions.get(conditions.size()-1));
         }
         switch(command)
         {
@@ -183,20 +179,14 @@ public class ConditionCMD extends DBcmd
     {
         int startTokenNum = dbServer.getCurrentTokenNum();
         int endTokenNum = dbServer.getQueryLength();
-        System.out.println("startnum "+startTokenNum);
-        System.out.println("endnum "+endTokenNum);
         for (int i = startTokenNum+1; i < endTokenNum; i++)
         {
             token = dbServer.nextToken();
-            System.out.println("token: "+token);
-            System.out.println(i+"<"+endTokenNum);
             if (token.contains("(") && token.contains(")"))
             {
-                System.out.println("pre remove "+token);
                 token = token.replace("(","");
                 token = token.replace(")","");
                 dbServer.replaceToken(token);
-                System.out.println("post Change "+dbServer.getTokens().get(i).getTokenString());
             }
         }
         dbServer.setCurrentTokenNum(startTokenNum);

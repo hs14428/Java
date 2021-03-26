@@ -155,11 +155,18 @@ public class DBTesting {
         System.out.println();
         System.out.println("Start here");
 //        Tokenizer tok = new Tokenizer("SELECT ( name, age ) FROM marks WHERE name>='Hugh Grant';");
-        Tokenizer tok = new Tokenizer("SELECT * FROM actors WHERE awards > 5;");
+        Tokenizer tok = new Tokenizer("SELECT * FROM actors WHERE name LIKE 'an';");
 //        Tokenizer tok = new Tokenizer("SELECT * FROM actors WHERE (awards > 5) AND ((nationality == 'British') OR (nationality == 'Australian'));");
         tok.tokenize();
         tok.scanForANDOR();
         System.out.println("end here");
+
+        String s5 = "40";
+        String[] splitNameValuePair = s5.split(RegEx.SPLITSET.getRegex());
+        for (int i = 0; i < splitNameValuePair.length; i++) {
+            System.out.println(splitNameValuePair.length);
+            System.out.println(splitNameValuePair[i]);
+        }
 
         String s1 = "awards > 5";
         String s2 = "AND";
