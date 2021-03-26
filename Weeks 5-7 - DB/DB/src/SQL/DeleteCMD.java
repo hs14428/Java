@@ -26,7 +26,6 @@ public class DeleteCMD extends DBcmd
         databaseName = dbServer.getDatabaseName();
         database = new Database(databaseName);
         token = dbServer.nextToken().toUpperCase();
-        System.out.println("Hello UpdateCMD class: nextToken = " + token);
 
         if (token.equals("FROM"))
         {
@@ -44,7 +43,7 @@ public class DeleteCMD extends DBcmd
         throw new InvalidTokenException(token);
     }
 
-    public void checkValidTable() throws DatabaseException, IOException
+    public void checkValidTable() throws DatabaseException
     {
         getTableNames();
         if (!tables.containsKey(tableName))
@@ -53,7 +52,7 @@ public class DeleteCMD extends DBcmd
         }
     }
 
-    public void getTableNames() throws DatabaseException, IOException
+    public void getTableNames() throws DatabaseException
     {
         tables = new HashMap<String, Table>();
         tables = database.scanDBForTables();

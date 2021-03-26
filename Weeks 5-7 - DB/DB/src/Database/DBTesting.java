@@ -100,13 +100,13 @@ public class DBTesting {
 
 //      test printTable
         table.readTable("contactdetails");
-        System.out.println(table.printTable("contactdetails"));
+        System.out.println(table.printTable());
         ArrayList<String> columnNamesString = new ArrayList<>();
         columnNamesString.add("Name");
 
         columnNamesString.add("Age");
 //        System.out.println(table.selectTable("contactdetails", columnNamesString));
-        System.out.println(table.printTable("contactdetails"));
+        System.out.println(table.printTable());
 
 //      test regex matching
         trueString = "LIKE";

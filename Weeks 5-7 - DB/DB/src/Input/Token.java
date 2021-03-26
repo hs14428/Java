@@ -10,13 +10,10 @@ public class Token
         this.token = token;
     }
 
-//  Needs work
     public Token(String token, TokenType tokenType)
     {
         this.token = token;
         this.tokenType = TokenType.valueOf(token);
-//        TokenType whichToken = TokenType.valueOf("use");
-//        System.out.println("Tokentype: " + whichToken);
     }
 
     public TokenType getTokenType()

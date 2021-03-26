@@ -23,7 +23,6 @@ public class DBServer
     private String databaseName;
     private String tableName;
     private int currentTokenNum;
-    private int queryLength;
 
     public DBServer(int portNumber)
     {
@@ -60,7 +59,6 @@ public class DBServer
             tokenizer = new Tokenizer(incomingCommand);
             tokenList = tokenizer.tokenize();
             currentTokenNum = 0;
-//            createDBEnvironment();
             Parser parser = new Parser(this);
             socketWriter.write(parser.parse().runCommand(this));
         } catch (DatabaseException | IOException e) {
@@ -73,7 +71,7 @@ public class DBServer
 
     public static void main(String args[])
     {
-        DBServer server = new DBServer(8888);
+        DBServer server = new DBServer(8889);
     }
 
     public void createDBEnvironment()
@@ -81,7 +79,6 @@ public class DBServer
         currentDirectory = ".";
         baseDirectory = "Databases";
         File database = new File(currentDirectory + File.separator + baseDirectory);
-        System.out.println("createDBEnvironmet:" +currentDirectory + File.separator + baseDirectory);
 
         if (!database.exists())
         {
@@ -89,20 +86,9 @@ public class DBServer
         }
     }
 
-    public Tokenizer getTokenizer()
-    {
-        return tokenizer;
-    }
-
     public ArrayList<Token> getTokens()
     {
         return tokenList;
-    }
-
-    public void addTokens(int index, Token token)
-    {
-        tokenList.add(index, token);
-//        tokenList.
     }
 
     public ArrayList<Token> getBrackets(String tokenBrackets) throws InvalidQueryException
@@ -122,12 +108,6 @@ public class DBServer
             return token;
         }
         throw new DatabaseException("[Error] - Run out of tokens");
-    }
-
-    public String previousToken()
-    {
-        String previousToken = tokenList.get(currentTokenNum-1).getTokenString();
-        return previousToken;
     }
 
     public int getCurrentTokenNum()

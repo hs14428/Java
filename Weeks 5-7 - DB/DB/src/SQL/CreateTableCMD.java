@@ -24,25 +24,15 @@ public class CreateTableCMD extends DBcmd
     {
         String token = dbServer.nextToken();
         int queryLength = dbServer.getQueryLength();
-//        System.out.println("Hello CreateTableCMD class: nextToken = " + token);
-
-        // Need to add error handling for having not selected a DB?
-//        if (databaseName.equals(""))
-//        {
-//            System.out.println("In .equals");
-//            throw new InvalidTokenException(token);
-//        }
 
         if (token.matches(RegEx.VARIABLENAME.getRegex()))
         {
             tableName = token;
             databaseName = dbServer.getDatabaseName();
-            System.out.println("in CreateTableCMD - dbname:"+databaseName);
             Database database = new Database(databaseName);
             database.addTable(token);
             if (queryLength == 4)
             {
-                // Maybe split out to reduce complexity
                 token = dbServer.nextToken();
                 if (token.matches(RegEx.BRACKETS.getRegex()))
                 {
@@ -54,11 +44,9 @@ public class CreateTableCMD extends DBcmd
                 else {
                     throw new InvalidTokenException(token);
                 }
+                return "[OK] - "+tableName+" table created";
             }
-            return "[OK] - "+tableName+" table created";
         }
-        // Add custom messages to ITE
-        System.out.println("CreateTableCMD runCommand() error.");
         throw new InvalidTokenException(token);
     }
 

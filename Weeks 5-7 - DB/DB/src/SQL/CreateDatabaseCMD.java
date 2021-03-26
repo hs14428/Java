@@ -18,17 +18,14 @@ public class CreateDatabaseCMD extends DBcmd
     public String runCommand(DBServer dbServer) throws DatabaseException
     {
         String token = dbServer.nextToken();
-        System.out.println("Hello CreateDatabaseCMD class: nextToken = " + token);
 
         if (token.matches(RegEx.VARIABLENAME.getRegex()))
         {
-            System.out.println(token);
             databaseName = token;
             Database database = new Database(databaseName);
             database.createDatabase(databaseName);
             return "[OK] - "+databaseName+" database created";
         }
-        System.out.println("CreateDatabaseCMD runCommand() error.");
         throw new InvalidTokenException(token);
     }
 

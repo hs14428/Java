@@ -19,7 +19,6 @@ public class CreateCMD extends DBcmd
     public String runCommand(DBServer dbServer) throws DatabaseException, IOException
     {
         String token = dbServer.nextToken().toUpperCase();
-        System.out.println("Hello CreateCMD class: nextToken = " + token);
 
         switch (token)
         {
@@ -28,7 +27,6 @@ public class CreateCMD extends DBcmd
             case("TABLE"):
                 return new CreateTableCMD().runCommand(dbServer);
         }
-        System.out.println("CreateCMD runCommand() error.");
         throw new InvalidTokenException(token);
     }
 

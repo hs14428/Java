@@ -31,7 +31,6 @@ public class SelectCMD extends DBcmd
         scanForWhere(dbServer);
         token = dbServer.nextToken();
         databaseName = dbServer.getDatabaseName();
-        System.out.println("Hello SelectCMD class: nextToken = " + token);
 
         if (token.equals("*"))
         {
@@ -39,19 +38,19 @@ public class SelectCMD extends DBcmd
         }
         else if (token.matches(RegEx.VARIABLENAME.getRegex()))
         {
-            // if singular column, add to select columns
+//          If singular column, add to select columns
             selectColumns.add(token);
             return selectSome(dbServer);
         }
         else if (token.matches(RegEx.BRACKETS.getRegex()))
         {
+//          If multiple columns, build list to chose from later
             ArrayList<Token> bracketsTokens;
             bracketsTokens = dbServer.getBrackets(token);
             for (Token bracketsToken : bracketsTokens)
             {
                 selectColumns.add(bracketsToken.getTokenString());
             }
-//            dbServer.setColumnNames(selectColumns);
             return selectSome(dbServer);
         }
         else {
@@ -72,15 +71,15 @@ public class SelectCMD extends DBcmd
                 tableName = token;
                 getColumnNames(tableName);
                 dbServer.setColumnNames(columnNames);
-                System.out.println("select *: "+columnNames);
                 if (whereClause)
                 {
                     dbServer.setTableName(tableName);
                     return new ConditionCMD(command).runCommand(dbServer);
                 }
+//              Check that you are at last token. If not query is invalid
                 checkFinalToken(dbServer);
                 table.readTable(tableName);
-                String printTable = table.printTable(tableName);
+                String printTable = table.printTable();
                 return "[OK]\n"+printTable;
             }
         }
@@ -98,22 +97,20 @@ public class SelectCMD extends DBcmd
             if (token.matches(RegEx.VARIABLENAME.getRegex()))
             {
                 tableName = token;
-                // Check if the chosen selectColumns from runCommand are valid/in table
+//              Check if the chosen selectColumns from runCommand are valid/in table
                 checkValidColumn();
                 columnNames = selectColumns;
                 dbServer.setColumnNames(columnNames);
-                System.out.println("selectSome: "+columnNames);
-//                tableArrayList = table.selectTable(tableName, columnNames);
                 if (whereClause)
                 {
                     dbServer.setTableName(tableName);
-//                    dbServer.setTable(tableArrayList);
                     return new ConditionCMD(command).runCommand(dbServer);
                 }
+//              Check that you are at last token. If not query is invalid
                 checkFinalToken(dbServer);
                 tableArrayList = table.readTable(tableName);
                 table.trimTable(tableArrayList, columnNames);
-                String printTable = table.printTable(tableName);
+                String printTable = table.printTable();
                 return "[OK]\n"+printTable;
             }
         }
@@ -160,9 +157,6 @@ public class SelectCMD extends DBcmd
 
     public void checkValidColumn() throws DatabaseException, IOException
     {
-        System.out.println("table "+tableName);
-        System.out.println("columns "+selectColumns);
-
         getColumnNames(tableName);
         int validColumns = 0;
         for (String selectColumn : selectColumns)
@@ -183,7 +177,6 @@ public class SelectCMD extends DBcmd
 
     public void getColumnNames(String tableName) throws DatabaseException, IOException
     {
-        System.out.println("db "+databaseName);
         Table table = new Table(databaseName);
         columnNames = new ArrayList<>();
         columnNames = table.readColumnNames(tableName);

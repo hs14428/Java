@@ -17,10 +17,6 @@ public class Database
         this.database = new HashMap<String, Table>();
         this.databaseName = databaseName;
         currentDirectory = "."+File.separator+"Databases";
-//        if (!checkDatabaseExists())
-//        {
-//            throw new DatabaseException("[Error] - Database "+databaseName+" does not exists");
-//        }
     }
 
     public HashMap<String, Table> scanDBForTables() throws DatabaseException
@@ -28,11 +24,9 @@ public class Database
         Table table;
         String tableName;
         File[] tables = listTables();
-        System.out.println("listTables length: "+tables.length);
-        for (int i = 0; i < tables.length; i++)
+        for (File file : tables)
         {
-            tableName = tables[i].getName().split("\\.")[0];
-            System.out.println("Table name "+tableName);
+            tableName = file.getName().split("\\.")[0];
             table = new Table(databaseName, tableName);
             database.put(tableName, table);
         }
@@ -75,7 +69,6 @@ public class Database
     public boolean checkDatabaseExists()
     {
         File database = new File(currentDirectory + File.separator + databaseName);
-        System.out.println("checkDatabaseExists: "+currentDirectory + File.separator + databaseName);
         if (database.exists())
         {
             return true;
@@ -85,9 +78,6 @@ public class Database
 
     public Table addTable(String tableName) throws IOException, DatabaseException
     {
-        System.out.println("In addTable - dbName: "+databaseName);
-        System.out.println("In addTable - tableName: "+tableName);
-
         Table table = new Table(databaseName);
         table.createTable(tableName);
         return table;
@@ -98,24 +88,12 @@ public class Database
         File databaseTables = new File(currentDirectory + File.separator + databaseName);
         File[] listOfFiles = databaseTables.listFiles();
         assert listOfFiles != null;
-        for (File listOfFile : listOfFiles) {
-            if (listOfFile.isFile()) {
-                System.out.println("Table: " + listOfFile.getName());
-            } else if (listOfFile.isDirectory()) {
-                System.out.println("Database: " + listOfFile.getName());
-            }
-        }
         return listOfFiles;
     }
 
     public String getDatabaseName()
     {
         return databaseName;
-    }
-
-    public void setCurrentDirectory(String directory)
-    {
-        currentDirectory = directory;
     }
 
     public String getCurrentDirectory()

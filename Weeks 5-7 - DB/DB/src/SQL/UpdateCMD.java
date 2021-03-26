@@ -30,7 +30,6 @@ public class UpdateCMD extends DBcmd
         databaseName = dbServer.getDatabaseName();
         database = new Database(databaseName);
         token = dbServer.nextToken();
-        System.out.println("Hello UpdateCMD class: nextToken = " + token);
 
         tableName = token;
         dbServer.setTableName(tableName);
@@ -39,12 +38,14 @@ public class UpdateCMD extends DBcmd
         if (token.equals("SET"))
         {
             token = dbServer.nextToken();
+//          Loop through and store single/multiple SET conditions. Once we reach WHERE, move on
             while (!token.toUpperCase().equals("WHERE"))
             {
                 checkNameValuePair(dbServer);
                 token = dbServer.nextToken();
             }
             token = token.toUpperCase();
+//          Provided a WHERE follows the SET conditions, carry on. Otherwise throw a invalid token error.
             if (token.equals("WHERE"))
             {
                 dbServer.decCurrentTokenNum();
@@ -103,7 +104,7 @@ public class UpdateCMD extends DBcmd
         }
     }
 
-    public void getTableNames() throws DatabaseException, IOException
+    public void getTableNames() throws DatabaseException
     {
         tables = new HashMap<String, Table>();
         tables = database.scanDBForTables();

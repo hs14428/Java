@@ -21,7 +21,6 @@ public class DropCMD extends DBcmd
     {
         String token = dbServer.nextToken().toUpperCase();
         databaseName = dbServer.getDatabaseName();
-        System.out.println("Hello DropCMD class: nextToken = " + token);
 
         switch (token)
         {
@@ -31,8 +30,6 @@ public class DropCMD extends DBcmd
                 {
                     databaseName = token;
                 }
-                System.out.println(token);
-                System.out.println(databaseName);
                 if (!token.equals(databaseName))
                 {
                     throw new DatabaseException("[Error] - Selected database and database to be dropped don't match");

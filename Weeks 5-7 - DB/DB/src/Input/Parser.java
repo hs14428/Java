@@ -4,7 +4,7 @@ import DBExceptions.InvalidTokenException;
 import Database.DBServer;
 import SQL.*;
 
-// Parser needs to firstly check that the input string is valid before any commands
+// Parser checks that query inputs are valid
 public class Parser
 {
     private DBServer dbServer;
@@ -29,7 +29,6 @@ public class Parser
     {
         int currentToken = dbServer.getCurrentTokenNum();
         String token = dbServer.getTokens().get(currentToken).getTokenString().toUpperCase();
-        System.out.println("parse() token: " + token);
         for (DBcmd command : commandType)
         {
             if (command.getCommand().equals(token))
@@ -37,7 +36,6 @@ public class Parser
                 return command;
             }
         }
-        System.out.println("Parser parse() error.");
         throw new InvalidTokenException(token);
     }
 }

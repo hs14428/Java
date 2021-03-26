@@ -29,7 +29,6 @@ public class ConditionCMD extends DBcmd
         tableName = dbServer.getTableName();
         columnNames = dbServer.getColumnNames();
         getColumnNames(tableName);
-        System.out.println("Hello ConditionCMD class: nextToken = " + token);
 
 //      Check for AND/OR in a query and if so call AND/OR recursive condition
 //      Otherwise call basic where condition
@@ -50,18 +49,18 @@ public class ConditionCMD extends DBcmd
 
     public String storeCondition(DBServer dbServer) throws DatabaseException, IOException
     {
-        // Need to add some kind of catch/loop for multiple conditions with AND OR
-        // Add column name to conditions
+//      Need to add some kind of catch/loop for multiple conditions with AND OR
+//      Add column name to conditions
         conditions.add(token);
         token = dbServer.nextToken();
         if (token.matches(RegEx.OPERATOR.getRegex()))
         {
-            // Add operator to conditions
+//          Add operator to conditions
             conditions.add(token);
             token = dbServer.nextToken();
             if (token.matches(RegEx.VALUE.getRegex()))
             {
-                // Add value to conditions
+//              Add value to conditions
                 conditions.add(token);
                 switch(command)
                 {
@@ -83,7 +82,6 @@ public class ConditionCMD extends DBcmd
     {
         Table table = new Table(databaseName);
         updateValues = dbServer.getUpdateValues();
-        System.out.println(tableName);
         table.updateTable(tableName, updateValues, conditions, conditionNum);
         return "[OK] - Values updated";
     }
@@ -97,21 +95,16 @@ public class ConditionCMD extends DBcmd
 
     public String selectCondition(DBServer dbServer) throws DatabaseException, IOException
     {
-        // If this breaks i moved this from the runCommand method
         tableArrayList = dbServer.getTable();
-        System.out.println("tableName "+tableName);
         columnNames = dbServer.getColumnNames();
-        System.out.println("columnNames in selectCondition "+columnNames);
         Table table = new Table(databaseName);
 
         if (conditions.get(conditionNum).matches(RegEx.ANDOR.getRegex()))
         {
             //do something
-            System.out.println("check not in ANDOR");
             conditionNum++;
         }
         String printTable  = table.selectTable(tableName, columnNames, conditions, conditionNum);
-//        String printTable  = table.selectConditionTable(tableArrayList, conditions, conditionNum);
         return "[OK]\n" + printTable;
     }
 
@@ -123,7 +116,8 @@ public class ConditionCMD extends DBcmd
     }
 
     @Override
-    public String getCommand() {
-        return null;
+    public String getCommand()
+    {
+        return command;
     }
 }

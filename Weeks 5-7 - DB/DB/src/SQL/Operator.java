@@ -59,20 +59,12 @@ public class Operator
 
     public boolean floatGreaterThanEqual(Float entry, Float value)
     {
-        if (entry.compareTo(value) < 0)
-        {
-            return false;
-        }
-        return entry.compareTo(value) == 0;
+        return (entry.compareTo(value) >= 0) || (entry.compareTo(value) == 0);
     }
 
     public boolean floatLessThanEqual(Float entry, Float value)
     {
-        if (entry.compareTo(value) > 0)
-        {
-            return false;
-        }
-        return entry.compareTo(value) == 0;
+        return (entry.compareTo(value) <= 0) || (entry.compareTo(value) == 0);
     }
 
 

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 public class InsertCMD extends DBcmd
 {
+    ArrayList<String> columnNamesToAddTo = new ArrayList<>();
+    String token;
 
     public InsertCMD()
     {
@@ -22,9 +24,8 @@ public class InsertCMD extends DBcmd
     @Override
     public String runCommand(DBServer dbServer) throws DatabaseException, IOException
     {
-        String token = dbServer.nextToken().toUpperCase();
+        token = dbServer.nextToken().toUpperCase();
         databaseName = dbServer.getDatabaseName();
-        System.out.println("Hello InsertCMD class: nextToken = " + token);
 
         if (token.equals("INTO"))
         {
@@ -36,24 +37,54 @@ public class InsertCMD extends DBcmd
                 if (token.equals("VALUES"))
                 {
                     token = dbServer.nextToken();
-                    // Need to add a check for the amount of things inside bracks == num columns
                     if (token.matches(RegEx.BRACKETS.getRegex()))
                     {
-                        ArrayList<Token> bracketsTokens;
-                        bracketsTokens = dbServer.getBrackets(token);
-                        // Can cut out to reduce complexity
-                        for (Token bracketsToken : bracketsTokens)
-                        {
-                            columnNames.add(bracketsToken.getTokenString());
-                        }
-                        Table table = new Table(databaseName);
-                        table.addRow(tableName, columnNames);
-                        return "[OK] - Values inserted";
+//                        ArrayList<Token> bracketsTokens;
+//                        bracketsTokens = dbServer.getBrackets(token);
+//                        // columnNames.size()-1 because of the id column
+//                        if (bracketsTokens.size() == columnNames.size()-1)
+//                        {
+//                            // Can cut out to reduce complexity
+//                            for (Token bracketsToken : bracketsTokens)
+//                            {
+//                                columnNamesToAddTo.add(bracketsToken.getTokenString());
+//                            }
+//                            Table table = new Table(databaseName);
+//                            table.addRow(tableName, columnNamesToAddTo);
+//                            return "[OK] - Values inserted";
+//                        }
+                    return addRowsToTable(dbServer);
                     }
                 }
             }
         }
         throw new InvalidTokenException(token);
+    }
+
+    public String addRowsToTable(DBServer dbServer) throws DatabaseException, IOException
+    {
+        ArrayList<Token> bracketsTokens;
+        bracketsTokens = dbServer.getBrackets(token);
+        // columnNames.size()-1 because of the id column
+        getColumnNames(tableName);
+        if (bracketsTokens.size() == columnNames.size()-1)
+        {
+            for (Token bracketsToken : bracketsTokens)
+            {
+                columnNamesToAddTo.add(bracketsToken.getTokenString());
+            }
+            Table table = new Table(databaseName);
+            table.addRow(tableName, columnNamesToAddTo);
+            return "[OK] - Values inserted";
+        }
+        throw new DatabaseException("[ERROR] - Too many/few rows chosen");
+    }
+
+    public void getColumnNames(String tableName) throws DatabaseException, IOException
+    {
+        Table table = new Table(databaseName);
+        columnNames = new ArrayList<>();
+        columnNames = table.readColumnNames(tableName);
     }
 
     @Override

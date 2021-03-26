@@ -13,7 +13,6 @@ public class Record
     public Record ()
     {
         records = new LinkedHashMap<String, String>();
-        //records.getOrDefault()
     }
 
     public void addToRecords(String columnName, String columnData)
@@ -26,8 +25,4 @@ public class Record
         return records.get(columnName);
     }
 
-    public void removeRecords(String columnName)
-    {
-        records.remove(columnName);
-    }
 }

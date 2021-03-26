@@ -17,18 +17,17 @@ public class UseCMD extends DBcmd
     public String runCommand(DBServer dbServer) throws DatabaseException
     {
         String token = dbServer.nextToken();
-        System.out.println("Hello UseCMD class: nextToken = " + token);
 
         if (token.matches(RegEx.VARIABLENAME.getRegex()))
         {
             Database database = new Database(token);
-            if (database.checkDatabaseExists()) {
+            if (database.checkDatabaseExists())
+            {
                 databaseName = token;
                 dbServer.setDatabaseName(databaseName);
                 return "[OK] - "+databaseName+" database selected";
             }
         }
-        System.out.println("UseCMD runCommand() error.");
         throw new MissingDatabaseException(token);
     }
 
