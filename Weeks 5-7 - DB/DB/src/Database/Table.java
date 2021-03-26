@@ -366,14 +366,14 @@ public class Table
         conditionOperator = conditions.get(conditionNum++);
         conditionValue = conditions.get(conditionNum++);
         Operator op = new Operator(conditionOperator, conditionValue);
-        op.numberOrString();
+        op.valueNumberOrString();
 
-        if (op.isNumber())
+        if (op.isValueNumber())
         {
             System.out.println("Passed op.isNumber() check (ie. number)");
             deleteNumberOp();
         }
-        else if (!op.isNumber())
+        else if (!op.isValueNumber())
         {
             System.out.println("Passed !op.isNumber() check");
             deleteStringBoolOp();
@@ -487,14 +487,14 @@ public class Table
         System.out.println("operator "+ conditionOperator);
         conditionValue = conditions.get(conditionNum++);
         Operator op = new Operator(conditionOperator, conditionValue);
-        op.numberOrString();
+        op.valueNumberOrString();
 
-        if (op.isNumber())
+        if (op.isValueNumber())
         {
             System.out.println("Passed op.isNumber() check (ie. number)");
             updateNumberOp(updateValues);
         }
-        else if (!op.isNumber())
+        else if (!op.isValueNumber())
         {
             System.out.println("Passed !op.isNumber() check");
             updateStringBoolOp(updateValues);
@@ -628,23 +628,23 @@ public class Table
         Operator op = new Operator(conditionOperator, conditionValue);
 //      Check if column being operator on is a String/Bool or Int/Float type column and then
 //      perform the correct operation on it
-        op.numberOrString();
+        op.valueNumberOrString();
 
-        if (op.isNumber())
+        if (op.isValueNumber())
         {
             System.out.println("Passed op.isNumber() check (ie. number)");
             selectNumberOp();
             trimTable(table, columnNames);
             return printTable(tableName);
         }
-        if (!op.isNumber())
+        if (!op.isValueNumber())
         {
             System.out.println("Passed !op.isNumber() check");
             selectStringBoolOp();
             trimTable(table, columnNames);
             return printTable(tableName);
         }
-        throw new DatabaseException("[Error] - Could not carry out WHERE clause. Check inputs.");
+        throw new DatabaseException("[Error] - Could not carry out select WHERE clause. Check inputs.");
     }
 
 //  Method for operating on Strings and Bools for the SELECT command
@@ -700,7 +700,11 @@ public class Table
         for (int i = 0; i < records.size(); i++, j++)
         {
             entry = records.get(i).getColumnData(conditionColumnName);
-            floatEntry = Float.parseFloat(entry);
+            try {
+                floatEntry = Float.parseFloat(entry);
+            } catch (Exception e) {
+                throw new DatabaseException("[Error] - Cannot parse a string as a number");
+            }
             j = selectFloatOp(conditionOperator, floatEntry, floatValue, j);
         }
     }

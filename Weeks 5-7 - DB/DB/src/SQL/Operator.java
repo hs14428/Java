@@ -6,7 +6,7 @@ public class Operator
 {
     String operator;
     String value;
-    boolean number;
+    boolean numberBool;
 
     public Operator()
     {
@@ -19,15 +19,15 @@ public class Operator
         this.value = value;
     }
 
-    public void numberOrString() throws DatabaseException
+    public void valueNumberOrString() throws DatabaseException
     {
         if (value.matches(RegEx.STRINGLITERAL.getRegex()) || value.matches(RegEx.BOOLEANLITERAL.getRegex()))
         {
-            number = false;
+            numberBool = false;
         }
         else if (value.matches(RegEx.FLOATLITERAL.getRegex()) || value.matches(RegEx.INTLITERAL.getRegex()))
         {
-            number = true;
+            numberBool = true;
         }
         else {
             throw new DatabaseException("[Error] - Value is neither number, string or bool");
@@ -76,5 +76,5 @@ public class Operator
     }
 
 
-    public boolean isNumber() { return number ; }
+    public boolean isValueNumber() { return numberBool; }
 }

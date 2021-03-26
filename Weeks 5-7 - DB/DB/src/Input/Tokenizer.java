@@ -115,11 +115,10 @@ public class Tokenizer
             {
                 s = s.substring(0, finalChar);
                 System.out.println(s);
-            } else {
-                throw new InvalidQueryException("[Error] - Too many semi colons in query string");
+                return s;
             }
         }
-        return s;
+        throw new InvalidQueryException("[Error] - Missing semi colon in query string OR Too many semi colons");
     }
 
 //  split out conditions with operators without spaces STILL NEED TO FIX >= <= operators

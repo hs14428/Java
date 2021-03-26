@@ -37,12 +37,12 @@ public class SelectCMD extends DBcmd
         {
             return selectAll(dbServer);
         }
-//        else if (token.matches(RegEx.VARIABLENAME.getRegex()))
-//        {
-//            // if singular column, add to select columns
-//            selectColumns.add(token);
-//            return selectSome(dbServer);
-//        }
+        else if (token.matches(RegEx.VARIABLENAME.getRegex()))
+        {
+            // if singular column, add to select columns
+            selectColumns.add(token);
+            return selectSome(dbServer);
+        }
         else if (token.matches(RegEx.BRACKETS.getRegex()))
         {
             ArrayList<Token> bracketsTokens;
@@ -78,6 +78,7 @@ public class SelectCMD extends DBcmd
                     dbServer.setTableName(tableName);
                     return new ConditionCMD(command).runCommand(dbServer);
                 }
+                checkFinalToken(dbServer);
                 table.readTable(tableName);
                 String printTable = table.printTable(tableName);
                 return "[OK]\n"+printTable;
@@ -109,6 +110,7 @@ public class SelectCMD extends DBcmd
 //                    dbServer.setTable(tableArrayList);
                     return new ConditionCMD(command).runCommand(dbServer);
                 }
+                checkFinalToken(dbServer);
                 tableArrayList = table.readTable(tableName);
                 table.trimTable(tableArrayList, columnNames);
                 String printTable = table.printTable(tableName);
@@ -116,6 +118,14 @@ public class SelectCMD extends DBcmd
             }
         }
         throw new InvalidTokenException(token);
+    }
+
+    public void checkFinalToken(DBServer dbServer) throws DatabaseException
+    {
+        if (!(dbServer.getCurrentTokenNum() == dbServer.getQueryLength()-1))
+        {
+            throw new DatabaseException("[Error] - Invalid Query. Missing WHERE keyword");
+        }
     }
 
     public void scanForWhere(DBServer dbServer) throws DatabaseException
