@@ -25,26 +25,55 @@ public class Tokenizer
 
 //  Apologies for the bootleg fix here - I know it's not pretty, but I realised an error late on
 //  and time was against me!
+//    public ArrayList<Token> tokenize() throws InvalidQueryException
+//    {
+//        String[] tokenArray = command.split(",*\\s+(?![^(]*\\))");
+//
+//        // Currently doesnt work for Name== 'Harry'; Age< 42; etc
+//        tokenArray = tokenizeCondition(tokenArray);
+//
+//        for (String value : tokenArray)
+//        {
+//            System.out.println(value);
+//        }
+//
+//        int endTokenIndex = tokenArray.length-1;
+//        String endToken = tokenArray[endTokenIndex];
+//        if (!checkValidEnd(endToken))
+//        {
+//            System.out.println("Tokenizer tokenize() error.");
+//            throw new InvalidQueryException();
+//        }
+//        tokenArray[endTokenIndex] = endToken.replace(";","");
+//        tokenArrayList = new ArrayList<>();
+//        for (String s : tokenArray)
+//        {
+//            token = new Token(s);
+//            tokenArrayList.add(token);
+//        }
+//        return tokenArrayList;
+//    }
     public ArrayList<Token> tokenize() throws InvalidQueryException
     {
-        String[] tokenArray = command.split("\\s+(?![^(]*\\))");
+        // First check for only semi colon at end (and remove it) and if query is long enough
+        command = checkValidEnd2(command);
 
-        // Currently doesnt work for Name== 'Harry'; Age< 42; etc
-        tokenArray = tokenizeCondition(tokenArray);
-
+        String[] tokenArray = initialTokenSplit(command);
+        System.out.println("pre condition");
         for (String value : tokenArray)
         {
             System.out.println(value);
         }
 
-        int endTokenIndex = tokenArray.length-1;
-        String endToken = tokenArray[endTokenIndex];
-        if (!checkValidEnd(endToken))
+        // Currently doesnt work for Name== 'Harry'; Age< 42; etc
+        tokenArray = tokenizeCondition(tokenArray);
+
+        System.out.println("post condition");
+        for (String value : tokenArray)
         {
-            System.out.println("Tokenizer tokenize() error.");
-            throw new InvalidQueryException();
+            System.out.println(value);
         }
-        tokenArray[endTokenIndex] = endToken.replace(";","");
+
         tokenArrayList = new ArrayList<>();
         for (String s : tokenArray)
         {
@@ -58,6 +87,39 @@ public class Tokenizer
     {
         whereClause = false;
 //        Pattern p = Pattern.compile()
+    }
+
+    public String[] initialTokenSplit(String command)
+    {
+        Pattern pattern = Pattern.compile("\\(.*?\\)|'.*?'|[^('\\s]+");
+        String[] tokenArray = pattern.matcher(command).results().map(matchResult -> matchResult.group()).toArray(String[]::new);
+//        for (String s : tokenArray)
+//        {
+//            System.out.println(s);
+//        }
+        return tokenArray;
+    }
+
+    public String checkValidEnd2(String s) throws InvalidQueryException
+    {
+        int finalChar = s.length()-1;
+        int penultimateChar = s.length()-2;
+
+        if ((s == null) || ( s.length() == 0))
+        {
+            throw new InvalidQueryException("[Error] - Input string is too short");
+        }
+        if (s.substring(finalChar).equals(";"))
+        {
+            if (!s.substring(penultimateChar, finalChar).equals(";"))
+            {
+                s = s.substring(0, finalChar);
+                System.out.println(s);
+            } else {
+                throw new InvalidQueryException("[Error] - Too many semi colons in query string");
+            }
+        }
+        return s;
     }
 
 //  split out conditions with operators without spaces STILL NEED TO FIX >= <= operators
@@ -86,7 +148,9 @@ public class Tokenizer
         tokenArray = Arrays.copyOf(tokenArray, arraySize);
         for (int j = 1; j < operatorSplit.length; j++)
         {
+            String holdEndToken = tokenArray[i];
             tokenArray[i++] = operatorSplit[j];
+            tokenArray[i] = holdEndToken;
         }
         return tokenArray;
     }

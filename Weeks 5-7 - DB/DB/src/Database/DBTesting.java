@@ -133,9 +133,9 @@ public class DBTesting {
             System.out.println("pattern success");
         }
 
-        String set = "UPDATE marks SET mark = 90 WHERE name != 'Clive';";
+        String set = "UPDATE actors SET age = 45 WHERE name=='Hugh Grant';";
 //        String[] splitSet = set.split("((?<==)|(?==))");
-        String[] splitSet = set.split(",*\\s+(?![^(]*\\))");
+        String[] splitSet = set.split("([^\\s\"'()]+|\"([^\"]*)\"|'([^']*)'|\\(([^(]*)\\))|\\s");
         for (int i = 0; i < splitSet.length; i++)
         {
             System.out.println(splitSet[i].trim());
@@ -154,23 +154,55 @@ public class DBTesting {
 
         System.out.println();
         System.out.println("Start here");
-        Tokenizer tok = new Tokenizer("SELECT (name, age) from marks WHERE name < 'mark smith';");
+//        Tokenizer tok = new Tokenizer("SELECT ( name, age ) FROM marks WHERE name != 'Hugh Grant';");
+//        Tokenizer tok = new Tokenizer("SELECT * FROM actors WHERE (awards > 5) AND (nationality == 'British');");
+        Tokenizer tok = new Tokenizer("UPDATE actors SET age = 45 WHERE name =='Hugh Grant';");
         tok.tokenize();
-        for (int i = 0; i < 6; i++)
-        {
-//            System.out.println(tok.getToken(i));
-        }
         System.out.println("end here");
-
-
+        System.out.println();
 
         String query = "SELECT (name, age) FROM marks WHERE name == 'mark smith';";
-        var pattern = Pattern.compile("\\(.*\\)|'.*'|"+RegEx.WHERESPLIT2.getRegex()+"|\\w+");
+        var pattern = Pattern.compile("\\(.*\\)|'.*';|"+RegEx.WHERESPLIT2.getRegex()+"|\\w+");
         var matcher = pattern.matcher(query);
         while (matcher.find())
         {
-            System.out.println(matcher.group());
+//            System.out.println(matcher.group());
         }
+
+        Pattern pat = Pattern.compile("\\(.*?\\)|'.*?'|[^('\\s]+");
+//        String s = "UPDATE marks SET mark = 38 WHERE name == 'Clive';";
+//        String s = "SELECT * FROM marks WHERE pass == true;";
+        String s = "SELECT ( name, age ) FROM marks WHERE name == 'Hugh Grant';";
+
+//        if ((s == null) || ( s.length() ==0))
+//        {
+//            System.out.println("Error Success");
+//        }
+//        System.out.println();
+//        System.out.println(s.substring(s.length()-1));
+//        System.out.println();
+//        if (s.substring(s.length() - 1).equals(";"))
+//        {
+//            System.out.println(s.substring(s.length()-2, s.length()-1));
+//            if (!s.substring(s.length() - 2, s.length()-1).equals(";"))
+//            {
+//                System.out.println("; success");
+//                s = s.substring(0, s.length()-1);
+//                System.out.println(s);
+//            }
+//            else {
+//                System.out.println("too many semi colons");
+//            }
+//        }
+//
+//        String[] r = pat.matcher(s).results().map(m3 -> m3.group()).toArray(String[]::new);
+//        for (int i = 0; i < r.length; i++)
+//        {
+//            System.out.println(r[i]);
+//        }
+
+//        for (String e : r)
+//            System.out.println(e);
 
         System.out.println();
 

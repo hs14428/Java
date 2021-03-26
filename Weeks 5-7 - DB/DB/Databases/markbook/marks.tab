@@ -1,7 +1,2 @@
-id	name	mark	
-1	Steve	65	
-2	Dave	55	
-3	Bob	35	
-4	Clive	20	
-5	'Harry'	70	
-6	'Bob the'	35	false	
+id	name	mark	pass	
+1	'Steve'	65	true	

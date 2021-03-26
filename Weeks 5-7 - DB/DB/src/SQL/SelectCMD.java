@@ -37,6 +37,12 @@ public class SelectCMD extends DBcmd
         {
             return selectAll(dbServer);
         }
+//        else if (token.matches(RegEx.VARIABLENAME.getRegex()))
+//        {
+//            // if singular column, add to select columns
+//            selectColumns.add(token);
+//            return selectSome(dbServer);
+//        }
         else if (token.matches(RegEx.BRACKETS.getRegex()))
         {
             ArrayList<Token> bracketsTokens;
@@ -91,6 +97,7 @@ public class SelectCMD extends DBcmd
             if (token.matches(RegEx.VARIABLENAME.getRegex()))
             {
                 tableName = token;
+                // Check if the chosen selectColumns from runCommand are valid/in table
                 checkValidColumn();
                 columnNames = selectColumns;
                 dbServer.setColumnNames(columnNames);
