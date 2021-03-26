@@ -58,11 +58,8 @@ public class ConditionCMD extends DBcmd
     {
         for (String columnName : columnNames)
         {
-            System.out.println(columnNames);
-            System.out.println(column);
             if (column.equals(columnName))
             {
-                System.out.println("true");
                 return true;
             }
         }

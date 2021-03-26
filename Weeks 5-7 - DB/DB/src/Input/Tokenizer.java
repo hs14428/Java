@@ -39,10 +39,6 @@ public class Tokenizer
         scanForANDOR();
         String[] tokenArray = initialTokenSplit(command);
 
-//        for (int i = 0; i< tokenArray.length; i++)
-//        {
-//            System.out.println(tokenArray[i]);
-//        }
 //      If there is an AND/OR in the WHERE condition, correctly split it further
 //      Nested WHERE conditions are dealt with later on
         if (!logicClause)
@@ -52,7 +48,6 @@ public class Tokenizer
         tokenArrayList = new ArrayList<>();
         for (String s : tokenArray)
         {
-            System.out.println(s);
             token = new Token(s);
             tokenArrayList.add(token);
         }
@@ -117,9 +112,7 @@ public class Tokenizer
         for (int j = 1; j < operatorSplit.length; j++)
         {
             String holdEndToken = tokenArray[i];
-            System.out.println("hET "+holdEndToken);
             tokenArray[i++] = operatorSplit[j];
-            System.out.println("tA-1 "+tokenArray[i-1]);
             try {
                 tokenArray[i] = holdEndToken;
             } catch (Exception e) {

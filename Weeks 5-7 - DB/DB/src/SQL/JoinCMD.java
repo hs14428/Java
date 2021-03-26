@@ -29,32 +29,25 @@ public class JoinCMD extends DBcmd
     public String runCommand(DBServer dbServer) throws DatabaseException, IOException
     {
         databaseName = dbServer.getDatabaseName();
-        System.out.println("database "+databaseName);
         token = dbServer.nextToken();
-        System.out.println("Hello JoinCMD class: nextToken = " + token);
         tableName = token;
         checkValidTable();
         tableNames.add(token);
         token = dbServer.nextToken().toUpperCase();
-        System.out.println("37: "+token);
         if (token.equals("AND"))
         {
             token = dbServer.nextToken();
             tableName = token;
             checkValidTable();
             tableNames.add(token);
-            System.out.println("44: "+token);
             token = dbServer.nextToken().toUpperCase();
-            System.out.println("46: "+token);
             if (token.equals("ON"))
             {
                 token = dbServer.nextToken();
-                System.out.println("50: "+token);
                 columnName = token;
                 checkValidColumn();
                 joinColumnNames.add(token);
                 token = dbServer.nextToken().toUpperCase();
-                System.out.println("55: "+token);
                 if (token.equals("AND"))
                 {
                     token = dbServer.nextToken();
@@ -77,7 +70,6 @@ public class JoinCMD extends DBcmd
         {
             throw new DatabaseException("[ERROR] - No tables match \""+tableName+"\" input");
         }
-        System.out.println("passed check valid table");
     }
 
     public void getTableNames() throws DatabaseException

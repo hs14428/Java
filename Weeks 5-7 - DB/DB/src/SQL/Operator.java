@@ -67,6 +67,5 @@ public class Operator
         return (entry.compareTo(value) <= 0) || (entry.compareTo(value) == 0);
     }
 
-
     public boolean isValueNumber() { return numberBool; }
 }

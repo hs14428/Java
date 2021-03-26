@@ -689,8 +689,6 @@ public class Table
     {
         setUpConditionVars(tableName, conditions, conditionNum);
 
-        System.out.println(op.isValueNumber());
-
         if (op.isValueNumber())
         {
             selectNumberOp();
