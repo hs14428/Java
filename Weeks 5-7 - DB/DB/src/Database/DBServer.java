@@ -107,7 +107,7 @@ public class DBServer
             token = tokenList.get(currentTokenNum).getTokenString();
             return token;
         }
-        throw new DatabaseException("[Error] - Run out of tokens");
+        throw new DatabaseException("[ERROR] - Run out of tokens");
     }
 
     public int getCurrentTokenNum()

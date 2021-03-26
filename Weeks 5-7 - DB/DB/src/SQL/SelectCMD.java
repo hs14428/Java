@@ -121,7 +121,7 @@ public class SelectCMD extends DBcmd
     {
         if (!(dbServer.getCurrentTokenNum() == dbServer.getQueryLength()-1))
         {
-            throw new DatabaseException("[Error] - Invalid Query. Missing WHERE keyword");
+            throw new DatabaseException("[ERROR] - Invalid Query. Missing WHERE keyword");
         }
     }
 
@@ -171,7 +171,7 @@ public class SelectCMD extends DBcmd
         }
         if (!(validColumns == selectColumns.size()))
         {
-            throw new DatabaseException("[Error] - Incorrect columns given. "+selectColumns+" do not match "+columnNames+" columns from "+tableName+" table");
+            throw new DatabaseException("[ERROR] - Incorrect columns given. "+selectColumns+" do not match "+columnNames+" columns from "+tableName+" table");
         }
     }
 

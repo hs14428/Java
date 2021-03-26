@@ -30,7 +30,7 @@ public class Operator
             numberBool = true;
         }
         else {
-            throw new DatabaseException("[Error] - Value is neither number, string or bool");
+            throw new DatabaseException("[ERROR] - Value is neither number, string or bool");
         }
     }
 

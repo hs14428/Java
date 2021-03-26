@@ -71,7 +71,7 @@ public class ConditionCMD extends DBcmd
                     case ("DELETE"):
                         return deleteCondition(dbServer);
                     default:
-                        throw new DatabaseException("[Error] - Missing condition type command.");
+                        throw new DatabaseException("[ERROR] - Missing condition type command.");
                 }
             }
         }

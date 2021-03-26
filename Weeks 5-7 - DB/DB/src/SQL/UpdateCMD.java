@@ -100,7 +100,7 @@ public class UpdateCMD extends DBcmd
         getTableNames();
         if (!tables.containsKey(tableName))
         {
-            throw new DatabaseException("[Error] - No tables match \""+tableName+"\" input");
+            throw new DatabaseException("[ERROR] - No tables match \""+tableName+"\" input");
         }
     }
 
@@ -121,7 +121,7 @@ public class UpdateCMD extends DBcmd
                 return;
             }
         }
-        throw new DatabaseException("[Error] - No columns in \""+tableName+"\" table match \""+columnName+"\" input");
+        throw new DatabaseException("[ERROR] - No columns in \""+tableName+"\" table match \""+columnName+"\" input");
     }
 
     public void getColumnNames(String tableName) throws DatabaseException, IOException

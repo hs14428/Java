@@ -54,7 +54,7 @@ public class Tokenizer
 
         if ((s == null) || ( s.length() == 0))
         {
-            throw new InvalidQueryException("[Error] - Input string is too short");
+            throw new InvalidQueryException("[ERROR] - Input string is too short");
         }
         if (s.substring(finalChar).equals(";"))
         {
@@ -64,7 +64,7 @@ public class Tokenizer
                 return s;
             }
         }
-        throw new InvalidQueryException("[Error] - Missing semi colon in query string OR Too many semi colons");
+        throw new InvalidQueryException("[ERROR] - Missing semi colon in query string OR Too many semi colons");
     }
 
 //  Split out conditions with operators without spaces

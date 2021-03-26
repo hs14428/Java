@@ -84,7 +84,7 @@ public class AlterCMD extends DBcmd
         getTableNames();
         if (!tables.containsKey(tableName))
         {
-            throw new DatabaseException("[Error] - No tables match \""+tableName+"\" input");
+            throw new DatabaseException("[ERROR] - No tables match \""+tableName+"\" input");
         }
     }
 

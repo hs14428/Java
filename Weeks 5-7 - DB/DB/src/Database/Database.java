@@ -44,7 +44,7 @@ public class Database
             database.mkdirs();
         }
         else {
-            throw new DatabaseException("[Error] - Database already exists");
+            throw new DatabaseException("[ERROR] - Database already exists");
         }
     }
 
@@ -62,7 +62,7 @@ public class Database
             database.delete();
         }
         else {
-            throw new DatabaseException("[Error] - Database does not exist");
+            throw new DatabaseException("[ERROR] - Database does not exist");
         }
     }
 

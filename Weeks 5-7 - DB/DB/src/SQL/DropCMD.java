@@ -32,7 +32,7 @@ public class DropCMD extends DBcmd
                 }
                 if (!token.equals(databaseName))
                 {
-                    throw new DatabaseException("[Error] - Selected database and database to be dropped don't match");
+                    throw new DatabaseException("[ERROR] - Selected database and database to be dropped don't match");
                 }
                 Database databaseToDrop = new Database(token);
                 databaseToDrop.removeDatabase(token);
@@ -43,7 +43,7 @@ public class DropCMD extends DBcmd
                 tableToDrop.removeTable(token);
                 return "[OK] - "+token+" table dropped";
             default:
-                throw new DatabaseException("[Error] - Table/Database could not be dropped");
+                throw new DatabaseException("[ERROR] - Table/Database could not be dropped");
         }
     }
 

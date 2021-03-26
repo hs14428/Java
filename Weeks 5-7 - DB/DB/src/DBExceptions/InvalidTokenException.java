@@ -12,6 +12,6 @@ public class InvalidTokenException extends DatabaseException
     @Override
     public String toString()
     {
-        return String.format("[Error] - Given token: %s can not be processed. Check spelling?", tokenGiven);
+        return String.format("[ERROR] - Given token: %s can not be processed. Check spelling?", tokenGiven);
     }
 }

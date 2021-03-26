@@ -12,6 +12,6 @@ public class MissingDatabaseException extends DatabaseException
     @Override
     public String toString()
     {
-        return String.format("[Error] - %s database does not exist.", databaseName);
+        return String.format("[ERROR] - %s database does not exist.", databaseName);
     }
 }

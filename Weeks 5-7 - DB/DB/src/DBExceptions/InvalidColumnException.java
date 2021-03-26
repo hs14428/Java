@@ -12,6 +12,6 @@ public class InvalidColumnException extends DatabaseException
     @Override
     public String toString()
     {
-        return String.format("[Error] - Given token: %s is an invalid column", tokenGiven);
+        return String.format("[ERROR] - Given token: %s is an invalid column", tokenGiven);
     }
 }

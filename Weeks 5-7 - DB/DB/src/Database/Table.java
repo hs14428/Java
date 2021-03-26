@@ -65,7 +65,7 @@ public class Table
 
         if (!readTable.exists())
         {
-            throw new TableException("[Error] - "+tableName +" does not exist.");
+            throw new TableException("[ERROR] - "+tableName +" does not exist.");
         }
         else {
             FileReader reader = new FileReader(readTable);
@@ -137,7 +137,7 @@ public class Table
         {
             if (!newTable.createNewFile())
             {
-                throw new TableException("[Error] - Cannot find the path specified");
+                throw new TableException("[ERROR] - Cannot find the path specified");
             }
 
             FileWriter writer = new FileWriter(newTable);
@@ -148,7 +148,7 @@ public class Table
             writer.close();
         }
         else {
-            throw new TableException("[Error] - Table: "+tableName+" of same name already exists");
+            throw new TableException("[ERROR] - Table: "+tableName+" of same name already exists");
         }
     }
 
@@ -160,7 +160,7 @@ public class Table
             newTable.delete();
         }
         else {
-            throw new TableException("[Error] - Table: "+tableName+" does not exist");
+            throw new TableException("[ERROR] - Table: "+tableName+" does not exist");
         }
     }
 
@@ -171,7 +171,7 @@ public class Table
 
         if (!writeToTable.exists())
         {
-            throw new TableException("[Error] - Table: "+tableName+" does not exists. Failed to write");
+            throw new TableException("[ERROR] - Table: "+tableName+" does not exists. Failed to write");
         }
         else {
             FileWriter writer = new FileWriter(writeToTable);
@@ -215,7 +215,7 @@ public class Table
             }
         }
         else {
-            throw new TableException("[Error] - Table: "+tableName+" does not exist.");
+            throw new TableException("[ERROR] - Table: "+tableName+" does not exist.");
         }
     }
 
@@ -247,7 +247,7 @@ public class Table
             writeToTable(tableName);
         }
         else {
-            throw new TableException("[Error] - Table: "+tableName+" does not exist.");
+            throw new TableException("[ERROR] - Table: "+tableName+" does not exist.");
         }
     }
 
@@ -279,7 +279,7 @@ public class Table
             writeToTable(tableName);
         }
         else {
-            throw new TableException("[Error] - Table: "+tableName+" does not exist.");
+            throw new TableException("[ERROR] - Table: "+tableName+" does not exist.");
         }
     }
 
@@ -381,7 +381,7 @@ public class Table
             deleteStringBoolOp();
         }
         else {
-            throw new DatabaseException("[Error] - Could not update table. Check inputs.");
+            throw new DatabaseException("[ERROR] - Could not update table. Check inputs.");
         }
     }
 
@@ -434,7 +434,7 @@ public class Table
                     }
                     break;
                 default:
-                    throw new DatabaseException("[Error] - Error deleting from the table.");
+                    throw new DatabaseException("[ERROR] - Error deleting from the table.");
             }
         }
     }
@@ -460,7 +460,7 @@ public class Table
                     }
                     break;
                 default:
-                    throw new DatabaseException("[Error] - Error deleting from the table.");
+                    throw new DatabaseException("[ERROR] - Error deleting from the table.");
             }
         }
     }
@@ -497,7 +497,7 @@ public class Table
             updateStringBoolOp(updateValues);
         }
         else {
-            throw new DatabaseException("[Error] - Could not update table. Check inputs.");
+            throw new DatabaseException("[ERROR] - Could not update table. Check inputs.");
         }
     }
 
@@ -557,7 +557,7 @@ public class Table
                         }
                         break;
                     default:
-                        throw new DatabaseException("[Error] - Error updating the table.");
+                        throw new DatabaseException("[ERROR] - Error updating the table.");
                 }
             }
 //          Remove the update value pairs and "bring forward" the next pair (if there is more)
@@ -593,7 +593,7 @@ public class Table
                         }
                         break;
                     default:
-                        throw new DatabaseException("[Error] - Error updating the table.");
+                        throw new DatabaseException("[ERROR] - Error updating the table.");
                 }
             }
 // R        emove the update value pairs and "bring forward" the next pair (if there is more)
@@ -637,7 +637,7 @@ public class Table
             trimTable(table, columnNames);
             return printTable();
         }
-        throw new DatabaseException("[Error] - Could not carry out select WHERE clause. Check inputs.");
+        throw new DatabaseException("[ERROR] - Could not carry out select WHERE clause. Check inputs.");
     }
 
 //  Method for operating on Strings and Bools for the SELECT command
@@ -664,7 +664,7 @@ public class Table
                     }
                     break;
                 default:
-                    throw new DatabaseException("[Error] - "+ conditionOperator +" is invalid");
+                    throw new DatabaseException("[ERROR] - "+ conditionOperator +" is invalid");
             }
         }
     }
@@ -682,7 +682,7 @@ public class Table
             try {
                 floatEntry = Float.parseFloat(entry);
             } catch (Exception e) {
-                throw new DatabaseException("[Error] - Cannot parse a string as a number");
+                throw new DatabaseException("[ERROR] - Cannot parse a string as a number");
             }
             j = selectFloatOp(conditionOperator, floatEntry, floatValue, j);
         }
@@ -734,7 +734,7 @@ public class Table
             case ("LIKE"):
                 return index;
             default:
-                throw new DatabaseException("[Error] - "+operator+" is invalid");
+                throw new DatabaseException("[ERROR] - "+operator+" is invalid");
         }
     }
 
