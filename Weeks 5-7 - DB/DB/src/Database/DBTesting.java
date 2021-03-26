@@ -154,17 +154,41 @@ public class DBTesting {
 
         System.out.println();
         System.out.println("Start here");
-//        Tokenizer tok = new Tokenizer("SELECT ( name, age ) FROM marks WHERE name != 'Hugh Grant';");
-//        Tokenizer tok = new Tokenizer("SELECT * FROM actors WHERE (awards > 5) AND (nationality == 'British');");
-        Tokenizer tok = new Tokenizer("UPDATE actors SET age = 45 WHERE name =='Hugh Grant';");
+//        Tokenizer tok = new Tokenizer("SELECT ( name, age ) FROM marks WHERE name>='Hugh Grant';");
+        Tokenizer tok = new Tokenizer("SELECT * FROM actors WHERE awards > 5;");
+//        Tokenizer tok = new Tokenizer("SELECT * FROM actors WHERE (awards > 5) AND ((nationality == 'British') OR (nationality == 'Australian'));");
         tok.tokenize();
+        tok.scanForANDOR();
         System.out.println("end here");
+
+        String s1 = "awards > 5";
+        String s2 = "AND";
+        String s3 = "nationality=='British'";
+        String[] s1Arr = s1.split(RegEx.WHERESPLIT.getRegex().trim());
+
+        for (int i = 0; i < s1Arr.length; i++)
+        {
+            System.out.println(s1Arr[i]);
+        }
+        String[] s2Arr = s2.split(RegEx.WHERESPLIT.getRegex().trim());
+        for (int i = 0; i < s2Arr.length; i++)
+        {
+            System.out.println(s2Arr[i]);
+        }
+        String[] s3Arr = s3.split(RegEx.WHERESPLIT.getRegex().trim());
+        for (int i = 0; i < s3Arr.length; i++)
+        {
+            System.out.println(s3Arr[i]);
+        }
+
+
+
         System.out.println();
 
         String query = "SELECT (name, age) FROM marks WHERE name == 'mark smith';";
-        var pattern = Pattern.compile("\\(.*\\)|'.*';|"+RegEx.WHERESPLIT2.getRegex()+"|\\w+");
-        var matcher = pattern.matcher(query);
-        while (matcher.find())
+//        var pattern = Pattern.compile("\\(.*\\)|'.*';|"+RegEx.WHERESPLIT2.getRegex()+"|\\w+");
+//        var matcher = pattern.matcher(query);
+//        while (matcher.find())
         {
 //            System.out.println(matcher.group());
         }

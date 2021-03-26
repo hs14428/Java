@@ -63,7 +63,7 @@ public class JoinCMD extends DBcmd
                     joinColumnNames.add(token);
                     // NOT DONE
                     Table table = new Table(databaseName);
-                    return table.joinTables(tableName);
+                    return "[OK]\n"+table.joinTables(tableNames.get(0), tableNames.get(1), joinColumnNames.get(0), joinColumnNames.get(1));
                 }
             }
         }

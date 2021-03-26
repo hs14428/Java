@@ -110,6 +110,12 @@ public class DBServer
         throw new DatabaseException("[ERROR] - Run out of tokens");
     }
 
+    public void replaceToken(String newToken) throws DatabaseException
+    {
+        Token token = new Token(newToken);
+        tokenList.set(currentTokenNum, token);
+    }
+
     public int getCurrentTokenNum()
     {
         return currentTokenNum;

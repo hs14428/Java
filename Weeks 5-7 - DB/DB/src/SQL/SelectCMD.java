@@ -13,7 +13,6 @@ public class SelectCMD extends DBcmd
 {
     private ArrayList<String> selectColumns;
     private boolean whereClause;
-    private boolean logicClause;
     private String token;
 
     public SelectCMD()
@@ -135,21 +134,6 @@ public class SelectCMD extends DBcmd
             if (token.equals("WHERE"))
             {
                 whereClause = true;
-            }
-        }
-        dbServer.setCurrentTokenNum(startTokenNum);
-    }
-
-    public void scanForLogic(DBServer dbServer) throws DatabaseException
-    {
-        logicClause = false;
-        int startTokenNum = dbServer.getCurrentTokenNum();
-        for (int i = startTokenNum; i < dbServer.getQueryLength()-1; i++)
-        {
-            token = dbServer.nextToken().toUpperCase();
-            if (token.equals("AND") || token.equals("OR"))
-            {
-                logicClause = true;
             }
         }
         dbServer.setCurrentTokenNum(startTokenNum);

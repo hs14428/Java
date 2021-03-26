@@ -14,6 +14,10 @@ import java.util.List;
 
 public class Table
 {
+    private String leftTableName;
+    private String rightTableName;
+    private String leftJoinColumn;
+    private String rightJoinColumn;
     private String tableName;
     private String databaseName;
     private String databasePath;
@@ -286,9 +290,11 @@ public class Table
     public String printTable()
     {
         String tableString = "";
-        for (ArrayList<String> strings : table) {
-            for (String string : strings) {
-                tableString += string;
+        for (ArrayList<String> strings : table)
+        {
+            for (String string : strings)
+            {
+                tableString += string.replace("'","");
                 tableString += "\t";
             }
             tableString += "\n";
@@ -335,10 +341,82 @@ public class Table
     }
 
 //  Method for joining together tables based on inputs
-    public String joinTables(String tableName)
+    public String joinTables(String tableNameL, String tableNameR, String colNameL, String colNameR) throws IOException
     {
-        this.tableName = tableName;
+        leftTableName = tableNameL;
+        rightTableName = tableNameR;
+        leftJoinColumn = colNameL;
+        rightJoinColumn = colNameR;
+        ArrayList<ArrayList<String>> joinedTable = new ArrayList<>();
+        ArrayList<ArrayList<String>> leftTable = new ArrayList<>();
+        ArrayList<ArrayList<String>> rightTable = new ArrayList<>();
+        ArrayList<Record> leftRecords = new ArrayList<Record>();
+        ArrayList<Record> rightRecords = new ArrayList<Record>();
+
+        leftTable = readTable(leftTableName);
+        addRecords();
+        leftRecords = records;
+        joinedTable = readTable(leftTableName);
+        rightTable = readTable(rightTableName);
+        addRecords();
+        rightRecords = records;
+
+        joinedTable = changeColumnNames(joinedTable, leftTableName);
+
+        String leftColumnValue;
+        String rightColumnValue;
+        String dataToJoin;
+        int matchCount;
+        int newColumnSize = leftTable.get(0).size() + rightTable.get(0).size()-1;
+
+        for (int i = 0; i < leftRecords.size(); i++)
+        {
+            leftColumnValue = leftRecords.get(i).getColumnData(leftJoinColumn);
+            matchCount = 0;
+            for (int j = 0; j < rightRecords.size(); j++)
+            {
+                rightColumnValue = rightRecords.get(j).getColumnData(rightJoinColumn);
+                if (rightColumnValue.equals(leftColumnValue))
+                {
+                    matchCount++;
+                    if (matchCount > 1)
+                    {
+                        joinedTable.add(leftTable.get(i+1));
+                    }
+                    for (int k = 1; k < rightTable.get(j).size(); k++)
+                    {
+                        dataToJoin = rightTable.get(j+1).get(k);
+                        if (joinedTable.get(i+1).size()+1 > newColumnSize)
+                        {
+                            joinedTable.get(i+matchCount).add(dataToJoin);
+                        } else {
+                            joinedTable.get(i+1).add(dataToJoin);
+                        }
+                    }
+                }
+            }
+        }
+        changeColumnNames(rightTable, rightTableName);
+        rightTable.get(0).remove(0);
+        joinedTable.get(0).addAll(rightTable.get(0));
+        for (int i = 1; i < joinedTable.size(); i++)
+        {
+            String intString = String.valueOf(i);
+            joinedTable.get(i).set(0, intString);
+        }
+        table = joinedTable;
         return printTable();
+    }
+
+    public ArrayList<ArrayList<String>> changeColumnNames(ArrayList<ArrayList<String>> tableToChange, String appendString)
+    {
+        String oldColumnName;
+        for (int i = 1; i < tableToChange.get(0).size(); i++)
+        {
+            oldColumnName = tableToChange.get(0).get(i);
+            tableToChange.get(0).set(i, appendString+"."+oldColumnName);
+        }
+        return tableToChange;
     }
 
 //  Method to save duplicate lines. Sets up condition columnName, Operator and Value
@@ -347,10 +425,13 @@ public class Table
         table = readTable(tableName);
         this.tableName = tableName;
         addRecords();
-
+        System.out.println("condNum "+ conditionNum);
         conditionColumnName = conditions.get(conditionNum++);
+        System.out.println("col "+conditionColumnName);
         conditionOperator = conditions.get(conditionNum++);
+        System.out.println("op "+conditionOperator);
         conditionValue = conditions.get(conditionNum++);
+        System.out.println("val "+conditionValue);
         op = new Operator(conditionOperator, conditionValue);
 //      Check if column being operator on is a String/Bool or Int/Float type column and then
 //      perform the correct operation on it
@@ -610,20 +691,13 @@ public class Table
         writeToTable(tableName);
     }
 
-//  Method used for the SELECT command to return cut down table with less columns based on the WHERE conditions
+    //  Method used for the SELECT command to return cut down table with less columns based on the WHERE conditions
+
     public String selectTable(String tableName, ArrayList<String> columnNames, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
     {
-//        table = readTable(tableName);
-//        this.tableName = tableName;
-//        addRecords();
-//
-//        conditionColumnName = conditions.get(conditionNum++);
-//        conditionOperator = conditions.get(conditionNum++);
-//        conditionValue = conditions.get(conditionNum++);
-//        Operator op = new Operator(conditionOperator, conditionValue);
-//        op.valueNumberOrString();
-
         setUpConditionVars(tableName, conditions, conditionNum);
+
+        System.out.println(op.isValueNumber());
 
         if (op.isValueNumber())
         {
@@ -636,6 +710,33 @@ public class Table
             selectStringBoolOp();
             trimTable(table, columnNames);
             return printTable();
+        }
+        throw new DatabaseException("[ERROR] - Could not carry out select WHERE clause. Check inputs.");
+    }
+
+//  Method used for the SELECT command to return cut down table with less columns based on the WHERE conditions
+    public ArrayList<ArrayList<String>> selectAndTable(ArrayList<ArrayList<String>> inputTable, ArrayList<String> columnNames, ArrayList<String> conditions, int conditionNum) throws DatabaseException, IOException
+    {
+        table = inputTable;
+        addRecords();
+
+        conditionColumnName = conditions.get(conditionNum++);
+        conditionOperator = conditions.get(conditionNum++);
+        conditionValue = conditions.get(conditionNum++);
+        Operator op = new Operator(conditionOperator, conditionValue);
+        op.valueNumberOrString();
+
+        if (op.isValueNumber())
+        {
+            selectNumberOp();
+            trimTable(table, columnNames);
+            return table;
+        }
+        if (!op.isValueNumber())
+        {
+            selectStringBoolOp();
+            trimTable(table, columnNames);
+            return table;
         }
         throw new DatabaseException("[ERROR] - Could not carry out select WHERE clause. Check inputs.");
     }

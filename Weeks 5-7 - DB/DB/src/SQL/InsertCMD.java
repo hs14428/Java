@@ -39,20 +39,6 @@ public class InsertCMD extends DBcmd
                     token = dbServer.nextToken();
                     if (token.matches(RegEx.BRACKETS.getRegex()))
                     {
-//                        ArrayList<Token> bracketsTokens;
-//                        bracketsTokens = dbServer.getBrackets(token);
-//                        // columnNames.size()-1 because of the id column
-//                        if (bracketsTokens.size() == columnNames.size()-1)
-//                        {
-//                            // Can cut out to reduce complexity
-//                            for (Token bracketsToken : bracketsTokens)
-//                            {
-//                                columnNamesToAddTo.add(bracketsToken.getTokenString());
-//                            }
-//                            Table table = new Table(databaseName);
-//                            table.addRow(tableName, columnNamesToAddTo);
-//                            return "[OK] - Values inserted";
-//                        }
                     return addRowsToTable(dbServer);
                     }
                 }

@@ -13,6 +13,7 @@ public class ConditionCMD extends DBcmd
 {
     String token;
     int conditionNum;
+    private boolean logicClause;
 
     public ConditionCMD(String command)
     {
@@ -24,6 +25,7 @@ public class ConditionCMD extends DBcmd
     @Override
     public String runCommand(DBServer dbServer) throws DatabaseException, IOException
     {
+        scanForLogic(dbServer);
         token = dbServer.nextToken().toUpperCase();
         databaseName = dbServer.getDatabaseName();
         tableName = dbServer.getTableName();
@@ -34,6 +36,11 @@ public class ConditionCMD extends DBcmd
 //      Otherwise call basic where condition
         if (token.equals("WHERE"))
         {
+            if (logicClause)
+            {
+                removeBrackets(dbServer);
+                return storeMultiConditions(dbServer);
+            }
             token = dbServer.nextToken();
             for (String columnName : columnNames)
             {
@@ -45,6 +52,21 @@ public class ConditionCMD extends DBcmd
             throw new InvalidColumnException(token);
         }
         throw new InvalidTokenException(token);
+    }
+
+    public boolean checkValidColumn(String column) throws DatabaseException
+    {
+        for (String columnName : columnNames)
+        {
+            System.out.println(columnNames);
+            System.out.println(column);
+            if (column.equals(columnName))
+            {
+                System.out.println("true");
+                return true;
+            }
+        }
+        throw new DatabaseException("[ERROR] - Incorrect columns given. ");
     }
 
     public String storeCondition(DBServer dbServer) throws DatabaseException, IOException
@@ -98,14 +120,86 @@ public class ConditionCMD extends DBcmd
         tableArrayList = dbServer.getTable();
         columnNames = dbServer.getColumnNames();
         Table table = new Table(databaseName);
+        String printTable;
 
-        if (conditions.get(conditionNum).matches(RegEx.ANDOR.getRegex()))
+        if (logicClause)
         {
-            //do something
-            conditionNum++;
+            // Only works for AND... Sorry for how crap this is...
+            tableArrayList = table.readTable(tableName);
+            while (conditions.size() != 0)
+            {
+                if (conditions.get(0).equals("AND"))
+                {
+                    conditions.remove(0);
+                }
+                tableArrayList = table.selectAndTable(tableArrayList, columnNames, conditions, conditionNum);
+                conditions.remove(0);
+                conditions.remove(0);
+                conditions.remove(0);
+            }
+            printTable = table.printTable();
+        } else {
+            printTable  = table.selectTable(tableName, columnNames, conditions, conditionNum);
         }
-        String printTable  = table.selectTable(tableName, columnNames, conditions, conditionNum);
         return "[OK]\n" + printTable;
+    }
+
+    private String storeMultiConditions(DBServer dbServer) throws DatabaseException, IOException
+    {
+        String[] conditionsArray;
+        while ((dbServer.getCurrentTokenNum() != dbServer.getQueryLength()-1))
+        {
+            token = dbServer.nextToken();
+            System.out.println("token before split "+token);
+            conditionsArray = token.split(RegEx.WHERESPLIT.getRegex());
+            for (int i = 0; i < conditionsArray.length; i++)
+            {
+                conditionsArray[i] = conditionsArray[i].trim();
+                System.out.println(conditionsArray[i]);
+//              Check if each part of the condition matches allowed input
+                if (conditionsArray[i].matches(RegEx.OPERATOR.getRegex()) || conditionsArray[i].matches(RegEx.ANDOR.getRegex())
+                        || conditionsArray[i].matches(RegEx.VALUE.getRegex()) || checkValidColumn(conditionsArray[i]))
+                {
+                    conditions.add(conditionsArray[i].trim());
+                }
+            }
+            System.out.println("conditions: "+conditions.get(0));
+            System.out.println("conditions: "+conditions.get(conditions.size()-1));
+        }
+        switch(command)
+        {
+            case ("SELECT"):
+                return selectCondition(dbServer);
+            case ("UPDATE"):
+                return updateCondition(dbServer);
+            case ("DELETE"):
+                return deleteCondition(dbServer);
+            default:
+                throw new DatabaseException("[ERROR] - Missing condition type command.");
+        }
+    }
+
+    private void removeBrackets(DBServer dbServer) throws DatabaseException
+    {
+        int startTokenNum = dbServer.getCurrentTokenNum();
+        int endTokenNum = dbServer.getQueryLength();
+        System.out.println("startnum "+startTokenNum);
+        System.out.println("endnum "+endTokenNum);
+        for (int i = startTokenNum+1; i < endTokenNum; i++)
+        {
+            token = dbServer.nextToken();
+            System.out.println("token: "+token);
+            System.out.println(i+"<"+endTokenNum);
+            if (token.contains("(") && token.contains(")"))
+            {
+                System.out.println("pre remove "+token);
+                token = token.replace("(","");
+                token = token.replace(")","");
+                dbServer.replaceToken(token);
+                System.out.println("post Change "+dbServer.getTokens().get(i).getTokenString());
+            }
+        }
+        dbServer.setCurrentTokenNum(startTokenNum);
     }
 
     public void getColumnNames(String tableName) throws DatabaseException, IOException
@@ -113,6 +207,21 @@ public class ConditionCMD extends DBcmd
         Table table = new Table(databaseName);
         columnNames = new ArrayList<>();
         columnNames = table.readColumnNames(tableName);
+    }
+
+    public void scanForLogic(DBServer dbServer) throws DatabaseException
+    {
+        logicClause = false;
+        int startTokenNum = dbServer.getCurrentTokenNum();
+        for (int i = startTokenNum; i < dbServer.getQueryLength()-1; i++)
+        {
+            token = dbServer.nextToken().toUpperCase();
+            if (token.equals("AND") || token.equals("OR"))
+            {
+                logicClause = true;
+            }
+        }
+        dbServer.setCurrentTokenNum(startTokenNum);
     }
 
     @Override

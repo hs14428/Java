@@ -1,5 +1,6 @@
 package Input;
 
+import DBExceptions.DatabaseException;
 import DBExceptions.InvalidQueryException;
 import SQL.RegEx;
 
@@ -14,6 +15,7 @@ public class Tokenizer
     private Token token;
     private String command;
     private int currentToken;
+    private boolean logicClause;
 
     public Tokenizer(String incomingCommand)
     {
@@ -21,17 +23,36 @@ public class Tokenizer
         currentToken = 0;
     }
 
-    public ArrayList<Token> tokenize() throws InvalidQueryException
+    public void scanForANDOR()
+    {
+        logicClause = false;
+        if (command.contains("AND") || command.contains("OR"))
+        {
+            logicClause = true;
+        }
+    }
+
+    public ArrayList<Token> tokenize() throws DatabaseException
     {
 //      First check for semi colon at end (and remove it) and if query is long enough
         command = checkValidEnd(command);
-
+        scanForANDOR();
         String[] tokenArray = initialTokenSplit(command);
-//      If there is a singular WHERE condition, correctly split it further
-        tokenArray = tokenizeCondition(tokenArray);
+
+//        for (int i = 0; i< tokenArray.length; i++)
+//        {
+//            System.out.println(tokenArray[i]);
+//        }
+//      If there is an AND/OR in the WHERE condition, correctly split it further
+//      Nested WHERE conditions are dealt with later on
+        if (!logicClause)
+        {
+            tokenArray = tokenizeCondition(tokenArray);
+        }
         tokenArrayList = new ArrayList<>();
         for (String s : tokenArray)
         {
+            System.out.println(s);
             token = new Token(s);
             tokenArrayList.add(token);
         }
@@ -68,7 +89,7 @@ public class Tokenizer
     }
 
 //  Split out conditions with operators without spaces
-    public String[] tokenizeCondition(String[] tokenArray)
+    public String[] tokenizeCondition(String[] tokenArray) throws DatabaseException
     {
         String[] operatorSplit;
         for (int i=0; i<tokenArray.length;i++)
@@ -89,15 +110,21 @@ public class Tokenizer
     }
 
 //  Used for copying split conditions onto the end of the main tokenArray
-    private String[] copyArray(int i, String[] tokenArray, String[] operatorSplit)
+    private String[] copyArray(int i, String[] tokenArray, String[] operatorSplit) throws DatabaseException
     {
         int arraySize = tokenArray.length + operatorSplit.length-1;
         tokenArray = Arrays.copyOf(tokenArray, arraySize);
         for (int j = 1; j < operatorSplit.length; j++)
         {
             String holdEndToken = tokenArray[i];
+            System.out.println("hET "+holdEndToken);
             tokenArray[i++] = operatorSplit[j];
-            tokenArray[i] = holdEndToken;
+            System.out.println("tA-1 "+tokenArray[i-1]);
+            try {
+                tokenArray[i] = holdEndToken;
+            } catch (Exception e) {
+                throw new DatabaseException("[ERROR] - Failed to parse query");
+            }
         }
         return tokenArray;
     }
