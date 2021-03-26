@@ -71,7 +71,7 @@ public class DBServer
 
     public static void main(String args[])
     {
-        DBServer server = new DBServer(8889);
+        DBServer server = new DBServer(8888);
     }
 
     public void createDBEnvironment()
