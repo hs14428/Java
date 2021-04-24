@@ -1,6 +1,7 @@
 package game;
 
 import GameExceptions.STAGException;
+import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.net.*;
@@ -23,7 +24,7 @@ class StagServer
             System.out.println("Server Listening");
             stagGame = new GameEngine(entityFilename, actionFilename);
             while(true) acceptNextConnection(ss);
-        } catch(IOException ioe) {
+        } catch(IOException | ParseException ioe) {
             System.err.println(ioe);
         }
     }

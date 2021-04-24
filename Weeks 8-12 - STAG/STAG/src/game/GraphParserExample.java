@@ -46,7 +46,7 @@ public class GraphParserExample
                             entityType = g2.getId().getId();
                             entityName = nEnt.getId().getId();
                             entityDescription = nEnt.getAttribute("description");
-                            location.addEntity(entityType, entityName, entityDescription);
+                            location.addNewEntity(entityType, entityName, entityDescription);
                         }
                     }
                     // Add the new Location to the gameMap
@@ -94,15 +94,16 @@ public class GraphParserExample
                 Set<String> entityNames;
                 for (Map.Entry<String, Location> e : pairs)
                 {
+
                     System.out.println();
                     System.out.println("Location: "+e.getKey() + ", Description: "+e.getValue());
                     Location l = e.getValue();
-                    entityNames = l.getAllEntityNames("artefacts");
-                    System.out.println("Artefacts: "+entityNames);
-                    entityNames = l.getAllEntityNames("furniture");
-                    System.out.println("furniture: "+entityNames);
-                    entityNames = l.getAllEntityNames("characters");
-                    System.out.println("characters: "+entityNames);
+//                    entityNames = l.getAllEntityNames("artefacts");
+//                    System.out.println("Artefacts: "+entityNames);
+//                    entityNames = l.getAllEntityNames("furniture");
+//                    System.out.println("furniture: "+entityNames);
+//                    entityNames = l.getAllEntityNames("characters");
+//                    System.out.println("characters: "+entityNames);
                     System.out.println("Possible locations to move to: ");
                     l.printPaths();
                 }

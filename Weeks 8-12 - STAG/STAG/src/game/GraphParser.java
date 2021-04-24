@@ -12,7 +12,7 @@ import java.util.*;
 
 public class GraphParser
 {
-    private LinkedHashMap<String, Location> gameMap = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Location> gameMap = new LinkedHashMap<>();
 
     public GraphParser(String entityFileName)
     {
@@ -50,7 +50,7 @@ public class GraphParser
                             entityType = g2.getId().getId();
                             entityName = nEnt.getId().getId();
                             entityDescription = nEnt.getAttribute("description");
-                            location.addEntity(entityType, entityName, entityDescription);
+                            location.addNewEntity(entityType, entityName, entityDescription);
                         }
                     }
                     // Add the new Location to the gameMap

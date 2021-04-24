@@ -8,7 +8,6 @@ public class GotoCommand extends GameCommand
 {
     public GotoCommand()
     {
-//        super(gameEngine);
         setCommandType("goto");
     }
 

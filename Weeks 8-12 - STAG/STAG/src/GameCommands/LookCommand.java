@@ -8,7 +8,6 @@ public class LookCommand extends GameCommand
 
     public LookCommand()
     {
-//        super(gameEngine);
         setCommandType("look");
     }
 

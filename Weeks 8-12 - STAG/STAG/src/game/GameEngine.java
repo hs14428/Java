@@ -2,6 +2,7 @@ package game;
 
 import GameCommands.*;
 import GameExceptions.STAGException;
+import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.util.*;
@@ -9,21 +10,27 @@ import java.util.*;
 public class GameEngine
 {
     private GraphParser graphParser;
+    private JSONParsing jsonParser;
     private Location currentLocation;
+    private Location startLocation;
     private LinkedHashMap<String, Location> gameMap;
     private LinkedHashMap<String, Player> players;
+    private LinkedHashMap<String, Action> actions;
     private ArrayList<String> commands;
     private String currentPlayerName;
     private String currentCommand;
     private String errorMessage;
     int commandNumber;
 
-    public GameEngine(String entityFilename, String actionFilename)
+    public GameEngine(String entityFilename, String actionFilename) throws IOException, ParseException
     {
         graphParser = new GraphParser(entityFilename);
+        jsonParser = new JSONParsing(actionFilename);
         gameMap = graphParser.getGameMap();
+        actions = jsonParser.getActions();
         // Set start location to first entry on gameMap, i.e. starting location
-        currentLocation = gameMap.entrySet().iterator().next().getValue();
+        startLocation = gameMap.entrySet().iterator().next().getValue();
+        currentLocation = startLocation;
         System.out.println(currentLocation.getName()+" " +currentLocation.getDescription());
         players = new LinkedHashMap<>();
     }
@@ -31,6 +38,11 @@ public class GameEngine
     public LinkedHashMap<String, Location> getGameMap()
     {
         return gameMap;
+    }
+
+    public Location getStartLocation()
+    {
+        return startLocation;
     }
 
     public String runGame(String incomingCommand) throws IOException, STAGException
@@ -77,16 +89,19 @@ public class GameEngine
     public String processCommands() throws STAGException
     {
         GameCommand[] commandType;
+        // Could i change this into a factory?
         GameCommand lookCMD = new LookCommand();
         GameCommand gotoCMD = new GotoCommand();
         // Will need to deal with inv later
         GameCommand invCMD = new InventoryCommand();
         GameCommand getCMD = new GetCommand();
         GameCommand dropCMD = new DropCommand();
-        commandType = new GameCommand[]{lookCMD, gotoCMD, invCMD, getCMD, dropCMD};
+        GameCommand healthCMD = new HealthCommand();
+        commandType = new GameCommand[]{lookCMD, gotoCMD, invCMD, getCMD, dropCMD, healthCMD};
+        Set<String> actionNames = actions.keySet();
         currentCommand = commands.get(commandNumber++);
-        System.out.println("pc: "+currentCommand);
-        System.out.println("pC: "+commandNumber);
+
+        // Check if inputted command is a standard command type
         for (GameCommand command : commandType)
         {
             if (command.getCommandType().equals(currentCommand))
@@ -94,12 +109,15 @@ public class GameEngine
                 return command.runCommand(this);
             }
         }
+        // Or if it is an action trigger
+        for (String s : actionNames)
+        {
+            if (currentCommand.equalsIgnoreCase(s))
+            {
+                return actions.get(s).performAction(this);
+            }
+        }
         throw new STAGException("Input command: \""+currentCommand+"\" not recognized");
-    }
-
-    public String getCurrentCommand()
-    {
-        return currentCommand;
     }
 
     public String getNextCommand() throws STAGException

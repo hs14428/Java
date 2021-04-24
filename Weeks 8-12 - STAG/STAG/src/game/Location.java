@@ -1,9 +1,8 @@
 package game;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Set;
+import GameExceptions.STAGException;
+
+import java.util.*;
 
 public class Location extends Entity
 {
@@ -16,6 +15,7 @@ public class Location extends Entity
     {
         setName(name);
         setDescription(description);
+        setEntityType("location");
     }
 
     public LinkedHashMap<String, Entity> getArtefacts()
@@ -23,7 +23,7 @@ public class Location extends Entity
         return artefacts;
     }
 
-    public void addEntity(String entityType, String name, String description)
+    public void addNewEntity(String entityType, String name, String description)
     {
         EntityFactory entityFactory = new EntityFactory();
         Entity newEntity = entityFactory.makeEntity(entityType, name, description);
@@ -92,22 +92,29 @@ public class Location extends Entity
         }
     }
 
-    public Set<String> getAllEntityNames(String entityType)
+    public ArrayList<String> getEntityNames()
     {
-        Set<String> entityNames;
-        switch (entityType) {
-            case "artefacts":
-                entityNames = artefacts.keySet();
-                return entityNames;
-            case "furniture":
-                entityNames = furniture.keySet();
-                return entityNames;
-            case "characters":
-                entityNames = characters.keySet();
-                return entityNames;
-            default:
-                return null;
+        Set<String> entityNames = new HashSet<String>();
+        entityNames.addAll(artefacts.keySet());
+        entityNames.addAll(furniture.keySet());
+        entityNames.addAll(characters.keySet());
+        return new ArrayList<String>(entityNames);
+    }
+
+    public String getEntityType(String entityName) throws STAGException
+    {
+        Set<Map.Entry<String, Entity>> pairs = artefacts.entrySet();
+        pairs.addAll(furniture.entrySet());
+        pairs.addAll(characters.entrySet());
+
+        for (Map.Entry<String, Entity> e : pairs)
+        {
+            if (e.getKey().equals(entityName))
+            {
+                return e.getValue().getEntityType();
+            }
         }
+        throw new STAGException("No entity of that name present in this location");
     }
 
     public String getEntityDescriptions()
@@ -129,6 +136,38 @@ public class Location extends Entity
         }
 
         return descriptionsString;
+    }
+
+    public void addEntity(String entityType, Entity entity)
+    {
+        switch (entityType) {
+            case "artefact":
+                artefacts.put(entity.getName(), entity);
+                return;
+            case "furniture":
+                furniture.put(entity.getName(), entity);
+                return;
+            case "character":
+                characters.put(entity.getName(), entity);
+                return;
+            default:
+        }
+    }
+
+    public void removeEntity(String entityType, Entity entity)
+    {
+        switch (entityType) {
+            case "artefact":
+                artefacts.remove(entity.getName());
+                return;
+            case "furniture":
+                furniture.remove(entity.getName());
+                return;
+            case "character":
+                characters.remove(entity.getName());
+                return;
+            default:
+        }
     }
 
     @Override

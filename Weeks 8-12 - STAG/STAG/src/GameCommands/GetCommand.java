@@ -32,7 +32,11 @@ public class GetCommand extends GameCommand
                 // Add artefact to players inventory
                 gameEngine.getCurrentPlayer().addToInv(artefactToPickup);
                 // Then remove it from the current location
-                gameEngine.getCurrentLocation().removeArtefact(artefactToPickup);
+//                gameEngine.getCurrentLocation().removeArtefact(artefactToPickup);
+                gameEngine.getCurrentLocation().removeEntity(artefactToPickup.getEntityType(), artefactToPickup);
+                // Then update the game map to reflect changes to location
+                // Not sure if the below is needed as location state seems to change automatically, without updating gamemap
+                gameEngine.getGameMap().put(gameEngine.getCurrentLocation().getName(), gameEngine.getCurrentLocation());
                 returnMessage = "You picked up a ";
                 returnMessage += currentCommand;
                 return  returnMessage;
