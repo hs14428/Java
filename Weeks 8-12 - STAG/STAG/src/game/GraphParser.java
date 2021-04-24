@@ -1,17 +1,21 @@
 package game;
 
-import com.alexmerz.graphviz.*;
-import com.alexmerz.graphviz.objects.*;
+import com.alexmerz.graphviz.ParseException;
+import com.alexmerz.graphviz.Parser;
+import com.alexmerz.graphviz.objects.Edge;
+import com.alexmerz.graphviz.objects.Graph;
+import com.alexmerz.graphviz.objects.Node;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
 
-public class GraphParserExample
+public class GraphParser
 {
+    private LinkedHashMap<String, Location> gameMap = new LinkedHashMap<>();
 
-    public static void main(String[] args)
+    public GraphParser(String entityFileName)
     {
-        LinkedHashMap<String, Location> gameMap = new LinkedHashMap<>();
         Location location;
         String locationName;
         String locationDescription;
@@ -23,7 +27,7 @@ public class GraphParserExample
 
         try {
             Parser parser = new Parser();
-            FileReader reader = new FileReader(args[0]);
+            FileReader reader = new FileReader(entityFileName);
             parser.parse(reader);
             ArrayList<Graph> graphs = parser.getGraphs();
             ArrayList<Graph> subGraphs = graphs.get(0).getSubgraphs();
@@ -54,7 +58,6 @@ public class GraphParserExample
                 }
                 ArrayList<Edge> edges = g.getEdges();
                 for (Edge e : edges) {
-//                    Location newLocation;
                     // Set the location equal to the start start of the path route
                     pathStart = e.getSource().getNode().getId().getId();
                     location = gameMap.get(pathStart);
@@ -66,53 +69,17 @@ public class GraphParserExample
                     System.out.printf("Path from %s to %s\n", e.getSource().getNode().getId().getId(), e.getTarget().getNode().getId().getId());
                 }
 
-//                location = gameMap.get("start");
-//                System.out.println("Location: "+ location.getName());
-//                System.out.println(location.getEntity("artefacts", "potion").getDescription());
-//                System.out.println(location.getEntity("furniture", "door").getDescription());
-//                location.getPaths();
-//
-//                location = gameMap.get("cellar");
-//                System.out.println("Location: "+ location.getName());
-//                System.out.println(location.getEntity("characters", "elf").getDescription());
-//
-//                location.getPaths();
-
-                Set<String> locationNames = gameMap.keySet();
-                Collection<Location> locationDescriptions = gameMap.values();
-                // Key value pair
-                Set<Map.Entry<String, Location>> pairs = gameMap.entrySet();
-                System.out.println(pairs);
-                System.out.println(locationNames);
-                System.out.println(locationDescriptions);
-
-                for (String s : locationNames)
-                {
-                    System.out.println(s);
-                }
-
-                Set<String> entityNames;
-                for (Map.Entry<String, Location> e : pairs)
-                {
-                    System.out.println();
-                    System.out.println("Location: "+e.getKey() + ", Description: "+e.getValue());
-                    Location l = e.getValue();
-                    entityNames = l.getAllEntityNames("artefacts");
-                    System.out.println("Artefacts: "+entityNames);
-                    entityNames = l.getAllEntityNames("furniture");
-                    System.out.println("furniture: "+entityNames);
-                    entityNames = l.getAllEntityNames("characters");
-                    System.out.println("characters: "+entityNames);
-                    System.out.println("Possible locations to move to: ");
-                    l.printPaths();
-                }
-
             }
 
         } catch (FileNotFoundException fnfe) {
             System.out.println(fnfe);
-        } catch (com.alexmerz.graphviz.ParseException pe) {
+        } catch (ParseException pe) {
             System.out.println(pe);
         }
+    }
+
+    public LinkedHashMap<String, Location> getGameMap()
+    {
+        return gameMap;
     }
 }
