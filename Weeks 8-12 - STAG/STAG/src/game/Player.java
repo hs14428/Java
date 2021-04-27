@@ -7,12 +7,23 @@ public class Player extends Entity
 {
     private LinkedHashMap<String, Artefact> inventory = new LinkedHashMap<>();
     private int health;
+    private String playerLocation;
 
     public Player(String playerName)
     {
         setName(playerName);
-        setDescription("A hero on a noble quest.");
+        setDescription(playerName+", a hero on a noble quest.");
         health = 3;
+    }
+
+    public String getPlayerLocation()
+    {
+        return playerLocation;
+    }
+
+    public void setPlayerLocation(String locationName)
+    {
+        playerLocation = locationName;
     }
 
     public int getHealth()

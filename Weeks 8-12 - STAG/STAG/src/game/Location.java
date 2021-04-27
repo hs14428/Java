@@ -10,12 +10,34 @@ public class Location extends Entity
     private LinkedHashMap<String, Entity> artefacts = new LinkedHashMap<>();
     private LinkedHashMap<String, Entity> furniture = new LinkedHashMap<>();
     private LinkedHashMap<String, Entity> characters = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> otherPlayers = new LinkedHashMap<>();
 
     public Location(String name, String description)
     {
         setName(name);
         setDescription(description);
         setEntityType("location");
+    }
+
+    public void addPlayer(String playerName)
+    {
+        otherPlayers.put(playerName, playerName);
+    }
+
+    public void removePlayer(String playerName)
+    {
+        for (String s : otherPlayers.keySet())
+        {
+            if (playerName.equals(s))
+            {
+                otherPlayers.remove(playerName);
+            }
+        }
+    }
+
+    public LinkedHashMap<String, String> getOtherPlayers()
+    {
+        return otherPlayers;
     }
 
     public LinkedHashMap<String, Entity> getArtefacts()
@@ -103,7 +125,8 @@ public class Location extends Entity
 
     public String getEntityType(String entityName) throws STAGException
     {
-        Set<Map.Entry<String, Entity>> pairs = artefacts.entrySet();
+        ArrayList<Map.Entry<String, Entity>> pairs = new ArrayList<Map.Entry<String, Entity>>(artefacts.entrySet());
+//        Set<Map.Entry<String, Entity>> pairs = artefacts.entrySet();
         pairs.addAll(furniture.entrySet());
         pairs.addAll(characters.entrySet());
 
@@ -111,6 +134,8 @@ public class Location extends Entity
         {
             if (e.getKey().equals(entityName))
             {
+                System.out.println("entityType key: "+e.getKey());
+                System.out.println("entityType entityName: "+entityName);
                 return e.getValue().getEntityType();
             }
         }
@@ -141,13 +166,13 @@ public class Location extends Entity
     public void addEntity(String entityType, Entity entity)
     {
         switch (entityType) {
-            case "artefact":
+            case "artefacts":
                 artefacts.put(entity.getName(), entity);
                 return;
             case "furniture":
                 furniture.put(entity.getName(), entity);
                 return;
-            case "character":
+            case "characters":
                 characters.put(entity.getName(), entity);
                 return;
             default:
@@ -157,13 +182,13 @@ public class Location extends Entity
     public void removeEntity(String entityType, Entity entity)
     {
         switch (entityType) {
-            case "artefact":
+            case "artefacts":
                 artefacts.remove(entity.getName());
                 return;
             case "furniture":
                 furniture.remove(entity.getName());
                 return;
-            case "character":
+            case "characters":
                 characters.remove(entity.getName());
                 return;
             default:
@@ -175,27 +200,4 @@ public class Location extends Entity
     {
         return getDescription();
     }
-
-    public void removeArtefact(Artefact artefact)
-    {
-        artefacts.remove(artefact.getName());
-    }
-
-    public void addArtefact(Artefact artefact)
-    {
-        artefacts.put(artefact.getName(), artefact);
-    }
-
-    public void addFurniture(String name, String description)
-    {
-        Furniture furniture = new Furniture(name, description);
-        this.furniture.put(name, furniture);
-    }
-
-    public void addCharacter(String name, String description)
-    {
-        Character character = new Character(name, description);
-        characters.put(name, character);
-    }
-
 }

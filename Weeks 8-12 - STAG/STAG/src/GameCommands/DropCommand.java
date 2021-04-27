@@ -4,6 +4,7 @@ import GameExceptions.STAGException;
 import game.Artefact;
 import game.GameEngine;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -18,16 +19,21 @@ public class DropCommand extends GameCommand
     public String runCommand(GameEngine gameEngine) throws STAGException
     {
         LinkedHashMap<String, Artefact> inventory = gameEngine.getCurrentPlayer().getInventory();
-        Set<String> inventoryItems = inventory.keySet();
+//        Set<String> inventoryItems = inventory.keySet();
+        ArrayList<String> inventoryItems = new ArrayList<String>(inventory.keySet());
         String currentCommand = gameEngine.getNextCommand();
         Artefact artefactToDrop;
         String returnMessage;
 
         for (String s : inventoryItems)
         {
+            System.out.println("drop, inv item: "+ s);
+            System.out.println("drop, curr item: "+currentCommand);
             if (currentCommand.equalsIgnoreCase(s))
             {
+                System.out.println("drop, curr loc: " +gameEngine.getCurrentLocation().getName());
                 artefactToDrop = gameEngine.getCurrentPlayer().getInventory().get(currentCommand);
+                System.out.println("drop, art to drop: "+artefactToDrop.getName());
                 // Remove artefact from players inventory
                 gameEngine.getCurrentPlayer().removeFromInv(artefactToDrop);
                 // Then re-add it to the current location

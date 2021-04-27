@@ -3,6 +3,8 @@ package GameCommands;
 import GameExceptions.STAGException;
 import game.GameEngine;
 
+import java.util.ArrayList;
+
 public class LookCommand extends GameCommand
 {
 
@@ -24,7 +26,28 @@ public class LookCommand extends GameCommand
         gameState += gameEngine.getCurrentLocation().getEntityDescriptions();
         gameState += "You can access from here:\n";
         gameState += gameEngine.getCurrentLocation().getPathsString();
-//        System.out.println(gameState);
+        gameState = checkForOtherPlayers(gameEngine, gameState);
+        return gameState;
+    }
+
+    public String checkForOtherPlayers(GameEngine gameEngine, String gameState)
+    {
+        ArrayList<String> otherPlayers;
+        if (gameEngine.getCurrentLocation().getOtherPlayers().size() > 1)
+        {
+            otherPlayers = new ArrayList<String>(gameEngine.getCurrentLocation().getOtherPlayers().keySet());
+            gameState += "You can also see some other players:\n";
+            for (String s : otherPlayers)
+            {
+                // If player in current location is NOT equal to current player, add to list
+                if (!gameEngine.getCurrentPlayer().getName().equals(s))
+                {
+                    gameState += s;
+                    gameState += "\n";
+                }
+            }
+            return gameState;
+        }
         return gameState;
     }
 }

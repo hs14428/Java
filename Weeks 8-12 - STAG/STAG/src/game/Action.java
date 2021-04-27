@@ -2,6 +2,7 @@ package game;
 
 import GameExceptions.STAGException;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -59,9 +60,13 @@ public class Action
                     gameEngine.getCurrentPlayer().increaseHealth();
                 } else {
                     gameEngine.setCurrentLocation(unplaced);
+                    System.out.println("gameLocation: "+gameEngine.getCurrentLocation().getName());
                     entityType = gameEngine.getCurrentLocation().getEntityType(s);
+                    System.out.println(gameEngine.getCurrentLocation().getEntityDescriptions());
                     entity = gameEngine.getCurrentLocation().getEntity(entityType, s);
                     // Remove entity from unplaced
+                    System.out.println("entity type: "+entityType);
+                    System.out.println("entity: "+entity.getName());
                     gameEngine.getCurrentLocation().removeEntity(entityType, entity);
                     // Reset location back to original before making changes
                     gameEngine.setCurrentLocation(gameEngine.getGameMap().get(originalLocation));
@@ -77,7 +82,8 @@ public class Action
 
     public boolean checkIfLocation(GameEngine gameEngine, String entityName)
     {
-        Set<String> locationNames = gameEngine.getGameMap().keySet();
+//        Set<String> locationNames = gameEngine.getGameMap().keySet();
+        ArrayList<String> locationNames = new ArrayList<String>(gameEngine.getGameMap().keySet());
         for (String s : locationNames)
         {
             if (entityName.equals(s))
@@ -121,7 +127,7 @@ public class Action
         for (String s : playerInventory)
         {
             entity = gameEngine.getCurrentPlayer().getInventory().get(s);
-            entityType = "artefact";
+            entityType = "artefacts";
             gameEngine.getCurrentPlayer().removeFromInv((Artefact)  entity);
             gameEngine.getCurrentLocation().addEntity(entityType, entity);
             gameEngine.getGameMap().put(gameEngine.getCurrentLocation().getName(), gameEngine.getCurrentLocation());
@@ -140,6 +146,7 @@ public class Action
                 {
                     entityType = gameEngine.getCurrentLocation().getEntityType(s);
                     entity = gameEngine.getCurrentLocation().getEntity(entityType, s);
+                    System.out.println("removing Location entity: "+entityType +", "+entity.getName());
                     gameEngine.getCurrentLocation().removeEntity(entityType, entity);
                 }
             }
@@ -148,7 +155,8 @@ public class Action
 
     public void consumeInventoryEntities(GameEngine gameEngine)
     {
-        Set<String> inventoryEntityNames = gameEngine.getCurrentPlayer().getInventory().keySet();
+//        Set<String> inventoryEntityNames = gameEngine.getCurrentPlayer().getInventory().keySet();
+        ArrayList<String> inventoryEntityNames = new ArrayList<String>(gameEngine.getCurrentPlayer().getInventory().keySet());
         for (String s : consumed)
         {
             for (String i : inventoryEntityNames)
@@ -156,6 +164,7 @@ public class Action
                 if (s.equals(i))
                 {
                     entity = gameEngine.getCurrentPlayer().getInventory().get(s);
+                    System.out.println("removing inv entity: "+entity.getName());
                     gameEngine.getCurrentPlayer().removeFromInv((Artefact) entity);
                 }
             }
@@ -167,8 +176,10 @@ public class Action
         ArrayList<String> locationEntityNames = gameEngine.getCurrentLocation().getEntityNames();
         for (String s : subjects)
         {
+            System.out.println("check Loc subject name: "+ s);
             for (String l : locationEntityNames)
             {
+                System.out.println("check loc entity name: " + l);
                 if (s.equals(l))
                 {
                     // If one of subject entities is present in the location, add to count
@@ -181,11 +192,14 @@ public class Action
 
     public void checkInventory(GameEngine gameEngine)
     {
-        Set<String> inventoryEntityNames = gameEngine.getCurrentPlayer().getInventory().keySet();
+//        Set<String> inventoryEntityNames = gameEngine.getCurrentPlayer().getInventory().keySet();
+        ArrayList<String> inventoryEntityNames = new ArrayList<String>(gameEngine.getCurrentPlayer().getInventory().keySet());
         for (String s : subjects)
         {
+            System.out.println("check inv subject name: "+ s);
             for (String i : inventoryEntityNames)
             {
+                System.out.println("check inv entity name: " + i);
                 if (s.equals(i))
                 {
                     // If one of subject entities is present in players inventory, add to count
@@ -200,7 +214,9 @@ public class Action
     {
         entityCount = 0;
         checkLocationEntities(gameEngine);
+        System.out.println("entityCount post location:" + entityCount);
         checkInventory(gameEngine);
+        System.out.println("entityCount post inventory:" + entityCount);
         if (entityCount == subjects.size())
         {
             return true;

@@ -6,6 +6,6 @@ public class Artefact extends Entity
     {
         setName(name);
         setDescription(description);
-        setEntityType("artefact");
+        setEntityType("artefacts");
     }
 }

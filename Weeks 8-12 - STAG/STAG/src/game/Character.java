@@ -6,6 +6,6 @@ public class Character extends Entity
     {
         setName(name);
         setDescription(description);
-        setEntityType("character");
+        setEntityType("characters");
     }
 }

@@ -9,10 +9,8 @@ import java.util.*;
 
 public class GameEngine
 {
-    private GraphParser graphParser;
-    private JSONParsing jsonParser;
+    private final Location startLocation;
     private Location currentLocation;
-    private Location startLocation;
     private LinkedHashMap<String, Location> gameMap;
     private LinkedHashMap<String, Player> players;
     private LinkedHashMap<String, Action> actions;
@@ -24,14 +22,13 @@ public class GameEngine
 
     public GameEngine(String entityFilename, String actionFilename) throws IOException, ParseException
     {
-        graphParser = new GraphParser(entityFilename);
-        jsonParser = new JSONParsing(actionFilename);
+        GraphParser graphParser = new GraphParser(entityFilename);
+        JSONParsing jsonParser = new JSONParsing(actionFilename);
         gameMap = graphParser.getGameMap();
         actions = jsonParser.getActions();
         // Set start location to first entry on gameMap, i.e. starting location
         startLocation = gameMap.entrySet().iterator().next().getValue();
         currentLocation = startLocation;
-        System.out.println(currentLocation.getName()+" " +currentLocation.getDescription());
         players = new LinkedHashMap<>();
     }
 
@@ -51,33 +48,56 @@ public class GameEngine
         String[] commandArray = incomingCommand.split(" ");
         commands = new ArrayList<String>(Arrays.asList(commandArray));
         commandNumber = 0;
-        checkPlayer();
-
+        checkPlayers();
+        // Set current location to the current players location to allow for multiple players
+        currentLocation = gameMap.get(getCurrentPlayer().getPlayerLocation());
         return processCommands();
     }
 
-    public void checkPlayer()
+    // Method checks which players are in the game. If none, add first player, if some, check if current player is new or not
+    public void checkPlayers()
     {
-        // Store playerNames HashMap in set
-        Set<String> playerNames = players.keySet();
+        // Store playerNames HashMap keySet in ArrayList
+        ArrayList<String> playerNames = new ArrayList<String>(players.keySet());
 
         // If no players yet, add one
-        if (playerNames.size() == 0)
+        if (!checkForFirstPlayer(playerNames))
         {
-            Player player = new Player(commands.get(0));
-            players.put(commands.get(0), player);
+            return;
         }
-
         for (String s : playerNames)
         {
             // Loop through and check if current player is new name, if so, create new player
-            if (!commands.get(0).equals(s))
+            if (commands.get(0).equals(s))
             {
-                Player player = new Player(commands.get(0));
-                players.put(commands.get(0), player);
+                currentPlayerName = commands.get(0);
+                commandNumber++;
+                return;
             }
         }
+        createNewPlayer();
+    }
+
+    // Method checks if there is an initial starting player already in the game. If not add one
+    public boolean checkForFirstPlayer(ArrayList<String> playerNames)
+    {
+        // If no players yet, add one
+        if (playerNames.size() == 0)
+        {
+            createNewPlayer();
+            return false;
+        }
+        return true;
+    }
+
+    public void createNewPlayer()
+    {
+        Player newPlayer = new Player(commands.get(0));
+        newPlayer.setPlayerLocation(startLocation.getName());
+        players.put(commands.get(0), newPlayer);
         currentPlayerName = commands.get(0);
+        // Add the new player to start location
+        startLocation.addPlayer(currentPlayerName);
         commandNumber++;
     }
 
@@ -98,7 +118,8 @@ public class GameEngine
         GameCommand dropCMD = new DropCommand();
         GameCommand healthCMD = new HealthCommand();
         commandType = new GameCommand[]{lookCMD, gotoCMD, invCMD, getCMD, dropCMD, healthCMD};
-        Set<String> actionNames = actions.keySet();
+        ArrayList<String> actionNames = new ArrayList<String>(actions.keySet());
+        checkValidInput();
         currentCommand = commands.get(commandNumber++);
 
         // Check if inputted command is a standard command type
@@ -120,6 +141,15 @@ public class GameEngine
         throw new STAGException("Input command: \""+currentCommand+"\" not recognized");
     }
 
+    public void checkValidInput() throws STAGException
+    {
+        // First check commands is not null
+        if (commands.size() < 2)
+        {
+            throw new STAGException("Please enter a command");
+        }
+    }
+
     public String getNextCommand() throws STAGException
     {
         if (commandNumber < commands.size())
@@ -139,53 +169,4 @@ public class GameEngine
     {
         return currentLocation;
     }
-//    public String processCommands() throws STAGException, IOException
-//    {
-//        currentCommand = commands.get(commandNumber++);
-//        if (currentCommand.equalsIgnoreCase("look"))
-//        {
-//            return lookCommand();
-//        }
-//        else if (currentCommand.equalsIgnoreCase("goto"))
-//        {
-//            currentCommand = commands.get(commandNumber);
-//            return gotoCommand();
-//        }
-//        else if (currentCommand.equalsIgnoreCase("get"))
-//        {
-//            return null;
-//        }
-//        else {
-//            throw new STAGException("Input command: \""+currentCommand+"\" not recognized");
-//        }
-//    }
-//
-//    public String gotoCommand() throws STAGException
-//    {
-//        for (String s : currentLocation.getPaths())
-//        {
-//            if (currentCommand.equalsIgnoreCase(s))
-//            {
-//                currentLocation = gameMap.get(currentCommand);
-//                return lookCommand();
-//            }
-//        }
-//        errorMessage = "Invalid path selected. Valid Paths: ";
-//        errorMessage += currentLocation.getPathsString();
-//        throw new STAGException(errorMessage);
-//    }
-//
-//    public String lookCommand()
-//    {
-//        String gameState = "";
-//
-//        gameState += currentLocation.getDescription();
-//        gameState += ". You can see:\n";
-//        gameState += currentLocation.getEntityDescriptions();
-//        gameState += "You can access from here:\n";
-//        gameState += currentLocation.getPathsString();
-//        System.out.println(gameState);
-//        return gameState;
-//    }
-
 }

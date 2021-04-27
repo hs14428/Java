@@ -23,7 +23,13 @@ public class GotoCommand extends GameCommand
             if (currentCommand.equalsIgnoreCase(s))
             {
                 nextLocation = gameEngine.getGameMap().get(currentCommand);
+                // Remove current player for location they are leaving
+                gameEngine.getCurrentLocation().removePlayer(gameEngine.getCurrentPlayer().getName());
                 gameEngine.setCurrentLocation(nextLocation);
+                // Set currentPlayer location = set location
+                gameEngine.getCurrentPlayer().setPlayerLocation(nextLocation.getName());
+                // Add the current player to the new location they have just arrived at
+                gameEngine.getCurrentLocation().addPlayer(gameEngine.getCurrentPlayer().getName());
                 return new LookCommand().runCommand(gameEngine);
             }
         }
