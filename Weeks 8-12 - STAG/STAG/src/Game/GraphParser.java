@@ -1,5 +1,6 @@
-package game;
+package Game;
 
+import Entities.Location;
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
 import com.alexmerz.graphviz.objects.Edge;

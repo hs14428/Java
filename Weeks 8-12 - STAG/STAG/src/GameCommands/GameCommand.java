@@ -1,9 +1,7 @@
 package GameCommands;
 
 import GameExceptions.STAGException;
-import game.GameEngine;
-
-import java.util.LinkedHashMap;
+import Game.GameEngine;
 
 public abstract class GameCommand
 {

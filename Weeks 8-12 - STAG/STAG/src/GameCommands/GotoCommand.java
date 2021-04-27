@@ -1,8 +1,8 @@
 package GameCommands;
 
 import GameExceptions.STAGException;
-import game.GameEngine;
-import game.Location;
+import Game.GameEngine;
+import Entities.Location;
 
 public class GotoCommand extends GameCommand
 {

@@ -1,7 +1,7 @@
 package GameCommands;
 
 import GameExceptions.STAGException;
-import game.GameEngine;
+import Game.GameEngine;
 
 import java.util.ArrayList;
 

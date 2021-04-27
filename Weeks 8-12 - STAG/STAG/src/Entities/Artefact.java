@@ -1,4 +1,4 @@
-package game;
+package Entities;
 
 public class Artefact extends Entity
 {

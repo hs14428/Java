@@ -1,11 +1,9 @@
 package GameCommands;
 
-import GameExceptions.STAGException;
-import game.GameEngine;
-import game.Player;
+import Game.GameEngine;
+import Entities.Player;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 public class InventoryCommand extends GameCommand
 {
@@ -16,18 +14,21 @@ public class InventoryCommand extends GameCommand
     }
 
     @Override
-    public String runCommand(GameEngine gameEngine) throws STAGException
+    public String runCommand(GameEngine gameEngine)
     {
         Player currentPlayer = gameEngine.getCurrentPlayer();
-        System.out.println("current player: "+currentPlayer.getName());
-//        Set<String> inventorySet = currentPlayer.getInventory().keySet();
-        ArrayList<String> inventorySet = new ArrayList<String>(currentPlayer.getInventory().keySet());
+        ArrayList<String> inventoryArrayList = new ArrayList<String>(currentPlayer.getInventory().keySet());
         String inventoryString = "";
 
-        for (String s : inventorySet)
+        for (String s : inventoryArrayList)
         {
             inventoryString += s;
             inventoryString += "\n";
+        }
+        // If inventory is empty, tell the player so
+        if (inventoryString.equals(""))
+        {
+            inventoryString = "Your inventory is empty";
         }
         return inventoryString;
     }

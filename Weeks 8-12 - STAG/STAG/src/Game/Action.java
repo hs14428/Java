@@ -1,10 +1,12 @@
-package game;
+package Game;
 
+import Entities.Artefact;
+import Entities.Entity;
+import Entities.Furniture;
+import Entities.Location;
 import GameExceptions.STAGException;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Set;
 
 public class Action
 {
@@ -14,6 +16,7 @@ public class Action
     private String narration;
     private String entityType;
     private Entity entity;
+    private String errorMessage;
     private int entityCount;
 
     public Action()
@@ -24,6 +27,7 @@ public class Action
     {
         // Check that word after action is valid
         checkValidAction(gameEngine);
+//        errorMessage = "You don't have the tools/items/surroundings required to do this action";
         if (subjectCheck(gameEngine))
         {
             consumeEntities(gameEngine);
@@ -55,18 +59,18 @@ public class Action
             // First check if a location or not
             if (!checkIfLocation(gameEngine, s))
             {
+                // Then check if producing health - this is a special case
                 if (s.equalsIgnoreCase("health"))
                 {
                     gameEngine.getCurrentPlayer().increaseHealth();
-                } else {
+                } else if (consumed.isEmpty()) {
+                    produceRepeatEntity(gameEngine);
+                }
+                else {
                     gameEngine.setCurrentLocation(unplaced);
-                    System.out.println("gameLocation: "+gameEngine.getCurrentLocation().getName());
                     entityType = gameEngine.getCurrentLocation().getEntityType(s);
-                    System.out.println(gameEngine.getCurrentLocation().getEntityDescriptions());
                     entity = gameEngine.getCurrentLocation().getEntity(entityType, s);
                     // Remove entity from unplaced
-                    System.out.println("entity type: "+entityType);
-                    System.out.println("entity: "+entity.getName());
                     gameEngine.getCurrentLocation().removeEntity(entityType, entity);
                     // Reset location back to original before making changes
                     gameEngine.setCurrentLocation(gameEngine.getGameMap().get(originalLocation));
@@ -80,9 +84,35 @@ public class Action
         }
     }
 
+    // Method for special cases where action can be performed multiple times due to no consumption of entities
+    public void produceRepeatEntity(GameEngine gameEngine) throws STAGException
+    {
+        // Can't have multiple entities of same name, so need to search for produced entity to move it
+        for (String s : produced)
+        {
+            // Search each location for produced entity
+            for (Location l : gameEngine.getGameMap().values())
+            {
+                ArrayList<String> entityNames = l.getEntityNames();
+                // Check all entities in each location
+                for (String e : entityNames)
+                {
+                    // If find a match, remove that entity from that location
+                    if (e.equals(s))
+                    {
+                        entityType = gameEngine.getGameMap().get(l.getName()).getEntityType(s);
+                        entity = gameEngine.getGameMap().get(l.getName()).getEntity(entityType, s);
+                        l.removeEntity(entityType, entity);
+                        // And add it to the current location
+                        gameEngine.getCurrentLocation().addEntity(entityType, entity);
+                    }
+                }
+            }
+        }
+    }
+
     public boolean checkIfLocation(GameEngine gameEngine, String entityName)
     {
-//        Set<String> locationNames = gameEngine.getGameMap().keySet();
         ArrayList<String> locationNames = new ArrayList<String>(gameEngine.getGameMap().keySet());
         for (String s : locationNames)
         {
@@ -112,7 +142,11 @@ public class Action
                     narration = "Oh dear, you died! You dropped all your items and respawned at the start";
                     dropItems(gameEngine);
                     gameEngine.getCurrentPlayer().resetHealth();
-                    gameEngine.setCurrentLocation(gameEngine.getStartLocation());
+                    // Remove player from location as they have died
+                    gameEngine.getCurrentLocation().removePlayer(gameEngine.getCurrentPlayer().getName());
+                    // Add player back to start location and reset their location
+                    gameEngine.getStartLocation().addPlayer(gameEngine.getCurrentPlayer().getName());
+                    gameEngine.getCurrentPlayer().setPlayerLocation(gameEngine.getStartLocation().getName());
                 } else {
                     gameEngine.getCurrentPlayer().reduceHealth();
                 }
@@ -120,9 +154,10 @@ public class Action
         }
     }
 
+    // Method for dropping items, should a player's health drop to 0
     public void dropItems(GameEngine gameEngine)
     {
-        Set<String> playerInventory = gameEngine.getCurrentPlayer().getInventory().keySet();
+        ArrayList<String> playerInventory = new ArrayList<String>(gameEngine.getCurrentPlayer().getInventory().keySet());
 
         for (String s : playerInventory)
         {
@@ -135,6 +170,7 @@ public class Action
 
     }
 
+    // Consume entities from location if an action consumed entity
     public void consumeLocationEntities(GameEngine gameEngine) throws STAGException
     {
         ArrayList<String> locationEntityNames = gameEngine.getCurrentLocation().getEntityNames();
@@ -144,18 +180,18 @@ public class Action
             {
                 if (s.equals(l))
                 {
+                    // If location item matches a consumed entity, remove from location
                     entityType = gameEngine.getCurrentLocation().getEntityType(s);
                     entity = gameEngine.getCurrentLocation().getEntity(entityType, s);
-                    System.out.println("removing Location entity: "+entityType +", "+entity.getName());
                     gameEngine.getCurrentLocation().removeEntity(entityType, entity);
                 }
             }
         }
     }
 
+    // Consume entities from inventory if an action consumed entity
     public void consumeInventoryEntities(GameEngine gameEngine)
     {
-//        Set<String> inventoryEntityNames = gameEngine.getCurrentPlayer().getInventory().keySet();
         ArrayList<String> inventoryEntityNames = new ArrayList<String>(gameEngine.getCurrentPlayer().getInventory().keySet());
         for (String s : consumed)
         {
@@ -163,43 +199,46 @@ public class Action
             {
                 if (s.equals(i))
                 {
+                    // If inventory item matches a consumed entity, remove from inventory
                     entity = gameEngine.getCurrentPlayer().getInventory().get(s);
-                    System.out.println("removing inv entity: "+entity.getName());
                     gameEngine.getCurrentPlayer().removeFromInv((Artefact) entity);
                 }
             }
         }
     }
 
-    public void checkLocationEntities(GameEngine gameEngine)
+    // Check location for action subject entities
+    public void checkLocationEntities(GameEngine gameEngine) throws STAGException
     {
         ArrayList<String> locationEntityNames = gameEngine.getCurrentLocation().getEntityNames();
         for (String s : subjects)
         {
-            System.out.println("check Loc subject name: "+ s);
             for (String l : locationEntityNames)
             {
-                System.out.println("check loc entity name: " + l);
                 if (s.equals(l))
                 {
                     // If one of subject entities is present in the location, add to count
                     entityCount++;
-                    // Also set the furn
+//                    // If the subject entity is furniture, set it to used
+//                    entityType = gameEngine.getCurrentLocation().getEntityType(s);
+//                    if (entityType.equals("furniture"))
+//                    {
+//                        Furniture furniture = (Furniture) gameEngine.getCurrentLocation().getFurniture().get(s);
+//                        furniture.setFurnitureUsed();
+//                    }
                 }
             }
         }
     }
 
-    public void checkInventory(GameEngine gameEngine)
+    // Check inventory for action subject entities
+    public void checkInventoryEntities(GameEngine gameEngine)
     {
-//        Set<String> inventoryEntityNames = gameEngine.getCurrentPlayer().getInventory().keySet();
         ArrayList<String> inventoryEntityNames = new ArrayList<String>(gameEngine.getCurrentPlayer().getInventory().keySet());
         for (String s : subjects)
         {
-            System.out.println("check inv subject name: "+ s);
             for (String i : inventoryEntityNames)
             {
-                System.out.println("check inv entity name: " + i);
                 if (s.equals(i))
                 {
                     // If one of subject entities is present in players inventory, add to count
@@ -209,19 +248,46 @@ public class Action
         }
     }
 
-    // Add feature to say e.g. door is already open
+    // Add feature to say e.g. door is already open??
     public boolean subjectCheck(GameEngine gameEngine) throws STAGException
     {
         entityCount = 0;
         checkLocationEntities(gameEngine);
-        System.out.println("entityCount post location:" + entityCount);
-        checkInventory(gameEngine);
-        System.out.println("entityCount post inventory:" + entityCount);
+        checkInventoryEntities(gameEngine);
         if (entityCount == subjects.size())
         {
             return true;
         }
-        throw new STAGException("Not enough subjects present in environment to perform this action");
+//        checkIfFurnitureUsed(gameEngine);
+//        throw new STAGException("You don't have the tools/items required to do this");
+        errorMessage = "You don't have the tools/items/surroundings required to do this action";
+        throw new STAGException(errorMessage);
+    }
+
+    public void setFurnitureUsed(GameEngine gameEngine, String entityType, String furnitureName)
+    {
+        if (entityType.equals("furniture"))
+        {
+            Furniture furniture = (Furniture) gameEngine.getCurrentLocation().getFurniture().get(furnitureName);
+            furniture.setFurnitureUsed();
+        }
+    }
+
+    public void checkIfFurnitureUsed(GameEngine gameEngine)
+    {
+        ArrayList<String> locationEntityNames = new ArrayList<String>(gameEngine.getCurrentLocation().getFurniture().keySet());
+        for (String s : locationEntityNames)
+        {
+            Furniture furniture = (Furniture) gameEngine.getCurrentLocation().getFurniture().get(s);
+            if (furniture.getFurnitureUsed())
+            {
+                System.out.println("furniture used");
+                errorMessage = "You have already interacted with this piece of furniture";
+            } else {
+                System.out.println("furniture not used");
+                errorMessage = "You don't have the tools/items/surroundings required to do this action";
+            }
+        }
     }
 
     public void setNarration(String narration)

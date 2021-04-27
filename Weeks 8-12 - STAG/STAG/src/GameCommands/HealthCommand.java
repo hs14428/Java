@@ -1,8 +1,7 @@
 package GameCommands;
 
 import GameExceptions.STAGException;
-import game.GameEngine;
-import game.Player;
+import Game.GameEngine;
 
 public class HealthCommand extends GameCommand
 {

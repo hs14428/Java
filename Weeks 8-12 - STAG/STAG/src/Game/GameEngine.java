@@ -1,5 +1,7 @@
-package game;
+package Game;
 
+import Entities.Location;
+import Entities.Player;
 import GameCommands.*;
 import GameExceptions.STAGException;
 import org.json.simple.parser.ParseException;
@@ -17,8 +19,7 @@ public class GameEngine
     private ArrayList<String> commands;
     private String currentPlayerName;
     private String currentCommand;
-    private String errorMessage;
-    int commandNumber;
+    private int commandNumber;
 
     public GameEngine(String entityFilename, String actionFilename) throws IOException, ParseException
     {
@@ -49,7 +50,7 @@ public class GameEngine
         commands = new ArrayList<String>(Arrays.asList(commandArray));
         commandNumber = 0;
         checkPlayers();
-        // Set current location to the current players location to allow for multiple players
+        // Set current location to the current players location to allow for changing between multiple players
         currentLocation = gameMap.get(getCurrentPlayer().getPlayerLocation());
         return processCommands();
     }
@@ -106,23 +107,30 @@ public class GameEngine
         return players.get(currentPlayerName);
     }
 
-    public String processCommands() throws STAGException
+    public GameCommand[] initiateCommandArray()
     {
-        GameCommand[] commandType;
         // Could i change this into a factory?
+        GameCommand[] commandType;
         GameCommand lookCMD = new LookCommand();
         GameCommand gotoCMD = new GotoCommand();
-        // Will need to deal with inv later
         GameCommand invCMD = new InventoryCommand();
         GameCommand getCMD = new GetCommand();
         GameCommand dropCMD = new DropCommand();
         GameCommand healthCMD = new HealthCommand();
         commandType = new GameCommand[]{lookCMD, gotoCMD, invCMD, getCMD, dropCMD, healthCMD};
+        return commandType;
+    }
+
+    public String processCommands() throws STAGException
+    {
         ArrayList<String> actionNames = new ArrayList<String>(actions.keySet());
+        GameCommand[] commandType = initiateCommandArray();
         checkValidInput();
         currentCommand = commands.get(commandNumber++);
 
         // Check if inputted command is a standard command type
+        // Will need to add features allow for first word not being a trigger or command
+        // e.g. Please open door etc.
         for (GameCommand command : commandType)
         {
             if (command.getCommandType().equals(currentCommand))
@@ -138,7 +146,7 @@ public class GameEngine
                 return actions.get(s).performAction(this);
             }
         }
-        throw new STAGException("Input command: \""+currentCommand+"\" not recognized");
+        throw new STAGException("Input command: \""+ currentCommand +"\" not recognized");
     }
 
     public void checkValidInput() throws STAGException

@@ -1,4 +1,4 @@
-package game;
+package Entities;
 
 import GameExceptions.STAGException;
 
@@ -84,45 +84,6 @@ public class Location extends Entity
         }
     }
 
-    public void addPath(String locationName)
-    {
-        pathLocations.add(locationName);
-    }
-
-    public ArrayList<String> getPaths()
-    {
-        return pathLocations;
-    }
-
-    public String getPathsString()
-    {
-        String pathList = "";
-        for (String pathLocation : pathLocations)
-        {
-            pathList += pathLocation;
-            pathList += "\n";
-        }
-        return pathList;
-    }
-
-    // remove
-    public void printPaths()
-    {
-        for (String pathLocation : pathLocations)
-        {
-            System.out.println(pathLocation);
-        }
-    }
-
-    public ArrayList<String> getEntityNames()
-    {
-        Set<String> entityNames = new HashSet<String>();
-        entityNames.addAll(artefacts.keySet());
-        entityNames.addAll(furniture.keySet());
-        entityNames.addAll(characters.keySet());
-        return new ArrayList<String>(entityNames);
-    }
-
     public String getEntityType(String entityName) throws STAGException
     {
         ArrayList<Map.Entry<String, Entity>> pairs = new ArrayList<Map.Entry<String, Entity>>(artefacts.entrySet());
@@ -140,6 +101,16 @@ public class Location extends Entity
             }
         }
         throw new STAGException("No entity of that name present in this location");
+    }
+
+    // Can probably remove and just use hashmap keyset
+    public ArrayList<String> getEntityNames()
+    {
+        Set<String> entityNames = new HashSet<String>();
+        entityNames.addAll(artefacts.keySet());
+        entityNames.addAll(furniture.keySet());
+        entityNames.addAll(characters.keySet());
+        return new ArrayList<String>(entityNames);
     }
 
     public String getEntityDescriptions()
@@ -193,6 +164,32 @@ public class Location extends Entity
                 return;
             default:
         }
+    }
+
+    public void addPath(String locationName)
+    {
+        pathLocations.add(locationName);
+    }
+
+    public ArrayList<String> getPaths()
+    {
+        return pathLocations;
+    }
+
+    public String getPathsString()
+    {
+        String pathList = "";
+        for (String pathLocation : pathLocations)
+        {
+            pathList += pathLocation;
+            pathList += "\n";
+        }
+        return pathList;
+    }
+
+    public LinkedHashMap<String, Entity> getFurniture()
+    {
+        return furniture;
     }
 
     @Override

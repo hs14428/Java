@@ -1,11 +1,10 @@
-package game;
+package Game;
 
 import GameExceptions.STAGException;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 class StagServer
 {

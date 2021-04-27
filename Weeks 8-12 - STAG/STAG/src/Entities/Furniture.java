@@ -1,8 +1,8 @@
-package game;
+package Entities;
 
 public class Furniture extends Entity
 {
-    boolean furnitureUsed;
+    private boolean furnitureUsed;
 
     public Furniture(String name, String description)
     {
@@ -16,4 +16,6 @@ public class Furniture extends Entity
     {
         furnitureUsed = true;
     }
+
+    public boolean getFurnitureUsed() { return furnitureUsed; }
 }
