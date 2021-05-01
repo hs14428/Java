@@ -1,6 +1,7 @@
 package Game;
 
 import Entities.Location;
+import GameExceptions.STAGException;
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
 import com.alexmerz.graphviz.objects.Edge;
@@ -32,8 +33,7 @@ public class GraphParser
             parser.parse(reader);
             ArrayList<Graph> graphs = parser.getGraphs();
             ArrayList<Graph> subGraphs = graphs.get(0).getSubgraphs();
-            for(Graph g : subGraphs){
-                System.out.printf("id = %s\n",g.getId().getId());
+            for (Graph g : subGraphs){
                 ArrayList<Graph> subGraphs1 = g.getSubgraphs();
                 for (Graph g1 : subGraphs1){
                     ArrayList<Node> nodesLoc = g1.getNodes(false);
@@ -41,13 +41,10 @@ public class GraphParser
                     locationName = nLoc.getId().getId();
                     locationDescription = nLoc.getAttribute("description");
                     location = new Location(locationName, locationDescription);
-                    System.out.printf("\tid = %s, name = %s, description = %s\n",g1.getId().getId(), nLoc.getId().getId(), nLoc.getAttribute("description"));
                     ArrayList<Graph> subGraphs2 = g1.getSubgraphs();
                     for (Graph g2 : subGraphs2) {
-                        System.out.printf("\t\tid = %s\n", g2.getId().getId());
                         ArrayList<Node> nodesEnt = g2.getNodes(false);
                         for (Node nEnt : nodesEnt) {
-                            System.out.printf("\t\t\tid = %s, description = %s\n", nEnt.getId().getId(), nEnt.getAttribute("description"));
                             entityType = g2.getId().getId();
                             entityName = nEnt.getId().getId();
                             entityDescription = nEnt.getAttribute("description");
@@ -67,15 +64,12 @@ public class GraphParser
                     location.addPath(pathEnd);
                     // Save the updated location class back to the gameMap, now with possible path locations
                     gameMap.put(e.getSource().getNode().getId().getId(), location);
-                    System.out.printf("Path from %s to %s\n", e.getSource().getNode().getId().getId(), e.getTarget().getNode().getId().getId());
                 }
 
             }
 
-        } catch (FileNotFoundException fnfe) {
-            System.out.println(fnfe);
-        } catch (ParseException pe) {
-            System.out.println(pe);
+        } catch (FileNotFoundException | ParseException | STAGException e) {
+            System.out.println(e);
         }
     }
 

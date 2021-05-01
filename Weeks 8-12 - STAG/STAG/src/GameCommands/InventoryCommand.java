@@ -20,6 +20,7 @@ public class InventoryCommand extends GameCommand
         ArrayList<String> inventoryArrayList = new ArrayList<String>(currentPlayer.getInventory().keySet());
         String inventoryString = "";
 
+        // Add inventory items to a string to return back to player
         for (String s : inventoryArrayList)
         {
             inventoryString += s;

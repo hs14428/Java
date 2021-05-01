@@ -1,8 +1,10 @@
 package Entities;
 
+import GameExceptions.STAGException;
+
 public class EntityFactory
 {
-    public Entity makeEntity(String entityType, String name, String description)
+    public Entity makeEntity(String entityType, String name, String description) throws STAGException
     {
         switch (entityType) {
             case "artefacts":
@@ -12,7 +14,7 @@ public class EntityFactory
             case "characters":
                 return new Character(name, description);
             default:
-                return null;
+                throw new STAGException("Failed to create Entity in the factory");
         }
     }
 }

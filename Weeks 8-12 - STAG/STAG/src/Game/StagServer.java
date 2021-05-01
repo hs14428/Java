@@ -13,7 +13,7 @@ class StagServer
     public static void main(String args[])
     {
         if(args.length != 2) System.out.println("Usage: java StagServer <entity-file> <action-file>");
-        else new StagServer(args[0], args[1], 8888);
+        else new StagServer(args[0], args[1], 8889);
     }
 
     public StagServer(String entityFilename, String actionFilename, int portNumber)
@@ -47,7 +47,6 @@ class StagServer
     private void processNextCommand(BufferedReader in, BufferedWriter out) throws IOException
     {
         String line = in.readLine();
-//        out.write("You said... " + line + "\n");
         try {
             out.write(stagGame.runGame(line));
         } catch (STAGException | IOException e) {

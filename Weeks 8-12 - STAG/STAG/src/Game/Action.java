@@ -38,7 +38,7 @@ public class Action
 
     public void checkValidAction(GameEngine gameEngine) throws STAGException
     {
-        String currentCommand = gameEngine.getNextCommand();
+        String currentCommand = gameEngine.getNextCommand().toLowerCase();
         // Improve later - probs better to check name again location entities
         for (String s : subjects)
         {

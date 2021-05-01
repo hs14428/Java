@@ -6,11 +6,11 @@ import java.util.*;
 
 public class Location extends Entity
 {
-    private ArrayList<String> pathLocations = new ArrayList<>();
-    private LinkedHashMap<String, Entity> artefacts = new LinkedHashMap<>();
-    private LinkedHashMap<String, Entity> furniture = new LinkedHashMap<>();
-    private LinkedHashMap<String, Entity> characters = new LinkedHashMap<>();
-    private LinkedHashMap<String, String> otherPlayers = new LinkedHashMap<>();
+    private final ArrayList<String> pathLocations = new ArrayList<>();
+    private final LinkedHashMap<String, Entity> artefacts = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Entity> furniture = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Entity> characters = new LinkedHashMap<>();
+    private final LinkedHashMap<String, String> otherPlayers = new LinkedHashMap<>();
 
     public Location(String name, String description)
     {
@@ -26,13 +26,16 @@ public class Location extends Entity
 
     public void removePlayer(String playerName)
     {
+        String playerToRemove = null;
         for (String s : otherPlayers.keySet())
         {
             if (playerName.equals(s))
             {
-                otherPlayers.remove(playerName);
+                playerToRemove = s;
             }
         }
+        // Remove player after iterator has looped through keySet to avoid ConcurrentModificationException
+        otherPlayers.remove(playerToRemove);
     }
 
     public LinkedHashMap<String, String> getOtherPlayers()
@@ -45,22 +48,19 @@ public class Location extends Entity
         return artefacts;
     }
 
-    public void addNewEntity(String entityType, String name, String description)
+    public void addNewEntity(String entityType, String name, String description) throws STAGException
     {
         EntityFactory entityFactory = new EntityFactory();
         Entity newEntity = entityFactory.makeEntity(entityType, name, description);
         switch (entityType) {
             case "artefacts":
-                System.out.println("Adding artefact");
                 artefacts.put(name, newEntity);
                 System.out.println(artefacts.get(name).getDescription());
                 return;
             case "furniture":
-                System.out.println("Adding furniture");
                 furniture.put(name, newEntity);
                 return;
             case "characters":
-                System.out.println("Adding character");
                 characters.put(name, newEntity);
                 return;
             default:
@@ -71,13 +71,10 @@ public class Location extends Entity
     {
         switch (entityType) {
             case "artefacts":
-                System.out.println("Getting artefact");
                 return artefacts.get(name);
             case "furniture":
-                System.out.println("Getting furniture");
                 return furniture.get(name);
             case "characters":
-                System.out.println("Getting character");
                 return characters.get(name);
             default:
                 return null;
@@ -87,7 +84,6 @@ public class Location extends Entity
     public String getEntityType(String entityName) throws STAGException
     {
         ArrayList<Map.Entry<String, Entity>> pairs = new ArrayList<Map.Entry<String, Entity>>(artefacts.entrySet());
-//        Set<Map.Entry<String, Entity>> pairs = artefacts.entrySet();
         pairs.addAll(furniture.entrySet());
         pairs.addAll(characters.entrySet());
 
@@ -95,15 +91,13 @@ public class Location extends Entity
         {
             if (e.getKey().equals(entityName))
             {
-                System.out.println("entityType key: "+e.getKey());
-                System.out.println("entityType entityName: "+entityName);
                 return e.getValue().getEntityType();
             }
         }
         throw new STAGException("No entity of that name present in this location");
     }
 
-    // Can probably remove and just use hashmap keyset
+    // Can probably remove and just use hashmap keySet
     public ArrayList<String> getEntityNames()
     {
         Set<String> entityNames = new HashSet<String>();

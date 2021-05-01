@@ -13,9 +13,10 @@ public class GameEngine
 {
     private final Location startLocation;
     private Location currentLocation;
-    private LinkedHashMap<String, Location> gameMap;
-    private LinkedHashMap<String, Player> players;
-    private LinkedHashMap<String, Action> actions;
+    private final LinkedHashMap<String, Location> gameMap;
+    private final LinkedHashMap<String, Player> players;
+    private final LinkedHashMap<String, Action> actions;
+    private ArrayList<String> actionNames;
     private ArrayList<String> commands;
     private String currentPlayerName;
     private String currentCommand;
@@ -107,6 +108,7 @@ public class GameEngine
         return players.get(currentPlayerName);
     }
 
+    // Initiate fill Command array with the games base commands for running based off input
     public GameCommand[] initiateCommandArray()
     {
         // Could i change this into a factory?
@@ -123,9 +125,12 @@ public class GameEngine
 
     public String processCommands() throws STAGException
     {
-        ArrayList<String> actionNames = new ArrayList<String>(actions.keySet());
+        actionNames = new ArrayList<String>(actions.keySet());
         GameCommand[] commandType = initiateCommandArray();
         checkValidInput();
+        commands.removeAll(Arrays.asList("", null));
+        alterCommands();
+        System.out.println(commands.toString());
         currentCommand = commands.get(commandNumber++);
 
         // Check if inputted command is a standard command type
@@ -133,20 +138,44 @@ public class GameEngine
         // e.g. Please open door etc.
         for (GameCommand command : commandType)
         {
-            if (command.getCommandType().equals(currentCommand))
+            if (command.getCommandType().equalsIgnoreCase(currentCommand))
             {
                 return command.runCommand(this);
             }
         }
         // Or if it is an action trigger
+        return processActions();
+    }
+
+    public String processActions() throws STAGException
+    {
         for (String s : actionNames)
         {
             if (currentCommand.equalsIgnoreCase(s))
             {
-                return actions.get(s).performAction(this);
+                return actions.get(s.toLowerCase()).performAction(this);
             }
         }
         throw new STAGException("Input command: \""+ currentCommand +"\" not recognized");
+    }
+
+    // Method to handle some common abbreviations/situations in commands, e.g. inv instead of inventory
+    public void alterCommands()
+    {
+        int index = 0;
+        for (String s : commands)
+        {
+            if (s.equalsIgnoreCase("inv"))
+            {
+                commands.set(index, "inventory");
+            }
+            index++;
+        }
+        // Cater for polite players. Start at 1 b/c first command is name
+        if (commands.get(1).equalsIgnoreCase("please"))
+        {
+            commands.remove(1);
+        }
     }
 
     public void checkValidInput() throws STAGException
@@ -166,6 +195,11 @@ public class GameEngine
             return commands.get(commandNumber);
         }
         throw new STAGException("Not any commands left to process.");
+    }
+
+    public ArrayList<String> getCommands()
+    {
+        return commands;
     }
 
     public void setCurrentLocation(Location location)

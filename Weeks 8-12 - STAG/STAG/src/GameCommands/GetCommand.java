@@ -28,7 +28,7 @@ public class GetCommand extends GameCommand
         {
             if (currentCommand.equalsIgnoreCase(s))
             {
-                artefactToPickup = (Artefact) locationArtefacts.get(currentCommand);
+                artefactToPickup = (Artefact) locationArtefacts.get(currentCommand.toLowerCase());
                 // Add artefact to players inventory
                 gameEngine.getCurrentPlayer().addToInv(artefactToPickup);
                 // Then remove it from the current location
