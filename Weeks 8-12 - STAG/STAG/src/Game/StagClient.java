@@ -21,7 +21,7 @@ public class StagClient
             String incoming;
             System.out.print("\n" + playerName + ": ");
             String command = commandLine.readLine();
-            Socket socket = new Socket("127.0.0.1", 8889);
+            Socket socket = new Socket("127.0.0.1", 8888);
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.write(playerName + ": " + command + "\n");
