@@ -25,7 +25,7 @@ public class DropCommand extends GameCommand
 
         for (String s : inventoryItems)
         {
-            if (currentCommand.equalsIgnoreCase(s))
+            if (currentCommand.equals(s))
             {
                 artefactToDrop = gameEngine.getCurrentPlayer().getInventory().get(currentCommand);
                 // Remove artefact from players inventory

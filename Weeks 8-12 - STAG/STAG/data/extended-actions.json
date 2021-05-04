@@ -18,6 +18,14 @@
         },
 
         {
+            "triggers": ["chop"],
+            "subjects": ["coin", "axe"],
+            "consumed": ["coin"],
+            "produced": ["log2"],
+            "narration": "You cut down the tree with the axe"
+        },
+
+        {
             "triggers": ["drink"],
             "subjects": ["potion"],
             "consumed": ["potion"],

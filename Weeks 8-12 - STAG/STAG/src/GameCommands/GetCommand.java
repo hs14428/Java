@@ -26,7 +26,7 @@ public class GetCommand extends GameCommand
 
         for (String s : artefactNames)
         {
-            if (currentCommand.equalsIgnoreCase(s))
+            if (currentCommand.equals(s))
             {
                 artefactToPickup = (Artefact) locationArtefacts.get(currentCommand.toLowerCase());
                 // Add artefact to players inventory
@@ -35,12 +35,11 @@ public class GetCommand extends GameCommand
                 gameEngine.getCurrentLocation().removeEntity(artefactToPickup.getEntityType(), artefactToPickup);
                 // Then update the game map to reflect changes to location
                 // Not sure if the below is needed as location state seems to change automatically, without updating gamemap
-//                gameEngine.getGameMap().put(gameEngine.getCurrentLocation().getName(), gameEngine.getCurrentLocation());
                 returnMessage = "You picked up a ";
                 returnMessage += currentCommand;
                 return  returnMessage;
             }
         }
-        throw new STAGException("No item matches that description here");
+        throw new STAGException("No item matches that description here. Check spelling and case sensitivity");
     }
 }

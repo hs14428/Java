@@ -76,6 +76,7 @@ digraph layout {
             subgraph artefacts {
                 node [shape = "diamond"];
                 log [description = "A heavy wooden log"];
+                log2 [description = "A heavy wooden log for testing multiple actions"];
                 shovel [description = "A sturdy shovel"];
                 gold [description = "A big pot of gold"];
             }

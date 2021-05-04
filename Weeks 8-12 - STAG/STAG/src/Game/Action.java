@@ -17,38 +17,64 @@ public class Action
     private String entityType;
     private Entity entity;
     private String errorMessage;
+    private String actionName;
     private int entityCount;
 
     public Action()
     {
     }
 
-    public String performAction(GameEngine gameEngine) throws STAGException
+    public void setActionName(String actionName)
+    {
+        this.actionName = actionName;
+    }
+
+    public String getActionName()
+    {
+        return actionName;
+    }
+
+    public boolean performAction(GameEngine gameEngine) throws STAGException
     {
         // Check that word after action is valid
-        checkValidAction(gameEngine);
+        if (!checkValidAction(gameEngine))
+        {
+            return false;
+        }
 //        errorMessage = "You don't have the tools/items/surroundings required to do this action";
         if (subjectCheck(gameEngine))
         {
             consumeEntities(gameEngine);
             produceEntities(gameEngine);
         }
-        return narration;
+        return true;
     }
 
-    public void checkValidAction(GameEngine gameEngine) throws STAGException
+    public boolean checkValidAction(GameEngine gameEngine) throws STAGException
     {
         String currentCommand = gameEngine.getNextCommand().toLowerCase();
-        // Improve later - probs better to check name again location entities
         for (String s : subjects)
         {
             if (currentCommand.equals(s))
             {
-                return;
+                return true;
             }
         }
-        throw new STAGException("Invalid entity to perform action on");
+        return false;
     }
+
+//    public void checkValidAction(GameEngine gameEngine) throws STAGException
+//    {
+//        String currentCommand = gameEngine.getNextCommand().toLowerCase();
+//        for (String s : subjects)
+//        {
+//            if (currentCommand.equals(s))
+//            {
+//                return;
+//            }
+//        }
+//        throw new STAGException("Invalid entity to perform action on");
+//    }
 
     public void produceEntities(GameEngine gameEngine) throws STAGException
     {

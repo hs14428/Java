@@ -15,7 +15,8 @@ public class GameEngine
     private Location currentLocation;
     private final LinkedHashMap<String, Location> gameMap;
     private final LinkedHashMap<String, Player> players;
-    private final LinkedHashMap<String, Action> actions;
+//    private final LinkedHashMap<String, Action> actions;
+    private final ArrayList<Action> actionArrayList;
     private ArrayList<String> actionNames;
     private ArrayList<String> commands;
     private String currentPlayerName;
@@ -27,7 +28,8 @@ public class GameEngine
         GraphParser graphParser = new GraphParser(entityFilename);
         JSONParsing jsonParser = new JSONParsing(actionFilename);
         gameMap = graphParser.getGameMap();
-        actions = jsonParser.getActions();
+//        actions = jsonParser.getActions();
+        actionArrayList = jsonParser.getActionsAL();
         // Set start location to first entry on gameMap, i.e. starting location
         startLocation = gameMap.entrySet().iterator().next().getValue();
         currentLocation = startLocation;
@@ -46,10 +48,13 @@ public class GameEngine
 
     public String runGame(String incomingCommand) throws IOException, STAGException
     {
+        // Remove the colon from the player name in prep for storing inputted commands
         incomingCommand = incomingCommand.replace(":","");
+        // Split incoming commands on spaces and add to arraylist
         String[] commandArray = incomingCommand.split(" ");
         commands = new ArrayList<String>(Arrays.asList(commandArray));
         commandNumber = 0;
+        // Check if current player is first player in game, if so add new player, otherwise check current player against current players to see if need to create new player
         checkPlayers();
         // Set current location to the current players location to allow for changing between multiple players
         currentLocation = gameMap.get(getCurrentPlayer().getPlayerLocation());
@@ -62,22 +67,21 @@ public class GameEngine
         // Store playerNames HashMap keySet in ArrayList
         ArrayList<String> playerNames = new ArrayList<String>(players.keySet());
 
-        // If no players yet, add one
-        if (!checkForFirstPlayer(playerNames))
+        // Check if the first player is in the game, if so loop through and check if current player is new or not
+        if (checkForFirstPlayer(playerNames))
         {
-            return;
-        }
-        for (String s : playerNames)
-        {
-            // Loop through and check if current player is new name, if so, create new player
-            if (commands.get(0).equals(s))
+            for (String s : playerNames)
             {
-                currentPlayerName = commands.get(0);
-                commandNumber++;
-                return;
+                // Loop through and check if current player is new name, if so, create new player
+                if (commands.get(0).equals(s))
+                {
+                    currentPlayerName = commands.get(0);
+                    commandNumber++;
+                    return;
+                }
             }
+            createNewPlayer();
         }
-        createNewPlayer();
     }
 
     // Method checks if there is an initial starting player already in the game. If not add one
@@ -123,12 +127,27 @@ public class GameEngine
         return commandType;
     }
 
+    public void storeActionNames()
+    {
+        String actionName;
+        actionNames = new ArrayList<String>();
+        for (Action a : actionArrayList)
+        {
+            actionName = a.getActionName();
+            actionNames.add(actionName);
+        }
+    }
+
     public String processCommands() throws STAGException
     {
-        actionNames = new ArrayList<String>(actions.keySet());
+//        actionNames = new ArrayList<String>(actions.keySet());
+        storeActionNames();
         GameCommand[] commandType = initiateCommandArray();
+        // Check that the inputted commands isn't empty, bar name
         checkValidInput();
+        // Remove any array entries that are empty, i.e. if there was double+ spaces in input
         commands.removeAll(Arrays.asList("", null));
+        // Make minor amendments to the commands, i.e. accept inv as well as inventory
         alterCommands();
         System.out.println(commands.toString());
         currentCommand = commands.get(commandNumber++);
@@ -138,6 +157,7 @@ public class GameEngine
         // e.g. Please open door etc.
         for (GameCommand command : commandType)
         {
+            // Can ignore case because commands are built in
             if (command.getCommandType().equalsIgnoreCase(currentCommand))
             {
                 return command.runCommand(this);
@@ -149,12 +169,19 @@ public class GameEngine
 
     public String processActions() throws STAGException
     {
+        int index = 0;
         for (String s : actionNames)
         {
-            if (currentCommand.equalsIgnoreCase(s))
+            // Case sensitive for actions
+            if (currentCommand.equals(s))
             {
-                return actions.get(s.toLowerCase()).performAction(this);
+//                return actions.get(s).performAction(this);
+                if (actionArrayList.get(index).performAction(this))
+                {
+                    return actionArrayList.get(index).getNarration();
+                }
             }
+            index++;
         }
         throw new STAGException("Input command: \""+ currentCommand +"\" not recognized");
     }
@@ -162,25 +189,30 @@ public class GameEngine
     // Method to handle some common abbreviations/situations in commands, e.g. inv instead of inventory
     public void alterCommands()
     {
-        int index = 0;
-        for (String s : commands)
-        {
-            if (s.equalsIgnoreCase("inv"))
-            {
-                commands.set(index, "inventory");
-            }
-            index++;
-        }
         // Cater for polite players. Start at 1 b/c first command is name
+        // Checking for if input starts with please and removes that entry from commands ArrayList
         if (commands.get(1).equalsIgnoreCase("please"))
         {
             commands.remove(1);
+        }
+        // Allow for inv or inventory for the command
+        if (commands.get(1).equals("inv"))
+        {
+            commands.set(1, "inventory");
+        }
+        // Allow "the" to follow goto command. Remove it from commands if present
+        if (commands.get(1).equals("goto"))
+        {
+            if (commands.get(2).equalsIgnoreCase("the"))
+            {
+                commands.remove(2);
+            }
         }
     }
 
     public void checkValidInput() throws STAGException
     {
-        // First check commands is not null
+        // First check commands is not null; first entry is name so check for < 2
         if (commands.size() < 2)
         {
             throw new STAGException("Please enter a command");
