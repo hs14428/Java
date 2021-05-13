@@ -1,6 +1,5 @@
 package GameCommands;
 
-import GameExceptions.STAGException;
 import Game.GameEngine;
 
 public class HealthCommand extends GameCommand
@@ -12,7 +11,7 @@ public class HealthCommand extends GameCommand
     }
 
     @Override
-    public String runCommand(GameEngine gameEngine) throws STAGException
+    public String runCommand(GameEngine gameEngine)
     {
         String returnMessage;
         int currentPlayerHealth = gameEngine.getCurrentPlayer().getHealth();

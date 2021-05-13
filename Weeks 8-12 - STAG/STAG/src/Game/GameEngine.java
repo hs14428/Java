@@ -15,7 +15,6 @@ public class GameEngine
     private Location currentLocation;
     private final LinkedHashMap<String, Location> gameMap;
     private final LinkedHashMap<String, Player> players;
-//    private final LinkedHashMap<String, Action> actions;
     private final ArrayList<Action> actionArrayList;
     private ArrayList<String> actionNames;
     private ArrayList<String> commands;
@@ -28,7 +27,6 @@ public class GameEngine
         GraphParser graphParser = new GraphParser(entityFilename);
         JSONParsing jsonParser = new JSONParsing(actionFilename);
         gameMap = graphParser.getGameMap();
-//        actions = jsonParser.getActions();
         actionArrayList = jsonParser.getActionsAL();
         // Set start location to first entry on gameMap, i.e. starting location
         startLocation = gameMap.entrySet().iterator().next().getValue();
@@ -115,7 +113,6 @@ public class GameEngine
     // Initiate fill Command array with the games base commands for running based off input
     public GameCommand[] initiateCommandArray()
     {
-        // Could i change this into a factory?
         GameCommand[] commandType;
         GameCommand lookCMD = new LookCommand();
         GameCommand gotoCMD = new GotoCommand();
@@ -140,7 +137,6 @@ public class GameEngine
 
     public String processCommands() throws STAGException
     {
-//        actionNames = new ArrayList<String>(actions.keySet());
         storeActionNames();
         GameCommand[] commandType = initiateCommandArray();
         // Check that the inputted commands isn't empty, bar name
@@ -153,8 +149,6 @@ public class GameEngine
         currentCommand = commands.get(commandNumber++);
 
         // Check if inputted command is a standard command type
-        // Will need to add features allow for first word not being a trigger or command
-        // e.g. Please open door etc.
         for (GameCommand command : commandType)
         {
             // Can ignore case because commands are built in
@@ -175,15 +169,16 @@ public class GameEngine
             // Case sensitive for actions
             if (currentCommand.equals(s))
             {
-//                return actions.get(s).performAction(this);
+                // Check that performing the action is actually possible in current gamestate/location
                 if (actionArrayList.get(index).performAction(this))
                 {
+                    // If so, return relevant game update to player
                     return actionArrayList.get(index).getNarration();
                 }
             }
             index++;
         }
-        throw new STAGException("Input command: \""+ currentCommand +"\" not recognized");
+        throw new STAGException("Input not recognized, check your spelling");
     }
 
     // Method to handle some common abbreviations/situations in commands, e.g. inv instead of inventory
@@ -210,6 +205,7 @@ public class GameEngine
         }
     }
 
+    // Check that the player input is populated
     public void checkValidInput() throws STAGException
     {
         // First check commands is not null; first entry is name so check for < 2

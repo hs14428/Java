@@ -16,12 +16,13 @@ public class Action
     private String narration;
     private String entityType;
     private Entity entity;
-    private String errorMessage;
     private String actionName;
     private int entityCount;
+    private boolean isDead;
 
     public Action()
     {
+        isDead = false;
     }
 
     public void setActionName(String actionName)
@@ -41,7 +42,6 @@ public class Action
         {
             return false;
         }
-//        errorMessage = "You don't have the tools/items/surroundings required to do this action";
         if (subjectCheck(gameEngine))
         {
             consumeEntities(gameEngine);
@@ -50,6 +50,7 @@ public class Action
         return true;
     }
 
+    // Check that the word inputted after the action is a valid subject type by comparing to subjects arraylist
     public boolean checkValidAction(GameEngine gameEngine) throws STAGException
     {
         String currentCommand = gameEngine.getNextCommand().toLowerCase();
@@ -63,19 +64,7 @@ public class Action
         return false;
     }
 
-//    public void checkValidAction(GameEngine gameEngine) throws STAGException
-//    {
-//        String currentCommand = gameEngine.getNextCommand().toLowerCase();
-//        for (String s : subjects)
-//        {
-//            if (currentCommand.equals(s))
-//            {
-//                return;
-//            }
-//        }
-//        throw new STAGException("Invalid entity to perform action on");
-//    }
-
+    // Method to produce any entities that need to be made after successful action call
     public void produceEntities(GameEngine gameEngine) throws STAGException
     {
         String originalLocation = gameEngine.getCurrentLocation().getName();
@@ -104,6 +93,7 @@ public class Action
                     gameEngine.getCurrentLocation().addEntity(entityType, entity);
                 }
             } else {
+                // If it is a location then:
                 // Add the new location to available paths from original location
                 gameEngine.getCurrentLocation().addPath(s);
             }
@@ -137,6 +127,7 @@ public class Action
         }
     }
 
+    // Method to check if the produced output of an action is a location
     public boolean checkIfLocation(GameEngine gameEngine, String entityName)
     {
         ArrayList<String> locationNames = new ArrayList<String>(gameEngine.getGameMap().keySet());
@@ -150,6 +141,7 @@ public class Action
         return false;
     }
 
+    // Master method to consume all relevant entities after a succesful action
     public void consumeEntities(GameEngine gameEngine) throws STAGException
     {
         consumeLocationEntities(gameEngine);
@@ -157,15 +149,19 @@ public class Action
         consumeHealth(gameEngine);
     }
 
+    // Consumes health if its included in the consumed array
     public void consumeHealth(GameEngine gameEngine)
     {
         for (String s : consumed)
         {
             if (s.equalsIgnoreCase("health"))
             {
+                // If player health is at 1, then they are about to die and special things must happen
                 if (gameEngine.getCurrentPlayer().getHealth() == 1)
                 {
-                    narration = "Oh dear, you died! You dropped all your items and respawned at the start";
+                    // Set isDead to true so that the user can be told that they have died
+                    isDead = true;
+                    // Drop all the current inventory items in the current location.
                     dropItems(gameEngine);
                     gameEngine.getCurrentPlayer().resetHealth();
                     // Remove player from location as they have died
@@ -174,6 +170,7 @@ public class Action
                     gameEngine.getStartLocation().addPlayer(gameEngine.getCurrentPlayer().getName());
                     gameEngine.getCurrentPlayer().setPlayerLocation(gameEngine.getStartLocation().getName());
                 } else {
+                    isDead = false;
                     gameEngine.getCurrentPlayer().reduceHealth();
                 }
             }
@@ -233,8 +230,8 @@ public class Action
         }
     }
 
-    // Check location for action subject entities
-    public void checkLocationEntities(GameEngine gameEngine) throws STAGException
+    // Check location for action subject entities by counting total entities
+    public void checkLocationEntities(GameEngine gameEngine)
     {
         ArrayList<String> locationEntityNames = gameEngine.getCurrentLocation().getEntityNames();
         for (String s : subjects)
@@ -245,13 +242,6 @@ public class Action
                 {
                     // If one of subject entities is present in the location, add to count
                     entityCount++;
-//                    // If the subject entity is furniture, set it to used
-//                    entityType = gameEngine.getCurrentLocation().getEntityType(s);
-//                    if (entityType.equals("furniture"))
-//                    {
-//                        Furniture furniture = (Furniture) gameEngine.getCurrentLocation().getFurniture().get(s);
-//                        furniture.setFurnitureUsed();
-//                    }
                 }
             }
         }
@@ -274,46 +264,19 @@ public class Action
         }
     }
 
-    // Add feature to say e.g. door is already open??
+    // Check if all the required subjects are present in the inventory and current location to perform and action
     public boolean subjectCheck(GameEngine gameEngine) throws STAGException
     {
         entityCount = 0;
         checkLocationEntities(gameEngine);
         checkInventoryEntities(gameEngine);
+        // If the checkers have counted the correct number of subjects required, return true
         if (entityCount == subjects.size())
         {
             return true;
         }
-//        checkIfFurnitureUsed(gameEngine);
-//        throw new STAGException("You don't have the tools/items required to do this");
-        errorMessage = "You don't have the tools/items/surroundings required to do this action";
+        String errorMessage = "You don't have the tools/items/surroundings required to do this action";
         throw new STAGException(errorMessage);
-    }
-
-    public void setFurnitureUsed(GameEngine gameEngine, String entityType, String furnitureName)
-    {
-        if (entityType.equals("furniture"))
-        {
-            Furniture furniture = (Furniture) gameEngine.getCurrentLocation().getFurniture().get(furnitureName);
-            furniture.setFurnitureUsed();
-        }
-    }
-
-    public void checkIfFurnitureUsed(GameEngine gameEngine)
-    {
-        ArrayList<String> locationEntityNames = new ArrayList<String>(gameEngine.getCurrentLocation().getFurniture().keySet());
-        for (String s : locationEntityNames)
-        {
-            Furniture furniture = (Furniture) gameEngine.getCurrentLocation().getFurniture().get(s);
-            if (furniture.getFurnitureUsed())
-            {
-                System.out.println("furniture used");
-                errorMessage = "You have already interacted with this piece of furniture";
-            } else {
-                System.out.println("furniture not used");
-                errorMessage = "You don't have the tools/items/surroundings required to do this action";
-            }
-        }
     }
 
     public void setNarration(String narration)
@@ -321,25 +284,20 @@ public class Action
         this.narration = narration;
     }
 
+    // Special getter that returns normal action narration, unless you deeeeed.
     public String getNarration()
     {
-        return narration;
+        if (!isDead)
+        {
+            return narration;
+        } else {
+            return "Oh dear, you died! You dropped all your items and respawned at the start";
+        }
     }
 
     public void setSubjects(ArrayList<String> subjects)
     {
         this.subjects = subjects;
-    }
-
-    public String printSubjects()
-    {
-        String subjectsString = "";
-
-        for (String s : subjects)
-        {
-            subjectsString += s;
-        }
-        return subjectsString;
     }
 
     public void setConsumed(ArrayList<String> subjects)

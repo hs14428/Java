@@ -34,7 +34,6 @@ public class GetCommand extends GameCommand
                 // Then remove it from the current location
                 gameEngine.getCurrentLocation().removeEntity(artefactToPickup.getEntityType(), artefactToPickup);
                 // Then update the game map to reflect changes to location
-                // Not sure if the below is needed as location state seems to change automatically, without updating gamemap
                 returnMessage = "You picked up a ";
                 returnMessage += currentCommand;
                 return  returnMessage;

@@ -8,11 +8,9 @@ import org.json.simple.parser.ParseException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 public class JSONParsing
 {
-//    private final LinkedHashMap<String, Action> actionsHashMap = new LinkedHashMap<>();
     private final ArrayList<Action> actionArrayList = new ArrayList<>();
 
     public JSONParsing(String actionFilename) throws IOException, ParseException
@@ -31,15 +29,6 @@ public class JSONParsing
             ArrayList<String> produced = (ArrayList<String>) jsonAction.get("produced");
             String narration = (String) jsonAction.get("narration");
 
-            // Have assumed trigger names are unique
-//            for (String s : triggers)
-//            {
-//                newAction.setSubjects(subjects);
-//                newAction.setConsumed(consumed);
-//                newAction.setProduced(produced);
-//                newAction.setNarration(narration);
-//                actionsHashMap.put(s, newAction);
-//            }
             for (String s : triggers)
             {
                 newAction = new Action();
@@ -52,11 +41,6 @@ public class JSONParsing
             }
         }
     }
-
-//    public LinkedHashMap<String, Action> getActions()
-//    {
-//        return actionsHashMap;
-//    }
 
     public ArrayList<Action> getActionsAL()
     {

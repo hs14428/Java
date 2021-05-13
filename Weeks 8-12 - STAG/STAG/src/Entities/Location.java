@@ -24,6 +24,7 @@ public class Location extends Entity
         otherPlayers.put(playerName, playerName);
     }
 
+    // Method to remove players from the players present in location hashmap
     public void removePlayer(String playerName)
     {
         String playerToRemove = null;
@@ -48,14 +49,15 @@ public class Location extends Entity
         return artefacts;
     }
 
+    // Add new entity to the location; primarily used during the entity parsing, but also for when unlocking new entities after succesful action
     public void addNewEntity(String entityType, String name, String description) throws STAGException
     {
+        // Use the factory design pattern to save complexity and make entity creating simpler
         EntityFactory entityFactory = new EntityFactory();
         Entity newEntity = entityFactory.makeEntity(entityType, name, description);
         switch (entityType) {
             case "artefacts":
                 artefacts.put(name, newEntity);
-                System.out.println(artefacts.get(name).getDescription());
                 return;
             case "furniture":
                 furniture.put(name, newEntity);
@@ -81,6 +83,7 @@ public class Location extends Entity
         }
     }
 
+    // Method for getting the type of an entity, e.g. artefact, furniture etc, as is used for flexibly working with entities
     public String getEntityType(String entityName) throws STAGException
     {
         ArrayList<Map.Entry<String, Entity>> pairs = new ArrayList<Map.Entry<String, Entity>>(artefacts.entrySet());
@@ -97,7 +100,7 @@ public class Location extends Entity
         throw new STAGException("No entity of that name present in this location");
     }
 
-    // Can probably remove and just use hashmap keySet
+    // Get all the entity names in a location into an ArrayList
     public ArrayList<String> getEntityNames()
     {
         Set<String> entityNames = new HashSet<String>();
@@ -107,6 +110,7 @@ public class Location extends Entity
         return new ArrayList<String>(entityNames);
     }
 
+    // Get the entity descriptions for presenting to the player at appropriate times
     public String getEntityDescriptions()
     {
         String descriptionsString = "";
@@ -128,6 +132,7 @@ public class Location extends Entity
         return descriptionsString;
     }
 
+    // For adding entities that are already present in the game world into current location
     public void addEntity(String entityType, Entity entity)
     {
         switch (entityType) {
@@ -160,6 +165,7 @@ public class Location extends Entity
         }
     }
 
+    // Add to the list of potential path routes in the current location
     public void addPath(String locationName)
     {
         pathLocations.add(locationName);
@@ -179,11 +185,6 @@ public class Location extends Entity
             pathList += "\n";
         }
         return pathList;
-    }
-
-    public LinkedHashMap<String, Entity> getFurniture()
-    {
-        return furniture;
     }
 
     @Override

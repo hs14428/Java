@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 
 public class Player extends Entity
 {
-    private LinkedHashMap<String, Artefact> inventory = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Artefact> inventory = new LinkedHashMap<>();
     private int health;
     private String playerLocation;
 

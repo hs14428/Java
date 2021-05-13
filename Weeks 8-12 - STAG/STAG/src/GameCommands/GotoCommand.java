@@ -4,10 +4,7 @@ import GameExceptions.STAGException;
 import Game.GameEngine;
 import Entities.Location;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
 
 public class GotoCommand extends GameCommand
 {
@@ -26,6 +23,7 @@ public class GotoCommand extends GameCommand
         {
             if (currentCommand.equalsIgnoreCase(s))
             {
+                // If valid location to move to, go there and look around automatically
                 movePlayer(gameEngine, currentCommand);
                 return new LookCommand().runCommand(gameEngine);
             }
@@ -64,6 +62,7 @@ public class GotoCommand extends GameCommand
             // Check if inputted commands is equal to the a possible path description
             if (stringifiedCommands.equalsIgnoreCase(locationDescription))
             {
+                // If valid location to move to, go there and look around automatically
                 movePlayer(gameEngine, locationName);
                 return new LookCommand().runCommand(gameEngine);
             }
